@@ -473,7 +473,7 @@
 <nav>
   <div class="nav-inner">
     <button class="nav-btn active" onclick="showSection('home')">🏠 <span data-i18n="nav_home">Accueil</span></button>
-    <button class="nav-btn" onclick="showSection('troops')">⚔️ <span data-i18n="nav_troops">Troupes</span></button>
+    <button class="nav-btn" onclick="showSection('troops')">⚔️ <span data-i18n="nav_troops">Héros</span></button>
     <button class="nav-btn" onclick="showSection('events')">📅 <span data-i18n="nav_events">Événements</span></button>
   </div>
 </nav>
@@ -492,7 +492,7 @@
       <div class="quick-link" onclick="showSection('troops')">
         <span class="ql-icon">⚔️</span>
         <div class="ql-text">
-          <strong data-i18n="nav_troops">Troupes</strong>
+          <strong data-i18n="nav_troops">Héros</strong>
           <span data-i18n="home_ql_troops">Stratégies</span>
         </div>
       </div>
@@ -518,31 +518,31 @@
 
     <div class="callout">
       <strong data-i18n="troops_tip_title">💡 CONSEIL :</strong>
-      <span data-i18n="troops_tip_text"> N'utilisez JAMAIS MIA pour les combats.</span>
+      <span data-i18n="troops_tip_text"> N'utilisez JAMAIS MIA ni les Récolteurs pour les combats.</span>
     </div>
 
     <div class="cards-grid">
 
-      <!-- Troupe 1 -->
+      <!-- Récoltes -->
       <div class="card">
-        <div class="card-tier tier-1" data-i18n="tier1">Rare</div>
-        <div class="card-name" data-i18n="troop1_name">Récolteur</div>
-        <div class="card-desc" data-i18n="troop1_desc">Héros de base. Idéal pour collecter des ressources uniquement.</div>
+        <div class="card-tier tier-1" data-i18n="tier1">Récoltes</div>
+        <div class="card-name" data-i18n="troop1_name">Récolteurs</div>
+        <div class="card-desc" data-i18n="troop1_desc">Idéal pour collecter des ressources uniquement.</div>
         <div class="stat-row"><img src="images/Rare - Aiksen.jpg" alt="Aiksen" style="width:20%; border-radius:4px; margin-bottom:12px;"><img src="images/Rare - Durga.jpg" alt="Durga" style="width:20%; border-radius:4px; margin-bottom:12px;"><img src="images/Rare - Harton.jpg" alt="Harton" style="width:20%; border-radius:4px; margin-bottom:12px;"><img src="images/Rare - Pasino.jpg" alt="Pasino" style="width:20%; border-radius:4px; margin-bottom:12px;"></div>
         <div class="stat-row"><span class="stat-label" data-i18n="stat_role">RÔLE</span><span class="stat-value warn" data-i18n="role_farm">Collecte</span></div>
-        <div class="stat-row"><span class="stat-label" data-i18n="stat_rec">RECOMMANDÉ</span><span class="stat-value bad" data-i18n="rec_no">PAS DE COMBAT</span></div>
+        <div class="stat-row"><span class="stat-label" data-i18n="stat_rec">RECOMMANDATION</span><span class="stat-value bad" data-i18n="rec_no">PAS DE COMBAT</span></div>
       </div>
 
-      <!-- Troupe 2 -->
+      <!-- Arenes -->
       <div class="card">
-        <div class="card-tier tier-2" data-i18n="tier2">TIER 2</div>
-        <div class="card-name" data-i18n="troop2_name">FANTASSIN</div>
-        <div class="card-desc" data-i18n="troop2_desc">Troupe polyvalente. Bon rapport coût / efficacité pour les débutants.</div>
-        <div class="stat-row"><span class="stat-label">ATK</span><span class="stat-value">280</span></div>
-        <div class="stat-row"><span class="stat-label">DEF</span><span class="stat-value">220</span></div>
-        <div class="stat-row"><span class="stat-label">HP</span><span class="stat-value">1 200</span></div>
-        <div class="stat-row"><span class="stat-label" data-i18n="stat_role">RÔLE</span><span class="stat-value warn" data-i18n="role_poly">Polyvalent</span></div>
-        <div class="stat-row"><span class="stat-label" data-i18n="stat_rec">RECOMMANDÉ</span><span class="stat-value warn" data-i18n="rec_mid">Possible</span></div>
+        <div class="card-tier tier-2" data-i18n="tier2">Arène/Arrestation/...</div>
+        <div class="card-desc" data-i18n="troop2_desc1">Concerne tous les combats où l'on doit placer 5 héros et 2 robots (Arène, arrestation, légende KOF, bataille de l'alliance...) </div>
+        <div class="card-desc" data-i18n="troop2_desc2">Prendre en compte uniquement les compétences d'arrestation.</div>
+        <div class="stat-row"><span class="stat-label" data-i18n="troop2_label1">Première ligne</span></div>
+
+        <div class="stat-row"><span class="stat-label" data-i18n="troop2_label2">Robots</span></div>
+
+        <div class="stat-row"><span class="stat-label" data-i18n="troop2_label3">Seconde ligne</span></div>
       </div>
 
       <!-- Troupe 3 -->
@@ -666,21 +666,22 @@
 // ══════════════════════════════════════════
 const i18n = {
   fr: {
-    nav_home: "Accueil", nav_troops: "Troupes", nav_events: "Événements",
-    home_title: "BIENVENUE, COMMANDANT",
-    home_desc: "Ce wiki est le manuel de terrain officiel de notre alliance. Retrouvez ici les guides de troupes, les événements à venir et toutes les informations stratégiques.",
-    home_ql_troops: "Stats & stratégies", home_ql_events: "Calendrier & guides",
-    home_notice_title: "📢 NOTICE :", home_notice_text: " Ce wiki est en lecture seule. Pour toute suggestion, contactez un officier de l'alliance.",
-    troops_title: "GUIDE DES TROUPES", troops_sub: "// UNITÉS DISPONIBLES — STATISTIQUES ET RECOMMANDATIONS",
-    troops_tip_title: "💡 CONSEIL :", troops_tip_text: " Privilégiez les troupes T3+ pour les guerres d'alliance. Les T1 sont à réserver à la collecte de ressources.",
-    tier1:"TIER 1", tier2:"TIER 2", tier3:"TIER 3", tier4:"TIER 4",
-    troop1_name:"Milice", troop1_desc:"Troupe de base. Peu coûteuse, idéale pour débuter et collecter des ressources.",
-    troop2_name:"Fantassin", troop2_desc:"Troupe polyvalente. Bon rapport coût / efficacité pour les débutants.",
+    nav_home: "Accueil", nav_troops: "Héros", nav_events: "Événements",
+    home_title: "BIENVENUE",
+    home_desc: "Ce wiki est le manuel de terrain officiel de notre alliance. Retrouvez ici les guides de troupes et toutes les informations stratégiques.",
+    home_ql_troops: "Stratégies", home_ql_events: "Guides",
+    home_notice_title: "📢 NOTICE :", home_notice_text: " Ce wiki est en lecture seule. Pour toute suggestion, contactez Schnereux23.",
+    troops_title: "GUIDE DES HEROS", troops_sub: "// RECOMMANDATIONS DES HEROS",
+    troops_tip_title: "💡 CONSEIL :", troops_tip_text: " N'utilisez JAMAIS MIA pour les combats.",
+    tier1:"Récolteurs", tier2:"Arène/Arrestation/...", tier3:"Attaques", tier4:"TIER 4",
+    troop1_name:"Récolteurs", troop1_desc:"Idéal pour collecter des ressources uniquement.",
+    troop2_desc1:"Toujours placer les tireurs en 1ere position.", troop2_desc2:"Prendre en compte uniquement les compétences d'arrestation.",
+    troop2label1:"Première ligne", troop2label2:"Robots", troop2label3:"Seconde ligne",
     troop3_name:"Garde d'Élite", troop3_desc:"Unité recommandée pour les guerres. Excellente défense et bon ATK.",
     troop4_name:"Commando", troop4_desc:"Unité d'élite. Réservée aux membres avancés. Coût élevé mais dévastateur.",
     stat_role:"RÔLE", stat_rec:"RECOMMANDÉ",
     role_farm:"Collecte", role_poly:"Polyvalent", role_war:"Guerre", role_elite:"Élite",
-    rec_no:"Non — Guerre", rec_mid:"Possible", rec_yes:"✔ Oui", rec_yes2:"✔ Prioritaire",
+    rec_no:"PAS DE COMBAT", rec_mid:"Possible", rec_yes:"✔ Oui", rec_yes2:"✔ Prioritaire",
     troops_table_title:"COMPARATIF RAPIDE",
     col_tier:"TIER", col_name:"NOM", col_role:"RÔLE",
     events_title:"ÉVÉNEMENTS", events_sub:"// CALENDRIER ET GUIDES DE L'ALLIANCE",
@@ -698,7 +699,7 @@ const i18n = {
   },
   en: {
     nav_home:"Home", nav_troops:"Troops", nav_events:"Events",
-    home_title:"WELCOME, COMMANDER",
+    home_title:"WELCOME",
     home_desc:"This wiki is the official field manual of our alliance. Find troop guides, upcoming events and all strategic information here.",
     home_ql_troops:"Stats & strategies", home_ql_events:"Calendar & guides",
     home_notice_title:"📢 NOTICE:", home_notice_text:" This wiki is read-only. For any suggestion, contact an alliance officer.",
