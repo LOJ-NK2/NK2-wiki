@@ -18,6 +18,8 @@
       --text:      #d4d8e0;
       --muted:     #6b7280;
       --green:     #2ecc71;
+      --blue:      #3498db;
+      --violet:    #9b59b6;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -247,8 +249,8 @@
       display: inline-block;
       margin-bottom: 12px;
     }
-    .tier-1 { color: var(--green); border-color: var(--green); }
-    .tier-2 { color: #3498db; border-color: #3498db; }
+    .tier-1 { color: var(--blue); border-color: var(--blue); }
+    .tier-2 { color: var(--violet); border-color: var(--violet); }
     .tier-3 { color: var(--accent); border-color: var(--accent); }
     .tier-4 { color: var(--danger); border-color: var(--danger); }
 
@@ -447,8 +449,8 @@
   <div class="header-inner">
     <div class="header-emblem">⚔️</div>
     <div class="header-text">
-      <h1>ALLIANCE <span>WIKI</span></h1>
-      <p>// LAND OF JAIL — FIELD MANUAL</p>
+      <h1>NK2 <span>WIKI</span></h1>
+      <p>// LAND OF JAIL</p>
     </div>
     <div class="header-badge">● ONLINE</div>
   </div>
@@ -458,12 +460,12 @@
 <div class="lang-bar">
   <div class="lang-inner">
     <span class="lang-label">LANG</span>
-    <button class="lang-btn active" onclick="setLang('fr')">🇫🇷 FR</button>
-    <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
-    <button class="lang-btn" onclick="setLang('it')">🇮🇹 IT</button>
-    <button class="lang-btn" onclick="setLang('pt')">🇧🇷 PT</button>
-    <button class="lang-btn" onclick="setLang('ar')">🇸🇦 AR</button>
-    <button class="lang-btn" onclick="setLang('ja')">🇯🇵 JA</button>
+    <button class="lang-btn active" onclick="setLang('fr')">🇫🇷</button>
+    <button class="lang-btn" onclick="setLang('en')">🇬🇧</button>
+    <button class="lang-btn" onclick="setLang('it')">🇮🇹</button>
+    <button class="lang-btn" onclick="setLang('pt')">🇧🇷</button>
+    <button class="lang-btn" onclick="setLang('ar')">🇸🇦</button>
+    <button class="lang-btn" onclick="setLang('ja')">🇯🇵</button>
   </div>
 </div>
 
@@ -482,8 +484,8 @@
   <!-- ══ HOME ══ -->
   <div id="section-home" class="section active">
     <div class="welcome-banner">
-      <h2 data-i18n="home_title">BIENVENUE, COMMANDANT</h2>
-      <p data-i18n="home_desc">Ce wiki est le manuel de terrain officiel de notre alliance. Retrouvez ici les guides de troupes, les événements à venir et toutes les informations stratégiques.</p>
+      <h2 data-i18n="home_title">BIENVENUE</h2>
+      <p data-i18n="home_desc">Ce wiki est le manuel de terrain officiel de notre alliance. Retrouvez ici les guides de troupes et toutes les informations stratégiques.</p>
     </div>
 
     <div class="quick-links">
@@ -491,46 +493,44 @@
         <span class="ql-icon">⚔️</span>
         <div class="ql-text">
           <strong data-i18n="nav_troops">Troupes</strong>
-          <span data-i18n="home_ql_troops">Stats & stratégies</span>
+          <span data-i18n="home_ql_troops">Stratégies</span>
         </div>
       </div>
       <div class="quick-link" onclick="showSection('events')">
         <span class="ql-icon">📅</span>
         <div class="ql-text">
           <strong data-i18n="nav_events">Événements</strong>
-          <span data-i18n="home_ql_events">Calendrier & guides</span>
+          <span data-i18n="home_ql_events">Guides</span>
         </div>
       </div>
     </div>
 
     <div class="callout">
       <strong data-i18n="home_notice_title">📢 NOTICE :</strong>
-      <span data-i18n="home_notice_text"> Ce wiki est en lecture seule. Pour toute suggestion, contactez un officier de l'alliance.</span>
+      <span data-i18n="home_notice_text"> Ce wiki est en lecture seule. Pour toute suggestion, contactez Schnereux23.</span>
     </div>
   </div>
 
   <!-- ══ TROOPS ══ -->
   <div id="section-troops" class="section">
-    <div class="section-title" data-i18n="troops_title">GUIDE DES TROUPES</div>
-    <div class="section-sub" data-i18n="troops_sub">// UNITÉS DISPONIBLES — STATISTIQUES ET RECOMMANDATIONS</div>
+    <div class="section-title" data-i18n="troops_title">GUIDE DES HEROS</div>
+    <div class="section-sub" data-i18n="troops_sub">// RECOMMANDATIONS DES HEROS</div>
 
     <div class="callout">
       <strong data-i18n="troops_tip_title">💡 CONSEIL :</strong>
-      <span data-i18n="troops_tip_text"> Privilégiez les troupes T3+ pour les guerres d'alliance. Les T1 sont à réserver à la collecte de ressources.</span>
+      <span data-i18n="troops_tip_text"> N'utilisez JAMAIS MIA pour les combats.</span>
     </div>
 
     <div class="cards-grid">
 
       <!-- Troupe 1 -->
       <div class="card">
-        <div class="card-tier tier-1" data-i18n="tier1">TIER 1</div>
-        <div class="card-name" data-i18n="troop1_name">MILICE</div>
-        <div class="card-desc" data-i18n="troop1_desc">Troupe de base. Peu coûteuse, idéale pour débuter et collecter des ressources.</div>
-        <div class="stat-row"><span class="stat-label">ATK</span><span class="stat-value">120</span></div>
-        <div class="stat-row"><span class="stat-label">DEF</span><span class="stat-value">80</span></div>
-        <div class="stat-row"><span class="stat-label">HP</span><span class="stat-value">500</span></div>
+        <div class="card-tier tier-1" data-i18n="tier1">Rare</div>
+        <div class="card-name" data-i18n="troop1_name">Récolteur</div>
+        <div class="card-desc" data-i18n="troop1_desc">Héros de base. Idéal pour collecter des ressources uniquement.</div>
+        <div class="stat-row"><img src="images/Rare - Aiksen.jpg" alt="Aiksen" style="width:100%; border-radius:4px; margin-bottom:12px;"></div>
         <div class="stat-row"><span class="stat-label" data-i18n="stat_role">RÔLE</span><span class="stat-value warn" data-i18n="role_farm">Collecte</span></div>
-        <div class="stat-row"><span class="stat-label" data-i18n="stat_rec">RECOMMANDÉ</span><span class="stat-value bad" data-i18n="rec_no">Non — Guerre</span></div>
+        <div class="stat-row"><span class="stat-label" data-i18n="stat_rec">RECOMMANDÉ</span><span class="stat-value bad" data-i18n="rec_no">PAS DE COMBAT</span></div>
       </div>
 
       <!-- Troupe 2 -->
