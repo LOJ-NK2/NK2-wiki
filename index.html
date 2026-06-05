@@ -91,18 +91,8 @@
       letter-spacing: 2px;
       margin-top: 6px;
     }
-    .header-badge {
-      margin-left: auto;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--green);
-      border: 1px solid var(--green);
-      padding: 4px 10px;
-      letter-spacing: 1px;
-      opacity: 0.8;
-    }
 
-    /* ── LANG BAR ── */
+        /* ── LANG BAR ── */
     .lang-bar {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -250,8 +240,8 @@
       margin-bottom: 12px;
     }
     .tier-1 { color: var(--blue); border-color: var(--blue); }
-    .tier-2 { color: var(--violet); border-color: var(--violet); }
-    .tier-3 { color: var(--accent); border-color: var(--accent); }
+    .tier-2 { color: var(--accent); border-color: var(--accent); }
+    .tier-3 { color: var(--danger); border-color: var(--danger); }
     .tier-4 { color: var(--danger); border-color: var(--danger); }
 
     .card-name {
@@ -346,7 +336,7 @@
     /* ── TABLE ── */
     .data-table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
       font-size: 0.85rem;
       margin-bottom: 32px;
       overflow-x: auto;
@@ -359,12 +349,13 @@
       color: var(--accent);
       border-bottom: 1px solid var(--accent);
       padding: 10px 14px;
-      text-align: left;
+      text-align: center;
       background: var(--card);
     }
     .data-table td {
       padding: 10px 14px;
       border-bottom: 1px solid var(--border);
+      text-align: center;
       color: var(--text);
     }
     .data-table tr:hover td { background: rgba(255,255,255,0.02); }
@@ -436,7 +427,7 @@
     .hero-strip-imgs {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
     }
     .hero-thumb {
       display: flex;
@@ -454,7 +445,7 @@
       background: var(--surface);
       transition: border-color 0.2s, transform 0.2s;
     }
-    .hero-thumb img:hover { border-color: var(--accent); transform: scale(1.08); }
+    .hero-thumb img:hover { border-color: var(--accent); transform: scale(1.2); }
     .hero-thumb span {
       font-family: 'Share Tech Mono', monospace;
       font-size: 0.58rem;
@@ -496,7 +487,6 @@
       <h1>NK2 <span>WIKI</span></h1>
       <p>// LAND OF JAIL</p>
     </div>
-    <div class="header-badge">● ONLINE</div>
   </div>
 </header>
 
@@ -518,7 +508,9 @@
   <div class="nav-inner">
     <button class="nav-btn active" onclick="showSection('home')">🏠 <span data-i18n="nav_home">Accueil</span></button>
     <button class="nav-btn" onclick="showSection('troops')">⚔️ <span data-i18n="nav_troops">Héros</span></button>
+    <!--
     <button class="nav-btn" onclick="showSection('events')">📅 <span data-i18n="nav_events">Événements</span></button>
+  -->
   </div>
 </nav>
 
@@ -540,6 +532,7 @@
           <span data-i18n="home_ql_troops">Stratégies</span>
         </div>
       </div>
+      <!--
       <div class="quick-link" onclick="showSection('events')">
         <span class="ql-icon">📅</span>
         <div class="ql-text">
@@ -547,11 +540,12 @@
           <span data-i18n="home_ql_events">Guides</span>
         </div>
       </div>
+    -->
     </div>
 
     <div class="callout">
-      <strong data-i18n="home_notice_title">📢 NOTICE :</strong>
-      <span data-i18n="home_notice_text"> Ce wiki est en lecture seule. Pour toute suggestion, contactez Schnereux23.</span>
+      <strong data-i18n="home_notice_title">📢 NOTE :</strong>
+      <span data-i18n="home_notice_text"> Pour toute suggestion, contactez Schnereux23.</span>
     </div>
   </div>
 
@@ -562,7 +556,7 @@
 
     <div class="callout">
       <strong data-i18n="troops_tip_title">💡 CONSEIL :</strong>
-      <span data-i18n="troops_tip_text"> N'utilisez JAMAIS MIA ni les Récolteurs pour les combats.</span>
+      <span data-i18n="troops_tip_text"> N'utilisez JAMAIS MIA ni les Récolteurs pour les combats. Ce n'est pas par ce qu'un héros à moins de puissance ou moins d'étoiles qu'un autre qu'il est moins fort.</span>
     </div>
 
     <div class="cards-grid">
@@ -593,54 +587,61 @@
         <div class="hero-strip">
           <span class="hero-strip-label" data-i18n="troop2_label1">Première ligne</span>
           <div class="hero-strip-imgs">
-            <div class="hero-thumb"><img data-hero="phenix" alt="Aiksen"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Durga" alt="Durga"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Harton" alt="Harton"><span>Haccccccrton</span></div>
-            <div class="hero-thumb"><img data-hero="Pasino" alt="Pasino"><span>cccccc</span></div>
+            <div class="hero-thumb"><img data-hero="marcus" alt="marcus"><span>Marcus</span></div>
+            <div class="hero-thumb"><img data-hero="tyronn" alt="tyronn"><span>Tyronn</span></div>
+            <div class="hero-thumb"><img data-hero="phenix" alt="phenix"><span>Phenix</span></div>
+            <div class="hero-thumb"><img data-hero="koschevoi" alt="koschevoi"><span>Koschevoi</span></div>
+            <div class="hero-thumb"><img data-hero="tormund" alt="tormund"><span>Tormund</span></div>
+            <div class="hero-thumb"><img data-hero="xuanming" alt="xuanming"><span>Xuanming</span></div>
+            <div class="hero-thumb"><img data-hero="cesar" alt="cesar"><span>Cesar</span></div>
+            <div class="hero-thumb"><img data-hero="ito" alt="ito"><span>Ito</span></div>
+            <div class="hero-thumb"><img data-hero="lanchester" alt="lanchester"><span>Lanchester</span></div>
+            <div class="hero-thumb"><img data-hero="zoltan" alt="zoltan"><span>Zoltan</span></div>
+            <div class="hero-thumb"><img data-hero="whisper" alt="whisper"><span>Whisper</span></div>
+            <div class="hero-thumb"><img data-hero="vivian" alt="vivian"><span>Vivian</span></div>
+            <div class="hero-thumb"><img data-hero="gerd" alt="gerd"><span>Gerd</span></div>        
           </div>
         </div>
         <div class="hero-strip">
           <span class="hero-strip-label" data-i18n="troop2_label2">Robots</span>
-          <div class="hero-strip-imgs">
-            <div class="hero-thumb"><img data-hero="Aiksen" alt="Aiksen"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Durga" alt="Durga"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Harton" alt="Harton"><span>Haccccccrton</span></div>
-            <div class="hero-thumb"><img data-hero="Pasino" alt="Pasino"><span>cccccc</span></div>
-          </div>
         </div>
         <div class="hero-strip">
           <span class="hero-strip-label" data-i18n="troop2_label3">Seconde ligne</span>
           <div class="hero-strip-imgs">
             <div class="hero-thumb"><img data-hero="drake" alt="drake"><span>Drake</span></div>
-            <div class="hero-thumb"><img data-hero="Durga" alt="Durga"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Harton" alt="Harton"><span>Haccccccrton</span></div>
-            <div class="hero-thumb"><img data-hero="Pasino" alt="Pasino"><span>cccccc</span></div>
+            <div class="hero-thumb"><img data-hero="mireya" alt="mireya"><span>Mireya</span></div>
+            <div class="hero-thumb"><img data-hero="sawyer" alt="sawyer"><span>Sawyer</span></div>
+            <div class="hero-thumb"><img data-hero="inata" alt="inata"><span>Inata</span></div>
+            <div class="hero-thumb"><img data-hero="ito" alt="ito"><span>Ito</span></div>
+            <div class="hero-thumb"><img data-hero="koschevoi" alt="koschevoi"><span>Koschevoi</span></div>
+            <div class="hero-thumb"><img data-hero="vivian" alt="vivian"><span>Vivian</span></div>
+            <div class="hero-thumb"><img data-hero="veronica" alt="veronica"><span>Veronica</span></div>
+            <div class="hero-thumb"><img data-hero="lee" alt="lee"><span>Lee</span></div>
+            <div class="hero-thumb"><img data-hero="ada" alt="ada"><span>Ada</span></div>
+            <div class="hero-thumb"><img data-hero="edwin" alt="edwin"><span>Edwin</span></div>
+            <div class="hero-thumb"><img data-hero="devilian" alt="devilian"><span>Devilian</span></div>
           </div>
         </div>
       </div>
 
       <!-- Troupe 3 -->
       <div class="card">
-        <div class="card-tier tier-3" data-i18n="tier3">TIER 3</div>
-        <div class="card-name" data-i18n="troop3_name">GARDE D'ÉLITE</div>
-        <div class="card-desc" data-i18n="troop3_desc">Unité recommandée pour les guerres. Excellente défense et bon ATK.</div>
-        <div class="stat-row"><span class="stat-label">ATK</span><span class="stat-value">620</span></div>
-        <div class="stat-row"><span class="stat-label">DEF</span><span class="stat-value">580</span></div>
-        <div class="stat-row"><span class="stat-label">HP</span><span class="stat-value">3 400</span></div>
-        <div class="stat-row"><span class="stat-label" data-i18n="stat_role">RÔLE</span><span class="stat-value good" data-i18n="role_war">Guerre</span></div>
-        <div class="stat-row"><span class="stat-label" data-i18n="stat_rec">RECOMMANDÉ</span><span class="stat-value good" data-i18n="rec_yes">✔ Oui</span></div>
+        <div class="card-tier tier-3" data-i18n="tier3">Attaques</div>
+        <div class="card-name" data-i18n="troop3_name">SOLO</div>
+        <div class="card-desc" data-i18n="troop3_desc">Privilégier des héros ayant des bonus de dégats ou de létalités, ainsi qu'un equipement exclusif pour les attaques en solo.</div>
+        <div class="stat-row"><span class="stat-label" data-i18n="troops_def">Déflecteurs</span><span class="stat-value">20%</span></div>
+        <div class="stat-row"><span class="stat-label" data-i18n="troops_bomber">Bombardiers</span><span class="stat-value">20%</span></div>
+        <div class="stat-row"><span class="stat-label" data-i18n="troops_tir">Tirreurs</span><span class="stat-value">60%</span></div>
       </div>
 
       <!-- Troupe 4 -->
       <div class="card">
-        <div class="card-tier tier-4" data-i18n="tier4">TIER 4</div>
-        <div class="card-name" data-i18n="troop4_name">COMMANDO</div>
-        <div class="card-desc" data-i18n="troop4_desc">Unité d'élite. Réservée aux membres avancés. Coût élevé mais dévastateur.</div>
-        <div class="stat-row"><span class="stat-label">ATK</span><span class="stat-value">1 400</span></div>
-        <div class="stat-row"><span class="stat-label">DEF</span><span class="stat-value">1 100</span></div>
-        <div class="stat-row"><span class="stat-label">HP</span><span class="stat-value">8 000</span></div>
-        <div class="stat-row"><span class="stat-label" data-i18n="stat_role">RÔLE</span><span class="stat-value good" data-i18n="role_elite">Élite</span></div>
-        <div class="stat-row"><span class="stat-label" data-i18n="stat_rec">RECOMMANDÉ</span><span class="stat-value good" data-i18n="rec_yes2">✔ Prioritaire</span></div>
+        <div class="card-tier tier-4" data-i18n="tier4">Attaques</div>
+        <div class="card-name" data-i18n="troop4_name">RALLIEMENTS</div>
+        <div class="card-desc" data-i18n="troop4_desc">Privilégier des héros ayant des bonus affectant tout les alliés. ainsi qu'un equipement exclusif pour les attaques groupées.</div>
+        <div class="stat-row"><span class="stat-label" data-i18n="troops_def">Déflecteurs</span><span class="stat-value">20%</span></div>
+        <div class="stat-row"><span class="stat-label" data-i18n="troops_bomber">Bombardiers</span><span class="stat-value">20%</span></div>
+        <div class="stat-row"><span class="stat-label" data-i18n="troops_tir">Tirreurs</span><span class="stat-value">60%</span></div>
       </div>
 
     </div>
@@ -649,19 +650,20 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th data-i18n="col_tier">TIER</th>
+          <th data-i18n="col_tier">HÉROS</th>
           <th data-i18n="col_name">NOM</th>
-          <th>ATK</th>
-          <th>DEF</th>
-          <th>HP</th>
-          <th data-i18n="col_role">RÔLE</th>
+          <th data-i18n= "troop3_name">SOLO</th>
+          <th data-i18n= "troop4_name">RALLIEMENTS</th>
+          <th data-i18n= "col_rally">RALLY CAGE</th>
+          <th data-i18n= "col_rejoin">REJOINDE CAGE</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>T1</td><td data-i18n="troop1_name">Milice</td><td>120</td><td>80</td><td>500</td><td data-i18n="role_farm">Collecte</td></tr>
-        <tr><td>T2</td><td data-i18n="troop2_name">Fantassin</td><td>280</td><td>220</td><td>1 200</td><td data-i18n="role_poly">Polyvalent</td></tr>
-        <tr><td>T3</td><td data-i18n="troop3_name">Garde d'Élite</td><td>620</td><td>580</td><td>3 400</td><td data-i18n="role_war">Guerre</td></tr>
-        <tr><td>T4</td><td data-i18n="troop4_name">Commando</td><td>1 400</td><td>1 100</td><td>8 000</td><td data-i18n="role_elite">Élite</td></tr>
+        <tr><td><div class="hero-thumb"><img data-hero="devilian" alt="devilian"></div></td><td>Devilian</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td><div class="hero-thumb"><img data-hero="ada" alt="ada"></div></td><td>Ada</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td><div class="hero-thumb"><img data-hero="aiksen" alt="aiksen"></div></td><td>Aiksen</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        <tr><td><div class="hero-thumb"><img data-hero="alph" alt="alph"></div></td><td>Alph</td><td></td><td></td><td></td><td></td></tr>
+
       </tbody>
     </table>
   </div>
@@ -736,43 +738,45 @@
 
 <script>
   const IMAGES = {
-  Ekko:        "images/heros/ekko.jpg",
-  Ada:         "images/heros/ada.jpg",
-  Aiksen:      "images/heros/aiksen.jpg",
-  Alph:        "images/heros/alph.jpg",
-  César:       "images/heros/cesar.jpg",
-  Devilian:    "images/heros/devilian.jpg",
-  Drake:       "images/heros/drake.jpg",
-  Durga:       "images/heros/durga.jpg",
-  Edwin:       "images/heros/edwin.jpg",
-  Flamme:      "images/heros/flamme.jpg",
-  Flora:       "images/heros/flora.jpg",
-  Gerd:        "images/heros/gerd.jpg",
-  Gimes:       "images/heros/gimes.jpg",
-  Harton:      "images/heros/harton.jpg",
-  Inata:       "images/heros/inata.jpg",
-  Ito:         "images/heros/ito.jpg",
-  Koschevoi:   "images/heros/koschevoi.jpg",
-  Lanchester:  "images/heros/lanchester.jpg",
-  Lee:         "images/heros/lee.jpg",
-  Lofili:      "images/heros/lofili.jpg",
-  Lunarl:      "images/heros/lunarl.jpg",
-  Marcus:      "images/heros/marcus.jpg",
-  Mia:         "images/heros/mia.jpg",
-  Mireya:      "images/heros/mireya.jpg",
-  Pasino:      "images/heros/pasino.jpg",
-  Phénix:      "images/heros/phenix.jpg",
-  Platos:      "images/heros/platos.jpg",
-  Samir:       "images/heros/samir.jpg",
-  Sawyer:      "images/heros/sawyer.jpg",
-  Sumo:        "images/heros/sumo.jpg",
-  Terry:       "images/heros/terry.jpg",
-  Tormund:     "images/heros/tormund.jpg",
-  Tyronn:      "images/heros/tyronn.jpg",
-  Veronica:    "images/heros/veronica.jpg",
-  Vesaryon:    "images/heros/vesaryon.jpg",
-  Vivian:      "images/heros/vivian.jpg",
-  Whisper:     "images/heros/whisper.jpg",
+  ada:         "images/heros/ada.jpg",
+  aiksen:      "images/heros/aiksen.jpg",
+  alph:        "images/heros/alph.jpg",
+  cesar:       "images/heros/cesar.jpg",
+  devilian:    "images/heros/devilian.jpg",
+  drake:       "images/heros/drake.jpg",
+  durga:       "images/heros/durga.jpg",
+  edwin:       "images/heros/edwin.jpg",
+  ekko:        "images/heros/ekko.jpg",
+  flamme:      "images/heros/flamme.jpg",
+  flora:       "images/heros/flora.jpg",
+  gerd:        "images/heros/gerd.jpg",
+  gimes:       "images/heros/gimes.jpg",
+  harton:      "images/heros/harton.jpg",
+  inata:       "images/heros/inata.jpg",
+  ito:         "images/heros/ito.jpg",
+  koschevoi:   "images/heros/koschevoi.jpg",
+  lanchester:  "images/heros/lanchester.jpg",
+  lee:         "images/heros/lee.jpg",
+  lofili:      "images/heros/lofili.jpg",
+  lunarl:      "images/heros/lunarl.jpg",
+  marcus:      "images/heros/marcus.jpg",
+  mia:         "images/heros/mia.jpg",
+  mireya:      "images/heros/mireya.jpg",
+  pasino:      "images/heros/pasino.jpg",
+  phenix:      "images/heros/phenix.jpg",
+  platos:      "images/heros/platos.jpg",
+  samir:       "images/heros/samir.jpg",
+  sawyer:      "images/heros/sawyer.jpg",
+  sumo:        "images/heros/sumo.jpg",
+  terry:       "images/heros/terry.jpg",
+  tormund:     "images/heros/tormund.jpg",
+  tyronn:      "images/heros/tyronn.jpg",
+  veronica:    "images/heros/veronica.jpg",
+  vesaryon:    "images/heros/vesaryon.jpg",
+  vivian:      "images/heros/vivian.jpg",
+  whisper:     "images/heros/whisper.jpg",
+  xuanming:    "images/heros/xuanming.jpg",
+  zoltan:      "images/heros/zoltan.jpg"
 };
 
 // Injecte les images dans tous les éléments [data-hero]
@@ -793,22 +797,23 @@ const i18n = {
     home_title: "BIENVENUE",
     home_desc: "Ce wiki est le manuel de terrain officiel de notre alliance. Retrouvez ici les guides de troupes et toutes les informations stratégiques.",
     home_ql_troops: "Stratégies", home_ql_events: "Guides",
-    home_notice_title: "📢 NOTICE :", home_notice_text: " Ce wiki est en lecture seule. Pour toute suggestion, contactez Schnereux23.",
+    home_notice_title: "📢 NOTE :", home_notice_text: " Pour toute suggestion, contactez Schnereux23.",
     troops_title: "GUIDE DES HEROS", troops_sub: "// RECOMMANDATIONS DES HEROS",
     troops_tip_title: "💡 CONSEIL :", troops_tip_text: " N'utilisez JAMAIS MIA pour les combats.",
-    tier1:"Récolteurs", tier2:"Arène/Arrestation/...", tier3:"Attaques", tier4:"TIER 4",
+    tier1:"Récolteurs", tier2:"Arène/Arrestation/...", tier3:"Attaques", tier4:"Attaques",
     troop1_name:"Récolteurs", troop1_desc:"Idéal pour collecter des ressources uniquement.", troop1label1:"HÉROS",
     troop2_desc1:"Toujours placer les tireurs en 1ere position.", troop2_desc2:"Prendre en compte uniquement les compétences d'arrestation.",
     troop2label1:"Première ligne", troop2label2:"Robots", troop2label3:"Seconde ligne",
-    troop3_name:"Garde d'Élite", troop3_desc:"Unité recommandée pour les guerres. Excellente défense et bon ATK.",
-    troop4_name:"Commando", troop4_desc:"Unité d'élite. Réservée aux membres avancés. Coût élevé mais dévastateur.",
+    troop3_name:"SOLO", troop3_desc:"Privilégier des héros ayant des bonus de dégats ou de létalités, ainsi qu'un équipement exclusif pour les attaques en solo.",
+    troop4_name:"RALLIEMENTS", troop4_desc:"Privilégier des héros ayant des bonus affectant tout les alliés. ainsi qu'un équipement exclusif pour les attaques groupées.",
     stat_role:"RÔLE", stat_rec:"RECOMMANDÉ",
     role_farm:"Collecte", role_poly:"Polyvalent", role_war:"Guerre", role_elite:"Élite",
     rec_no:"PAS DE COMBAT", rec_mid:"Possible", rec_yes:"✔ Oui", rec_yes2:"✔ Prioritaire",
+    troops_bomber:"Bombardiers", troops_tir:"Tirreurs", troops_def:"Déflecteurs",
     troops_table_title:"COMPARATIF RAPIDE",
-    col_tier:"TIER", col_name:"NOM", col_role:"RÔLE",
+    col_tier:"HÉROS", col_name:"NOM", col_role:"RÔLE", col_rally:"RALLY CAGE", col_rejoin:"REJOINDE CAGE",
     events_title:"ÉVÉNEMENTS", events_sub:"// CALENDRIER ET GUIDES DE L'ALLIANCE",
-    events_warning_title:"⚠️ PRIORITÉ :", events_warning_text:" Tous les membres actifs sont requis lors des guerres d'alliance. Prévenez un officier en cas d'absence.",
+    events_warning_title:"⚠️ ", events_warning_text:" ",
     tag_war:"GUERRE", tag_rally:"RALLY", tag_resource:"RESSOURCES", tag_alliance:"ALLIANCE",
     event1_name:"Guerre d'Alliance", event1_desc:"Affrontement inter-alliances. Mobilisez vos troupes T3/T4. Suivez les ordres des officiers.",
     event2_name:"Assaut Collectif", event2_desc:"Rally sur boss ou bâtiment ennemi. Rejoignez le rally du leader pour maximiser les dégâts.",
@@ -818,7 +823,7 @@ const i18n = {
     col_day:"JOUR", col_event:"ÉVÉNEMENT", col_type:"TYPE", col_req:"REQUIS",
     day_mon:"Lundi", day_wed:"Mercredi", day_thu:"Jeudi", day_fri:"Vendredi", day_weekend:"Sam / Dim",
     req_yes:"✔ Oui", req_rec:"Recommandé", req_opt:"Optionnel",
-    footer_text:"ALLIANCE WIKI — LAND OF JAIL // LECTURE SEULE // MISE À JOUR PAR LES OFFICIERS"
+    footer_text:"NK2 WIKI — LAND OF JAIL  // MISE À JOUR PAR Schnereux23"
   },
   en: {
     nav_home:"Home", nav_troops:"Troops", nav_events:"Events",
