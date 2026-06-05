@@ -573,12 +573,12 @@
         <div class="card-name" data-i18n="troop1_name">Récolteurs</div>
         <div class="card-desc" data-i18n="troop1_desc">Idéal pour collecter des ressources uniquement.</div>
         <div class="hero-strip">
-          <span class="hero-strip-label" data-i18n="troop1label1">HÉROS</span>
+          <span class="hero-strip-label">HÉROS</span>
           <div class="hero-strip-imgs">
-            <div class="hero-thumb"><img data-hero="aiksen" alt="aiksen"><span>Aiksen</span></div>
-            <div class="hero-thumb"><img data-hero="durga" alt="durga"><span>Durga</span></div>
-            <div class="hero-thumb"><img data-hero="harton" alt="harton"><span>Harton</span></div>
-            <div class="hero-thumb"><img data-hero="pasino" alt="pasino"><span>Pasino</span></div>
+            <div class="hero-thumb"><img data-hero="Aiksen" alt="Aiksen"><span>Aiksen</span></div>
+            <div class="hero-thumb"><img data-hero="Durga" alt="Durga"><span>Durga</span></div>
+            <div class="hero-thumb"><img data-hero="Harton" alt="Harton"><span>Harton</span></div>
+            <div class="hero-thumb"><img data-hero="Pasino" alt="Pasino"><span>Pasino</span></div>
           </div>
         </div>
         <div class="stat-row"><span class="stat-label" data-i18n="stat_role">RÔLE</span><span class="stat-value warn" data-i18n="role_farm">Collecte</span></div>
@@ -590,33 +590,11 @@
         <div class="card-tier tier-2" data-i18n="tier2">Arène/Arrestation/...</div>
         <div class="card-desc" data-i18n="troop2_desc1">Concerne tous les combats où l'on doit placer 5 héros et 2 robots (Arène, arrestation, légende KOF, bataille de l'alliance...) </div>
         <div class="card-desc" data-i18n="troop2_desc2">Prendre en compte uniquement les compétences d'arrestation.</div>
-        <div class="hero-strip">
-          <span class="hero-strip-label" data-i18n="troop2_label1">Première ligne</span>
-          <div class="hero-strip-imgs">
-            <div class="hero-thumb"><img data-hero="phenix" alt="Aiksen"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Durga" alt="Durga"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Harton" alt="Harton"><span>Haccccccrton</span></div>
-            <div class="hero-thumb"><img data-hero="Pasino" alt="Pasino"><span>cccccc</span></div>
-          </div>
-        </div>
-        <div class="hero-strip">
-          <span class="hero-strip-label" data-i18n="troop2_label2">Robots</span>
-          <div class="hero-strip-imgs">
-            <div class="hero-thumb"><img data-hero="Aiksen" alt="Aiksen"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Durga" alt="Durga"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Harton" alt="Harton"><span>Haccccccrton</span></div>
-            <div class="hero-thumb"><img data-hero="Pasino" alt="Pasino"><span>cccccc</span></div>
-          </div>
-        </div>
-        <div class="hero-strip">
-          <span class="hero-strip-label" data-i18n="troop2_label3">Seconde ligne</span>
-          <div class="hero-strip-imgs">
-            <div class="hero-thumb"><img data-hero="drake" alt="drake"><span>Drake</span></div>
-            <div class="hero-thumb"><img data-hero="Durga" alt="Durga"><span>cccccc</span></div>
-            <div class="hero-thumb"><img data-hero="Harton" alt="Harton"><span>Haccccccrton</span></div>
-            <div class="hero-thumb"><img data-hero="Pasino" alt="Pasino"><span>cccccc</span></div>
-          </div>
-        </div>
+        <div class="stat-row"><span class="stat-label" data-i18n="troop2_label1">Première ligne</span></div>
+
+        <div class="stat-row"><span class="stat-label" data-i18n="troop2_label2">Robots</span></div>
+
+        <div class="stat-row"><span class="stat-label" data-i18n="troop2_label3">Seconde ligne</span></div>
       </div>
 
       <!-- Troupe 3 -->
@@ -736,43 +714,41 @@
 
 <script>
   const IMAGES = {
-  Ekko:        "images/heros/ekko.jpg",
-  Ada:         "images/heros/ada.jpg",
-  Aiksen:      "images/heros/aiksen.jpg",
-  Alph:        "images/heros/alph.jpg",
-  César:       "images/heros/cesar.jpg",
-  Devilian:    "images/heros/devilian.jpg",
-  Drake:       "images/heros/drake.jpg",
-  Durga:       "images/heros/durga.jpg",
-  Edwin:       "images/heros/edwin.jpg",
-  Flamme:      "images/heros/flamme.jpg",
-  Flora:       "images/heros/flora.jpg",
-  Gerd:        "images/heros/gerd.jpg",
-  Gimes:       "images/heros/gimes.jpg",
-  Harton:      "images/heros/harton.jpg",
-  Inata:       "images/heros/inata.jpg",
-  Ito:         "images/heros/ito.jpg",
-  Koschevoi:   "images/heros/koschevoi.jpg",
-  Lanchester:  "images/heros/lanchester.jpg",
-  Lee:         "images/heros/lee.jpg",
-  Lofili:      "images/heros/lofili.jpg",
-  Lunarl:      "images/heros/lunarl.jpg",
-  Marcus:      "images/heros/marcus.jpg",
-  Mia:         "images/heros/mia.jpg",
-  Mireya:      "images/heros/mireya.jpg",
-  Pasino:      "images/heros/pasino.jpg",
-  Phénix:      "images/heros/phenix.jpg",
-  Platos:      "images/heros/platos.jpg",
-  Samir:       "images/heros/samir.jpg",
-  Sawyer:      "images/heros/sawyer.jpg",
-  Sumo:        "images/heros/sumo.jpg",
-  Terry:       "images/heros/terry.jpg",
-  Tormund:     "images/heros/tormund.jpg",
-  Tyronn:      "images/heros/tyronn.jpg",
-  Veronica:    "images/heros/veronica.jpg",
-  Vesaryon:    "images/heros/vesaryon.jpg",
-  Vivian:      "images/heros/vivian.jpg",
-  Whisper:     "images/heros/whisper.jpg",
+  Ekko:       "images/Heros/Ekko.png",
+  Ada:        "images/Heros/Ada.png",
+  Aiksen:     "images/Heros/Aiksen.png",
+  Alph:       "images/Heros/Alph.png",
+  Durga:      "images/Heros/Durga.png",
+  Harton:     "images/Heros/Harton.png",
+  César:      "images/Heros/César.png",
+  Pasino:     "images/Heros/Pasino.png",
+  Mia:        "images/Heros/Mia.png",
+  Devilian:   "images/Heros/Devilian.png",
+  Drake:      "images/Heros/Drake.png",
+  Edwin:      "images/Heros/Edwin.png",
+  Gerd:       "images/Heros/Gerd.png",
+  Gimes:      "images/Heros/Gimes.png",
+  Inata:      "images/Heros/Inata.png",
+  Ito:        "images/Heros/Ito.png",
+  Koschevoi:  "images/Heros/Koschevoi.png",
+  Lanchester: "images/Heros/Lanchester.png",
+  Lee:        "images/Heros/Lee.png",
+  Lofili:     "images/Heros/Lofili.png",
+  Lunarl:     "images/Heros/Lunarl.png",
+  Marcus:     "images/Heros/Marcus.png",
+  Mireya:     "images/Heros/Mireya.png",
+  Phénix:     "images/Heros/Phénix.png",
+  Platos:     "images/Heros/Platos.png",
+  Samir:      "images/Heros/Samir.png",
+  Sawyer:     "images/Heros/Sawyer.png",
+  Sumo:       "images/Heros/Sumo.png",
+  Terry:      "images/Heros/Terry.png",
+  Tormund:    "images/Heros/Tormund.png",
+  Tyronn:     "images/Heros/Tyronn.png",
+  Veronica:   "images/Heros/Veronica.png",
+  Vesaryon:   "images/Heros/Vesaryon.png",
+  Vivian:     "images/Heros/Vivian.png",
+  Whisper:    "images/Heros/Whisper.png",
 };
 
 // Injecte les images dans tous les éléments [data-hero]
@@ -797,7 +773,7 @@ const i18n = {
     troops_title: "GUIDE DES HEROS", troops_sub: "// RECOMMANDATIONS DES HEROS",
     troops_tip_title: "💡 CONSEIL :", troops_tip_text: " N'utilisez JAMAIS MIA pour les combats.",
     tier1:"Récolteurs", tier2:"Arène/Arrestation/...", tier3:"Attaques", tier4:"TIER 4",
-    troop1_name:"Récolteurs", troop1_desc:"Idéal pour collecter des ressources uniquement.", troop1label1:"HÉROS",
+    troop1_name:"Récolteurs", troop1_desc:"Idéal pour collecter des ressources uniquement.",
     troop2_desc1:"Toujours placer les tireurs en 1ere position.", troop2_desc2:"Prendre en compte uniquement les compétences d'arrestation.",
     troop2label1:"Première ligne", troop2label2:"Robots", troop2label3:"Seconde ligne",
     troop3_name:"Garde d'Élite", troop3_desc:"Unité recommandée pour les guerres. Excellente défense et bon ATK.",
