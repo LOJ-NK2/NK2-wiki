@@ -528,7 +528,7 @@
         <div class="card-tier tier-1" data-i18n="tier1">Récoltes</div>
         <div class="card-name" data-i18n="troop1_name">Récolteurs</div>
         <div class="card-desc" data-i18n="troop1_desc">Idéal pour collecter des ressources uniquement.</div>
-        <div class="stat-row"><img src="images/Rare - Aiksen.jpg" alt="Aiksen" style="width:20%; border-radius:4px; margin-bottom:12px;"><img src="images/Rare - Durga.jpg" alt="Durga" style="width:20%; border-radius:4px; margin-bottom:12px;"><img src="images/Rare - Harton.jpg" alt="Harton" style="width:20%; border-radius:4px; margin-bottom:12px;"><img src="images/Rare - Pasino.jpg" alt="Pasino" style="width:20%; border-radius:4px; margin-bottom:12px;"></div>
+        <div class="stat-row"><img data-hero="Aiksen" alt="Aiksen" style="width:20%; border-radius:4px; margin-bottom:12px;"><img data-hero="Durga" alt="Durga" style="width:20%; border-radius:4px; margin-bottom:12px;"><img data-hero="Harton" alt="Harton" style="width:20%; border-radius:4px; margin-bottom:12px;"><img data-hero="Pasino" alt="Pasino" style="width:20%; border-radius:4px; margin-bottom:12px;"></div>
         <div class="stat-row"><span class="stat-label" data-i18n="stat_role">RÔLE</span><span class="stat-value warn" data-i18n="role_farm">Collecte</span></div>
         <div class="stat-row"><span class="stat-label" data-i18n="stat_rec">RECOMMANDATION</span><span class="stat-value bad" data-i18n="rec_no">PAS DE COMBAT</span></div>
       </div>
@@ -661,6 +661,55 @@
 </footer>
 
 <script>
+  const IMAGES = {
+  Ekko:      "images/Héros/Ekko.png",
+  Ada:   "images/Héros/Ada.png",
+  Aiksen:  "images/Héros/Aiksen.png",
+  Alph:    "images/Héros/Alph.png",
+  Durga:   "images/Héros/Durga.png",
+  Harton:  "images/Héros/Harton.png",
+  César:   "images/Héros/César.png",
+  Pasino:  "images/Héros/Pasino.png",
+  Mia:     "images/Héros/Mia.png",
+  Devilian: "images/Héros/Devilian.png",
+  Drake:   "images/Héros/Drake.png",
+  Edwin:   "images/Héros/Edwin.png",
+  Gerd:    "images/Héros/Gerd.png",
+  Gimes:    "images/Héros/Gimes.png",
+  Inata:    "images/Héros/Inata.png",
+  Ito:      "images/Héros/Ito.png",
+  Koschevoi: "images/Héros/Koschevoi.png",
+  Lanchester: "images/Héros/Lanchester.png",
+  Lee:      "images/Héros/Lee.png",
+  Lofili:   "images/Héros/Lofili.png",
+  Lunarl:   "images/Héros/Lunarl.png",
+  Marcus:   "images/Héros/Marcus.png",
+  Mireya:   "images/Héros/Mireya.png",
+  Phénix:   "images/Héros/Phénix.png",
+  Platos:    "images/Héros/Platos.png",
+  Samir:     "images/Héros/Samir.png",
+  Sawyer:     "images/Héros/Sawyer.png",
+  Sumo:      "images/Héros/Sumo.png",
+  Terry:      "images/Héros/Terry.png",
+  Tormund:    "images/Héros/Tormund.png",
+  Tyronn:     "images/Héros/Tyronn.png",
+  Veronica:   "images/Héros/Veronica.png",
+  Vesaryon:   "images/Héros/Vesaryon.png",
+  Vivian:     "images/Héros/Vivian.png",
+  Whisper:    "images/Héros/Whisper.png",
+};
+
+// Injecte les images dans les cartes au chargement
+document.addEventListener("DOMContentLoaded", () => {
+  const slots = document.querySelectorAll("[data-hero]");
+  slots.forEach(slot => {
+    const key = slot.getAttribute("data-hero");
+    if (IMAGES[key]) {
+      slot.src = IMAGES[key];
+      slot.style.display = "block";
+    }
+  });
+});
 // ══════════════════════════════════════════
 //  TRANSLATIONS
 // ══════════════════════════════════════════
