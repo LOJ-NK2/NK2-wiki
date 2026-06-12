@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NK2 Wiki — Admin</title>
+  <title>NK2 Wiki — Land of Jail</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <style>
@@ -15,225 +15,255 @@
       --accent:    #c8960a;
       --accent2:   #e8b420;
       --danger:    #c0392b;
-      --green:     #2ecc71;
       --text:      #d4d8e0;
       --muted:     #6b7280;
+      --green:     #2ecc71;
+      --blue:      #3498db;
+      --violet:    #9b59b6;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
     body {
-      background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif;
-      font-weight: 300; line-height: 1.6; min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
     }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
     header {
-      border-bottom: 1px solid var(--border); padding: 24px 24px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-    }
-    header h1 {
-      font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 3px; color: #fff;
-    }
-    header h1 span { color: var(--accent); }
-    .topbar-actions { display: flex; gap: 10px; align-items: center; }
-
-    main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
-
-    /* LOGIN */
-    .login-box {
-      max-width: 400px; margin: 80px auto; background: var(--card);
-      border: 1px solid var(--border); padding: 32px;
-    }
-    .login-box h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; margin-bottom: 20px; color: #fff; }
-
-    label { display: block; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 1.5px; color: var(--muted); margin: 14px 0 6px; }
-    input, textarea, select {
-      width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text);
-      padding: 10px 12px; font-family: 'Barlow', sans-serif; font-size: 0.9rem; border-radius: 2px;
-    }
-    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
-    textarea { resize: vertical; min-height: 70px; }
-
-    button {
-      font-family: 'Barlow', sans-serif; font-weight: 600; letter-spacing: 1px; cursor: pointer;
-      border: 1px solid var(--accent); background: transparent; color: var(--accent2);
-      padding: 9px 18px; font-size: 0.82rem; border-radius: 2px; transition: all 0.2s; text-transform: uppercase;
-    }
-    button:hover { background: var(--accent); color: #0a0c0f; }
-    button.primary { background: var(--accent); color: #0a0c0f; }
-    button.primary:hover { background: var(--accent2); }
-    button.danger { border-color: var(--danger); color: var(--danger); }
-    button.danger:hover { background: var(--danger); color: #fff; }
-    button.small { padding: 4px 10px; font-size: 0.7rem; }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* TABS */
-    .admin-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; flex-wrap: wrap; }
-    .admin-tab {
-      background: none; border: none; color: var(--muted); padding: 12px 20px; cursor: pointer;
-      font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 0.82rem; letter-spacing: 1px;
-      text-transform: uppercase; border-bottom: 3px solid transparent;
-    }
-    .admin-tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
-    .admin-panel { display: none; }
-    .admin-panel.active { display: block; animation: fadeIn 0.2s ease; }
-    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-    /* CARDS */
-    .item-card {
-      background: var(--card); border: 1px solid var(--border); padding: 18px 20px; margin-bottom: 12px;
       position: relative;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #0d1117 0%, var(--bg) 100%);
+      overflow: hidden;
     }
-    .item-card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
-    .item-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 1.5px; color: #fff; display:flex; align-items:center; gap:10px; }
-    .item-card-actions { display: flex; gap: 6px; }
-    .item-card-body { display: none; padding-top: 14px; border-top: 1px solid var(--border); margin-top: 12px; }
-    .item-card.expanded .item-card-body { display: block; }
-    .item-card-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 1px; }
-
-    /* LANG SUBTABS */
-    .lang-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
-    .lang-tab {
-      background: var(--surface); border: 1px solid var(--border); color: var(--muted);
-      padding: 5px 12px; font-size: 0.75rem; cursor: pointer; border-radius: 2px;
+    .header-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.15;
     }
-    .lang-tab.active { color: var(--accent2); border-color: var(--accent); }
-    .lang-fields { display: none; }
-    .lang-fields.active { display: block; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-    @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-
-    .checkbox-row { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
-    .checkbox-row input { width: auto; }
-    .checkbox-row label { margin: 0; cursor: pointer; }
-
-    .toast {
-      position: fixed; bottom: 20px; right: 20px; background: var(--card); border: 1px solid var(--accent);
-      color: var(--text); padding: 12px 20px; border-radius: 2px; font-size: 0.85rem;
-      transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 1000;
-      font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;
+    .header-inner {
+      position: relative; max-width: 1100px; margin: 0 auto;
+      padding: 48px 24px 40px; display: flex; align-items: center; gap: 24px;
     }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.error { border-color: var(--danger); color: var(--danger); }
+    .header-emblem {
+      width: 72px; height: 72px; border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 2rem;
+      background: rgba(200,150,10,0.08); flex-shrink: 0;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+    .header-text h1 {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 6vw, 3.4rem);
+      letter-spacing: 4px; color: #fff; line-height: 1;
+    }
+    .header-text h1 span { color: var(--accent); }
+    .header-text p {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+      color: var(--muted); letter-spacing: 2px; margin-top: 6px;
+    }
 
-    .section-label { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--accent); letter-spacing: 2px; margin: 28px 0 12px; text-transform: uppercase; }
-    .help-text { font-size: 0.78rem; color: var(--muted); margin-bottom: 16px; }
+    .lang-bar { background: var(--surface); border-bottom: 1px solid var(--border); }
+    .lang-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; gap: 0; overflow-x: auto;
+    }
+    .lang-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted);
+      letter-spacing: 2px; padding-right: 16px; border-right: 1px solid var(--border);
+      margin-right: 4px; white-space: nowrap;
+    }
+    .lang-btn {
+      background: none; border: none; color: var(--muted); font-family: 'Barlow', sans-serif;
+      font-size: 0.82rem; font-weight: 600; padding: 10px 14px; cursor: pointer;
+      letter-spacing: 1px; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;
+    }
+    .lang-btn:hover { color: var(--text); }
+    .lang-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    .order-controls { display: flex; flex-direction: column; gap: 2px; }
-    .order-controls button { padding: 2px 6px; font-size: 0.6rem; line-height: 1; }
+    nav { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 2px; overflow-x: auto; }
+    .nav-btn {
+      background: none; border: none; color: var(--muted); font-family: 'Barlow', sans-serif;
+      font-size: 0.85rem; font-weight: 600; padding: 14px 20px; cursor: pointer; letter-spacing: 1px;
+      text-transform: uppercase; border-bottom: 3px solid transparent; transition: all 0.2s;
+      white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    }
+    .nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
 
-    table.hero-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; }
-    table.hero-table th, table.hero-table td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; }
-    table.hero-table th { background: var(--surface); font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 1px; color: var(--accent); }
-    table.hero-table td:first-child, table.hero-table th:first-child { text-align: left; }
-    table.hero-table input[type="checkbox"] { width: auto; }
-    table.hero-table input[type="text"] { width: 100px; padding: 4px 6px; font-size: 0.75rem; }
+    main { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+    .section { display: none; animation: fadeIn 0.3s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    .hidden { display: none !important; }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.6rem, 4vw, 2.4rem);
+      letter-spacing: 4px; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 14px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--accent) 0%, transparent 100%); }
+    .section-sub { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 32px; }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .card { background: var(--card); border: 1px solid var(--border); padding: 24px; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), transparent); }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card-tier { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 2px; padding: 3px 8px; border: 1px solid; display: inline-block; margin-bottom: 12px; }
+    .tier-1 { color: var(--blue); border-color: var(--blue); }
+    .tier-2 { color: var(--accent); border-color: var(--accent); }
+    .tier-3 { color: var(--danger); border-color: var(--danger); }
+    .tier-4 { color: var(--danger); border-color: var(--danger); }
+    .card-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 2px; color: #fff; margin-bottom: 8px; }
+    .card-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; }
+    .stat-value { color: var(--text); font-weight: 600; }
+    .stat-value.good { color: var(--green); }
+    .stat-value.warn { color: var(--accent); }
+    .stat-value.bad  { color: var(--danger); }
+
+    .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .event-card { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 20px 24px; position: relative; transition: border-color 0.2s; }
+    .event-card.type-war  { border-left-color: var(--danger); }
+    .event-card.type-rally{ border-left-color: #9b59b6; }
+    .event-card.type-resource { border-left-color: var(--green); }
+    .event-date { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 8px; }
+    .event-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; color: #fff; margin-bottom: 6px; }
+    .event-desc { font-size: 0.83rem; color: var(--muted); }
+    .event-tag { position: absolute; top: 20px; right: 20px; font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; padding: 3px 8px; border: 1px solid currentColor; }
+    .tag-war      { color: var(--danger); }
+    .tag-rally    { color: #9b59b6; }
+    .tag-resource { color: var(--green); }
+    .tag-alliance { color: var(--accent); }
+
+    .callout { border: 1px solid var(--border); border-left: 4px solid var(--accent); background: rgba(200,150,10,0.05); padding: 16px 20px; margin-bottom: 24px; font-size: 0.88rem; }
+    .callout.danger { border-left-color: var(--danger); background: rgba(192,57,43,0.06); }
+    .callout strong { color: var(--accent2); }
+    .callout.danger strong { color: var(--danger); }
+
+    .data-table { width: 100%; border-collapse: separate; font-size: 0.85rem; margin-bottom: 32px; overflow-x: auto; display: block; }
+    .data-table th { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 2px; color: var(--accent); border-bottom: 1px solid var(--accent); padding: 10px 14px; text-align: center; background: var(--card); }
+    .data-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; color: var(--text); }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .welcome-banner { background: var(--card); border: 1px solid var(--border); padding: 32px; margin-bottom: 32px; position: relative; overflow: hidden; }
+    .welcome-banner::after { content: '⚔'; position: absolute; right: 32px; top: 50%; transform: translateY(-50%); font-size: 6rem; opacity: 0.04; }
+    .welcome-banner h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 3px; color: var(--accent2); margin-bottom: 10px; }
+    .welcome-banner p { font-size: 0.92rem; color: var(--text); max-width: 600px; }
+
+    .quick-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .quick-link { background: var(--card); border: 1px solid var(--border); padding: 18px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+    .quick-link:hover { border-color: var(--accent); }
+    .quick-link .ql-icon { font-size: 1.6rem; }
+    .quick-link .ql-text strong { display: block; font-size: 0.88rem; color: #fff; font-weight: 700; letter-spacing: 0.5px; }
+    .quick-link .ql-text span { font-size: 0.75rem; color: var(--muted); }
+
+    .hero-strip { margin: 12px 0 4px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
+    .hero-strip-label { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 2px; color: var(--muted); display: block; margin-bottom: 8px; }
+    .hero-strip-imgs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .hero-thumb { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .hero-thumb img { width: 56px; height: 56px; object-fit: cover; object-position: top; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); transition: border-color 0.2s, transform 0.2s; }
+    .hero-thumb img:hover { border-color: var(--accent); transform: scale(1.2); }
+    .hero-thumb span { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--muted); letter-spacing: 0.5px; text-align: center; }
+
+    footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; }
+
+    /* ── CUSTOM SECTION TYPES ── */
+    .content-block { background: var(--card); border: 1px solid var(--border); padding: 20px 24px; margin-bottom: 16px; }
+    .content-block.callout { border-left: 4px solid var(--accent); background: rgba(200,150,10,0.05); }
+    .content-block h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 1.5px; color: #fff; margin-bottom: 8px; }
+    .content-block.callout h3 { color: var(--accent2); }
+    .content-block p { font-size: 0.9rem; color: var(--text); white-space: pre-line; }
+
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .gallery-item { background: var(--card); border: 1px solid var(--border); overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
+    .gallery-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .gallery-item img { width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover; background: var(--surface); }
+    .gallery-item .caption { padding: 10px 14px; font-size: 0.82rem; color: var(--muted); }
+
+    .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .link-card { background: var(--card); border: 1px solid var(--border); padding: 18px 20px; display: flex; align-items: center; gap: 12px; text-decoration: none; transition: all 0.2s; }
+    .link-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .link-card .lk-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .link-card .lk-text strong { display: block; font-size: 0.9rem; color: #fff; font-weight: 700; letter-spacing: 0.5px; }
+    .link-card .lk-text span { font-size: 0.76rem; color: var(--muted); }
+
+    .loading-screen {
+      position: fixed; inset: 0; background: var(--bg); z-index: 999;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Share Tech Mono', monospace; color: var(--accent); letter-spacing: 3px; font-size: 0.9rem;
+    }
+    .admin-link {
+      position: fixed; bottom: 16px; right: 16px;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      color: var(--muted); text-decoration: none; opacity: 0.4; letter-spacing: 1px;
+      border: 1px solid var(--border); padding: 4px 8px; transition: opacity 0.2s;
+    }
+    .admin-link:hover { opacity: 1; color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .header-inner { padding: 28px 16px 24px; }
+      .lang-inner, .nav-inner { padding: 0 12px; }
+      main { padding: 24px 16px 60px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .calendar-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-view" class="login-box hidden">
-  <h2>🔒 ADMIN — NK2 WIKI</h2>
-  <label>Email</label>
-  <input type="email" id="login-email" placeholder="admin@nk2.local" />
-  <label>Mot de passe</label>
-  <input type="password" id="login-password" placeholder="••••••••" />
-  <div style="margin-top:18px;">
-    <button class="primary" id="login-btn">Connexion</button>
+<div id="loading" class="loading-screen">CHARGEMENT...</div>
+
+<header>
+  <div class="header-grid"></div>
+  <div class="header-inner">
+    <div class="header-emblem">⚔️</div>
+    <div class="header-text">
+      <h1>NK2 <span>WIKI</span></h1>
+      <p>// LAND OF JAIL</p>
+    </div>
   </div>
-  <div id="login-error" style="color:var(--danger); margin-top:12px; font-size:0.8rem;"></div>
+</header>
+
+<div class="lang-bar">
+  <div class="lang-inner">
+    <span class="lang-label">LANG</span>
+    <button class="lang-btn active" data-lang="fr">🇫🇷</button>
+    <button class="lang-btn" data-lang="en">🇬🇧</button>
+    <button class="lang-btn" data-lang="it">🇮🇹</button>
+    <button class="lang-btn" data-lang="pt">🇧🇷</button>
+    <button class="lang-btn" data-lang="ar">🇸🇦</button>
+    <button class="lang-btn" data-lang="ja">🇯🇵</button>
+  </div>
 </div>
 
-<!-- ADMIN -->
-<div id="admin-view" class="hidden">
-  <header>
-    <h1>NK2 <span>ADMIN</span></h1>
-    <div class="topbar-actions">
-      <a href="index.html" target="_blank"><button>Voir le site</button></a>
-      <button id="save-btn" class="primary">💾 Enregistrer</button>
-      <button id="logout-btn" class="danger">Déconnexion</button>
-    </div>
-  </header>
+<nav>
+  <div class="nav-inner" id="nav-inner"></div>
+</nav>
 
-  <main>
-    <div id="toast" class="toast"></div>
+<main id="main"></main>
 
-    <div class="admin-tabs">
-      <button class="admin-tab active" data-panel="tabs">Onglets</button>
-      <button class="admin-tab" data-panel="heroes">Héros</button>
-      <button class="admin-tab" data-panel="events">Événements</button>
-      <button class="admin-tab" data-panel="ui">Textes UI</button>
-      <button class="admin-tab" data-panel="import">Import / Export</button>
-    </div>
+<footer id="footer"></footer>
 
-    <!-- ONGLETS -->
-    <div class="admin-panel active" id="panel-tabs">
-      <div class="help-text">Gérez les onglets de navigation, leur ordre, leur icône, leur activation et leurs traductions.</div>
-      <div id="tabs-list"></div>
-      <button id="add-tab-btn" style="margin-top:12px;">+ Ajouter un onglet</button>
-    </div>
+<a href="admin.html" class="admin-link">ADMIN</a>
 
-    <!-- HEROS -->
-    <div class="admin-panel" id="panel-heroes">
-      <div class="help-text">Gérez la liste des héros, leurs groupes (récolteurs / 1ère ligne / 2ème ligne) et le tableau comparatif.</div>
-
-      <div class="section-label">Liste des héros</div>
-      <div id="heroes-list"></div>
-      <button id="add-hero-btn" style="margin-top:12px;">+ Ajouter un héros</button>
-
-      <div class="section-label">Groupes de héros</div>
-      <div class="help-text">Sélectionnez les héros appartenant à chaque groupe (cartes de la section Héros).</div>
-      <div id="hero-groups"></div>
-
-      <div class="section-label">Tableau comparatif</div>
-      <div class="help-text">Cochez les capacités de chaque héros pour le tableau "Comparatif rapide".</div>
-      <div id="hero-table-editor"></div>
-    </div>
-
-    <!-- EVENTS -->
-    <div class="admin-panel" id="panel-events">
-      <div class="help-text">Gérez le calendrier des événements (visible uniquement si l'onglet Événements est activé).</div>
-      <div id="events-list"></div>
-      <button id="add-event-btn" style="margin-top:12px;">+ Ajouter un événement</button>
-    </div>
-
-    <!-- UI TEXTS -->
-    <div class="admin-panel" id="panel-ui">
-      <div class="help-text">Textes globaux de l'interface (pied de page, libellés de tableaux, descriptions génériques) par langue.</div>
-      <div id="ui-editor"></div>
-    </div>
-
-    <!-- IMPORT/EXPORT -->
-    <div class="admin-panel" id="panel-import">
-      <div class="section-label">Exporter</div>
-      <div class="help-text">Télécharger une copie JSON de toutes les données actuelles (sauvegarde).</div>
-      <button id="export-btn">⬇ Exporter le JSON</button>
-
-      <div class="section-label">Importer</div>
-      <div class="help-text">Coller un JSON complet pour remplacer toutes les données (attention : action destructive, pensez à exporter avant).</div>
-      <textarea id="import-textarea" style="min-height:200px; font-family:'Share Tech Mono',monospace; font-size:0.75rem;" placeholder="Collez le JSON ici..."></textarea>
-      <div style="margin-top:10px;">
-        <button id="import-btn" class="danger">⚠ Remplacer toutes les données</button>
-      </div>
-
-      <div class="section-label">Initialisation (premier lancement)</div>
-      <div class="help-text">Si la base de données est vide, cliquez ici pour charger les données par défaut du wiki.</div>
-      <button id="seed-btn">🌱 Charger les données par défaut</button>
-    </div>
-
-  </main>
-</div>
-
+<!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {
-    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import {
-    getFirestore, doc, getDoc, setDoc
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCWADXq-C8yTrc3XeO7GI44bYQo8inatQk",
@@ -245,648 +275,365 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
   const db = getFirestore(app);
 
-  const LANGS = [
-    { code: 'fr', label: '🇫🇷 FR' },
-    { code: 'en', label: '🇬🇧 EN' },
-    { code: 'it', label: '🇮🇹 IT' },
-    { code: 'pt', label: '🇧🇷 PT' },
-    { code: 'ar', label: '🇸🇦 AR' },
-    { code: 'ja', label: '🇯🇵 JA' }
-  ];
+  const IMAGES_BASE = "images/heros/";
 
   let DATA = null;
+  let currentLang = 'fr';
 
-  // ───────────────────────────────────────────
-  // AUTH
-  // ───────────────────────────────────────────
-  document.getElementById('login-btn').addEventListener('click', async () => {
-    const email = document.getElementById('login-email').value.trim();
-    const pass = document.getElementById('login-password').value;
-    const errEl = document.getElementById('login-error');
-    errEl.textContent = '';
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) {
-      errEl.textContent = "Échec de connexion : " + e.message;
-    }
-  });
-
-  document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
-
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      document.getElementById('login-view').classList.add('hidden');
-      document.getElementById('admin-view').classList.remove('hidden');
-      await loadData();
-    } else {
-      document.getElementById('login-view').classList.remove('hidden');
-      document.getElementById('admin-view').classList.add('hidden');
-    }
-  });
-
-  // ───────────────────────────────────────────
-  // DATA LOADING / SAVING
-  // ───────────────────────────────────────────
   async function loadData() {
     const snap = await getDoc(doc(db, "site", "content"));
     if (snap.exists()) {
       DATA = snap.data();
     } else {
-      DATA = emptyData();
+      document.getElementById('loading').textContent = "ERREUR: données introuvables. Lancez l'import depuis admin.html.";
+      return;
     }
-    renderAll();
+    render();
+    document.getElementById('loading').style.display = 'none';
   }
 
-  function emptyData() {
-    return {
-      tabs: [],
-      heroNames: {},
-      heroGroups: { gatherers: [], frontline: [], backline: [] },
-      heroTable: {},
-      events: [],
-      ui: { fr: {}, en: {}, it: {}, pt: {}, ar: {}, ja: {} }
-    };
+  function t(obj, lang, fallback) {
+    if (obj === null || obj === undefined) return fallback || '';
+    if (typeof obj === 'string') return obj;
+    return obj[lang] !== undefined ? obj[lang] : (obj['fr'] !== undefined ? obj['fr'] : (fallback || ''));
   }
 
-  async function saveData() {
-    try {
-      await setDoc(doc(db, "site", "content"), DATA);
-      showToast("Données enregistrées ✔");
-    } catch (e) {
-      showToast("Erreur d'enregistrement : " + e.message, true);
-    }
+  function heroThumb(key, label) {
+    const name = (DATA.heroNames && DATA.heroNames[key]) || key;
+    return `<div class="hero-thumb"><img src="${IMAGES_BASE}${key}.jpg" alt="${key}">${label !== false ? `<span>${name}</span>` : ''}</div>`;
   }
 
-  document.getElementById('save-btn').addEventListener('click', saveData);
-
-  function showToast(msg, isError) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
-
-  // ───────────────────────────────────────────
-  // TAB NAVIGATION
-  // ───────────────────────────────────────────
-  document.querySelectorAll('.admin-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
-    });
-  });
-
-  // ───────────────────────────────────────────
-  // RENDER ALL
-  // ───────────────────────────────────────────
-  function renderAll() {
-    renderTabs();
-    renderHeroes();
-    renderHeroGroups();
-    renderHeroTable();
-    renderEvents();
-    renderUi();
-  }
-
-  function langTabsHtml(uid, fields, getCurrentLang) {
-    return `<div class="lang-tabs" data-uid="${uid}">
-      ${LANGS.map((l, idx) => `<button type="button" class="lang-tab ${idx===0?'active':''}" data-lang="${l.code}">${l.label}</button>`).join('')}
-    </div>`;
-  }
-
-  function bindLangTabs(container) {
-    container.querySelectorAll('.lang-tabs').forEach(tabsEl => {
-      const uid = tabsEl.dataset.uid;
-      tabsEl.querySelectorAll('.lang-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          tabsEl.querySelectorAll('.lang-tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          container.querySelectorAll(`.lang-fields[data-uid="${uid}"]`).forEach(fe => {
-            fe.classList.toggle('active', fe.dataset.lang === btn.dataset.lang);
-          });
-        });
-      });
-    });
-  }
-
-  // ───────────────────────────────────────────
-  // TABS PANEL
-  // ───────────────────────────────────────────
-  const TAB_FIELD_SETS = {
-    home: [
-      { key: 'label', label: 'Libellé navigation' },
-      { key: 'title', label: 'Titre principal' },
-      { key: 'desc', label: 'Description', textarea: true },
-      { key: 'noticeTitle', label: 'Titre encadré note' },
-      { key: 'noticeText', label: 'Texte encadré note', textarea: true }
-    ],
-    troops: [
-      { key: 'label', label: 'Libellé navigation' },
-      { key: 'title', label: 'Titre principal' },
-      { key: 'sub', label: 'Sous-titre' },
-      { key: 'tipTitle', label: 'Titre conseil' },
-      { key: 'tipText', label: 'Texte conseil', textarea: true }
-    ],
-    events: [
-      { key: 'label', label: 'Libellé navigation' },
-      { key: 'title', label: 'Titre principal' },
-      { key: 'sub', label: 'Sous-titre' },
-      { key: 'warningTitle', label: 'Titre avertissement' },
-      { key: 'warningText', label: 'Texte avertissement', textarea: true }
-    ],
-    custom: [
-      { key: 'label', label: 'Libellé navigation' },
-      { key: 'title', label: 'Titre principal' },
-      { key: 'sub', label: 'Sous-titre' },
-      { key: 'desc', label: 'Description', textarea: true }
-    ]
-  };
-
-  function renderTabs() {
-    const container = document.getElementById('tabs-list');
-    const tabs = (DATA.tabs || []).slice().sort((a,b) => a.order - b.order);
-    container.innerHTML = tabs.map((tab, idx) => {
-      const uid = 'tab-' + tab.id;
-      const fields = TAB_FIELD_SETS[tab.type] || TAB_FIELD_SETS.custom;
-      const label = (tab.i18n && tab.i18n.fr && tab.i18n.fr.label) || tab.id;
-
-      return `
-        <div class="item-card" data-id="${tab.id}">
-          <div class="item-card-header">
-            <div class="item-card-title">
-              <span>${tab.icon || '❔'}</span>
-              <span>${label}</span>
-              <span class="item-card-meta">(${tab.id} · ${tab.type})</span>
-              ${!tab.enabled ? '<span class="item-card-meta" style="color:var(--danger)">DÉSACTIVÉ</span>' : ''}
-            </div>
-            <div class="item-card-actions">
-              <div class="order-controls">
-                <button class="small move-up" ${idx===0?'disabled':''}>▲</button>
-                <button class="small move-down" ${idx===tabs.length-1?'disabled':''}>▼</button>
-              </div>
-              <button class="small toggle-expand">Éditer</button>
-              <button class="small delete-tab danger">Suppr.</button>
-            </div>
-          </div>
-          <div class="item-card-body">
-            <div class="grid-3">
-              <div>
-                <label>Icône (emoji)</label>
-                <input type="text" class="f-icon" value="${tab.icon || ''}" />
-              </div>
-              <div>
-                <label>Type de section</label>
-                <select class="f-type">
-                  <option value="home" ${tab.type==='home'?'selected':''}>Accueil</option>
-                  <option value="troops" ${tab.type==='troops'?'selected':''}>Héros</option>
-                  <option value="events" ${tab.type==='events'?'selected':''}>Événements</option>
-                  <option value="custom" ${tab.type==='custom'?'selected':''}>Personnalisé (texte libre)</option>
-                </select>
-              </div>
-              <div class="checkbox-row" style="margin-top:24px;">
-                <input type="checkbox" class="f-enabled" id="enabled-${tab.id}" ${tab.enabled ? 'checked' : ''}/>
-                <label for="enabled-${tab.id}">Onglet activé (visible sur le site)</label>
-              </div>
-            </div>
-
-            ${langTabsHtml(uid)}
-            ${LANGS.map((l, i) => `
-              <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
-                ${fields.map(f => `
-                  <label>${f.label} (${l.code.toUpperCase()})</label>
-                  ${f.textarea
-                    ? `<textarea class="f-i18n" data-key="${f.key}" data-lang="${l.code}">${(tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || ''}</textarea>`
-                    : `<input type="text" class="f-i18n" data-key="${f.key}" data-lang="${l.code}" value="${(tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || ''}" />`
-                  }
-                `).join('')}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
+  function renderNav() {
+    const navInner = document.getElementById('nav-inner');
+    const tabs = (DATA.tabs || []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
+    navInner.innerHTML = tabs.map((tab, i) => {
+      const langData = (tab.i18n && (tab.i18n[currentLang] || tab.i18n.fr)) || {};
+      const label = langData.label || tab.id;
+      return `<button class="nav-btn ${i === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.icon || ''} <span>${label}</span></button>`;
     }).join('');
 
-    bindLangTabs(container);
-
-    // bindings
-    container.querySelectorAll('.item-card').forEach(card => {
-      const id = card.dataset.id;
-      const tab = DATA.tabs.find(t => t.id === id);
-
-      card.querySelector('.toggle-expand').addEventListener('click', () => card.classList.toggle('expanded'));
-
-      card.querySelector('.delete-tab').addEventListener('click', () => {
-        if (confirm(`Supprimer l'onglet "${id}" ?`)) {
-          DATA.tabs = DATA.tabs.filter(t => t.id !== id);
-          renderTabs();
-        }
-      });
-
-      card.querySelector('.move-up').addEventListener('click', () => {
-        moveTab(id, -1);
-      });
-      card.querySelector('.move-down').addEventListener('click', () => {
-        moveTab(id, 1);
-      });
-
-      card.querySelector('.f-icon').addEventListener('input', e => tab.icon = e.target.value);
-      card.querySelector('.f-enabled').addEventListener('change', e => tab.enabled = e.target.checked);
-      card.querySelector('.f-type').addEventListener('change', e => {
-        tab.type = e.target.value;
-        renderTabs();
-      });
-
-      card.querySelectorAll('.f-i18n').forEach(input => {
-        input.addEventListener('input', e => {
-          const lang = e.target.dataset.lang;
-          const key = e.target.dataset.key;
-          if (!tab.i18n) tab.i18n = {};
-          if (!tab.i18n[lang]) tab.i18n[lang] = {};
-          tab.i18n[lang][key] = e.target.value;
-        });
-      });
+    navInner.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => showSection(btn.dataset.tab));
     });
+
+    if (tabs.length) showSection(tabs[0].id);
   }
 
-  function moveTab(id, dir) {
-    const tabs = DATA.tabs.slice().sort((a,b) => a.order - b.order);
-    const idx = tabs.findIndex(t => t.id === id);
-    const swapIdx = idx + dir;
-    if (swapIdx < 0 || swapIdx >= tabs.length) return;
-    const tmp = tabs[idx].order;
-    tabs[idx].order = tabs[swapIdx].order;
-    tabs[swapIdx].order = tmp;
-    renderTabs();
-  }
+  function renderHomeSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    const otherTabs = (DATA.tabs || []).filter(tb => tb.enabled && tb.id !== tab.id).sort((a,b) => a.order - b.order);
 
-  document.getElementById('add-tab-btn').addEventListener('click', () => {
-    const id = prompt("Identifiant unique de l'onglet (sans espaces, ex: 'shop')");
-    if (!id) return;
-    if (DATA.tabs.find(t => t.id === id)) { alert("Cet identifiant existe déjà."); return; }
-    const maxOrder = DATA.tabs.reduce((m, t) => Math.max(m, t.order), -1);
-    DATA.tabs.push({
-      id, icon: '⭐', order: maxOrder + 1, enabled: true, type: 'custom',
-      i18n: { fr: { label: id, title: id.toUpperCase(), sub: '', desc: '' } }
-    });
-    renderTabs();
-  });
-
-  // ───────────────────────────────────────────
-  // HEROES PANEL
-  // ───────────────────────────────────────────
-  function renderHeroes() {
-    const container = document.getElementById('heroes-list');
-    const keys = Object.keys(DATA.heroNames || {}).sort();
-    container.innerHTML = keys.map(key => `
-      <div class="item-card" data-key="${key}" style="padding:10px 16px;">
-        <div class="item-card-header" style="margin:0;">
-          <div class="item-card-title" style="font-size:0.95rem;">
-            <span class="item-card-meta">${key}</span>
-            <input type="text" class="f-hero-name" value="${DATA.heroNames[key]}" style="width:160px; display:inline-block;" />
+    const quickLinks = otherTabs.map(ot => {
+      const oi = t(ot.i18n, currentLang, {});
+      const subLabel = ot.type === 'troops' ? ui.home_ql_troops : (ot.type === 'events' ? ui.home_ql_events : (oi.label || ''));
+      return `
+        <div class="quick-link" data-tab="${ot.id}">
+          <span class="ql-icon">${ot.icon || ''}</span>
+          <div class="ql-text">
+            <strong>${oi.label || ot.id}</strong>
+            <span>${subLabel}</span>
           </div>
-          <div class="item-card-actions">
-            <button class="small delete-hero danger">Suppr.</button>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="welcome-banner">
+        <h2>${i.title || ''}</h2>
+        <p>${i.desc || ''}</p>
+      </div>
+      <div class="quick-links">${quickLinks}</div>
+      <div class="callout">
+        <strong>${i.noticeTitle || ''}</strong>
+        <span>${i.noticeText || ''}</span>
+      </div>
+    `;
+  }
+
+  function renderTroopsSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    const groups = DATA.heroGroups || {};
+    const heroTable = DATA.heroTable || {};
+    const heroNames = DATA.heroNames || {};
+
+    const gatherersStrip = (groups.gatherers || []).map(k => heroThumb(k)).join('');
+    const frontlineStrip = (groups.frontline || []).map(k => heroThumb(k)).join('');
+    const backlineStrip = (groups.backline || []).map(k => heroThumb(k)).join('');
+
+    const tableRows = Object.keys(heroTable).sort().map(key => {
+      const row = heroTable[key];
+      const name = heroNames[key] || key;
+      const mark = v => v ? '✔️' : '❌';
+      return `<tr>
+        <td>${heroThumb(key, false)}</td>
+        <td>${name}</td>
+        <td>${mark(row.solo)}</td>
+        <td>${mark(row.rally)}</td>
+        <td>${mark(row.rallyCage)}</td>
+        <td>${mark(row.rejoinCage)}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+      <div class="section-title">${i.title || ''}</div>
+      <div class="section-sub">${i.sub || ''}</div>
+
+      <div class="callout">
+        <strong>${i.tipTitle || ''}</strong>
+        <span>${i.tipText || ''}</span>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-tier tier-1">${ui.tier1}</div>
+          <div class="card-name">${ui.troop1_name}</div>
+          <div class="card-desc">${ui.troop1_desc}</div>
+          <div class="hero-strip">
+            <span class="hero-strip-label">${ui.heroes_label}</span>
+            <div class="hero-strip-imgs">${gatherersStrip}</div>
+          </div>
+          <div class="stat-row"><span class="stat-label">${ui.stat_role}</span><span class="stat-value warn">${ui.role_farm}</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.stat_rec}</span><span class="stat-value bad">${ui.rec_no}</span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-tier tier-2">${ui.tier2}</div>
+          <div class="card-desc">${ui.troop2_desc1}</div>
+          <div class="card-desc">${ui.troop2_desc2}</div>
+          <div class="hero-strip">
+            <span class="hero-strip-label">${ui.first_line}</span>
+            <div class="hero-strip-imgs">${frontlineStrip}</div>
+          </div>
+          <div class="hero-strip">
+            <span class="hero-strip-label">${ui.robots}</span>
+          </div>
+          <div class="hero-strip">
+            <span class="hero-strip-label">${ui.second_line}</span>
+            <div class="hero-strip-imgs">${backlineStrip}</div>
           </div>
         </div>
-      </div>
-    `).join('');
 
-    container.querySelectorAll('.item-card').forEach(card => {
-      const key = card.dataset.key;
-      card.querySelector('.f-hero-name').addEventListener('input', e => {
-        DATA.heroNames[key] = e.target.value;
-      });
-      card.querySelector('.delete-hero').addEventListener('click', () => {
-        if (confirm(`Supprimer le héros "${key}" ? (image: images/heros/${key}.jpg à retirer manuellement)`)) {
-          delete DATA.heroNames[key];
-          delete DATA.heroTable[key];
-          Object.keys(DATA.heroGroups).forEach(g => {
-            DATA.heroGroups[g] = DATA.heroGroups[g].filter(k => k !== key);
-          });
-          renderAll();
-        }
-      });
-    });
-  }
+        <div class="card">
+          <div class="card-tier tier-3">${ui.tier3}</div>
+          <div class="card-name">${ui.troop3_name}</div>
+          <div class="card-desc">${ui.troop3_desc}</div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_def}</span><span class="stat-value">20%</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_bomber}</span><span class="stat-value">20%</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_tir}</span><span class="stat-value">60%</span></div>
+        </div>
 
-  document.getElementById('add-hero-btn').addEventListener('click', () => {
-    const key = prompt("Identifiant héros (en minuscules, sans espaces, ex: 'newhero')\nL'image devra être placée dans images/heros/<id>.jpg");
-    if (!key) return;
-    const cleanKey = key.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (!cleanKey) return;
-    if (DATA.heroNames[cleanKey]) { alert("Ce héros existe déjà."); return; }
-    const name = prompt("Nom affiché du héros", cleanKey.charAt(0).toUpperCase() + cleanKey.slice(1)) || cleanKey;
-    DATA.heroNames[cleanKey] = name;
-    DATA.heroTable[cleanKey] = { solo: false, rally: false, rallyCage: false, rejoinCage: false };
-    renderAll();
-  });
-
-  // ───────────────────────────────────────────
-  // HERO GROUPS
-  // ───────────────────────────────────────────
-  const GROUP_LABELS = {
-    gatherers: 'Récolteurs (carte Récoltes)',
-    frontline: 'Première ligne (carte Arène)',
-    backline: 'Seconde ligne (carte Arène)'
-  };
-
-  function renderHeroGroups() {
-    const container = document.getElementById('hero-groups');
-    const keys = Object.keys(DATA.heroNames || {}).sort();
-
-    container.innerHTML = Object.keys(GROUP_LABELS).map(group => `
-      <div style="margin-bottom:18px;">
-        <label>${GROUP_LABELS[group]}</label>
-        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
-          ${keys.map(key => `
-            <label class="checkbox-row" style="background:var(--surface); border:1px solid var(--border); padding:4px 10px; border-radius:2px;">
-              <input type="checkbox" class="f-group" data-group="${group}" data-key="${key}" ${(DATA.heroGroups[group]||[]).includes(key) ? 'checked' : ''}/>
-              ${DATA.heroNames[key]}
-            </label>
-          `).join('')}
+        <div class="card">
+          <div class="card-tier tier-4">${ui.tier4}</div>
+          <div class="card-name">${ui.troop4_name}</div>
+          <div class="card-desc">${ui.troop4_desc}</div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_def}</span><span class="stat-value">20%</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_bomber}</span><span class="stat-value">20%</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_tir}</span><span class="stat-value">60%</span></div>
         </div>
       </div>
-    `).join('');
 
-    container.querySelectorAll('.f-group').forEach(cb => {
-      cb.addEventListener('change', e => {
-        const group = e.target.dataset.group;
-        const key = e.target.dataset.key;
-        if (!DATA.heroGroups[group]) DATA.heroGroups[group] = [];
-        if (e.target.checked) {
-          if (!DATA.heroGroups[group].includes(key)) DATA.heroGroups[group].push(key);
-        } else {
-          DATA.heroGroups[group] = DATA.heroGroups[group].filter(k => k !== key);
-        }
-      });
-    });
-  }
-
-  // ───────────────────────────────────────────
-  // HERO TABLE
-  // ───────────────────────────────────────────
-  function renderHeroTable() {
-    const container = document.getElementById('hero-table-editor');
-    const keys = Object.keys(DATA.heroNames || {}).sort();
-
-    container.innerHTML = `
-      <table class="hero-table">
+      <div class="section-title" style="font-size:1.4rem;">${ui.troops_table_title}</div>
+      <table class="data-table">
         <thead>
           <tr>
-            <th>Héros</th>
-            <th>Solo</th>
-            <th>Ralliements</th>
-            <th>Rally Cage</th>
-            <th>Rejoindre Cage</th>
+            <th>${ui.col_tier}</th>
+            <th>${ui.col_name}</th>
+            <th>${ui.troop3_name}</th>
+            <th>${ui.troop4_name}</th>
+            <th>${ui.col_rally}</th>
+            <th>${ui.col_rejoin}</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    `;
+  }
+
+  function renderEventsSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    const events = DATA.events || [];
+
+    const cards = events.map(ev => {
+      const name = t(ev.name, currentLang);
+      const desc = t(ev.desc, currentLang);
+      const tag = t(ev.tag, currentLang);
+      return `
+        <div class="event-card type-${ev.type}">
+          <div class="event-tag tag-${ev.type}">${tag}</div>
+          <div class="event-date">${t(ev.date, currentLang)}</div>
+          <div class="event-name">${name}</div>
+          <div class="event-desc">${desc}</div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="section-title">${i.title || ''}</div>
+      <div class="section-sub">${i.sub || ''}</div>
+
+      <div class="callout danger">
+        <strong>${i.warningTitle || ''}</strong>
+        <span>${i.warningText || ''}</span>
+      </div>
+
+      <div class="calendar-grid">${cards}</div>
+
+      <div class="section-title" style="font-size:1.4rem;">${ui.events_table_title}</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>${ui.col_day}</th>
+            <th>${ui.col_event}</th>
+            <th>${ui.col_type}</th>
+            <th>${ui.col_req}</th>
           </tr>
         </thead>
         <tbody>
-          ${keys.map(key => {
-            const row = DATA.heroTable[key] || { solo:false, rally:false, rallyCage:false, rejoinCage:false };
-            return `
-              <tr data-key="${key}">
-                <td>${DATA.heroNames[key]}</td>
-                <td><input type="checkbox" class="f-table" data-field="solo" ${row.solo?'checked':''}/></td>
-                <td><input type="checkbox" class="f-table" data-field="rally" ${row.rally?'checked':''}/></td>
-                <td><input type="checkbox" class="f-table" data-field="rallyCage" ${row.rallyCage?'checked':''}/></td>
-                <td><input type="checkbox" class="f-table" data-field="rejoinCage" ${row.rejoinCage?'checked':''}/></td>
-              </tr>
-            `;
-          }).join('')}
+          ${events.map(ev => `
+            <tr>
+              <td>${t(ev.date, currentLang)}</td>
+              <td>${t(ev.name, currentLang)}</td>
+              <td>${t(ev.tag, currentLang)}</td>
+              <td>${ui.req_rec}</td>
+            </tr>`).join('')}
         </tbody>
       </table>
     `;
-
-    container.querySelectorAll('tr[data-key]').forEach(tr => {
-      const key = tr.dataset.key;
-      if (!DATA.heroTable[key]) DATA.heroTable[key] = { solo:false, rally:false, rallyCage:false, rejoinCage:false };
-      tr.querySelectorAll('.f-table').forEach(cb => {
-        cb.addEventListener('change', e => {
-          DATA.heroTable[key][e.target.dataset.field] = e.target.checked;
-        });
-      });
-    });
   }
 
-  // ───────────────────────────────────────────
-  // EVENTS PANEL
-  // ───────────────────────────────────────────
-  const EVENT_TYPES = [
-    { value: 'war', label: 'Guerre' },
-    { value: 'rally', label: 'Rally' },
-    { value: 'resource', label: 'Ressources' },
-    { value: 'alliance', label: 'Alliance' }
-  ];
-
-  function renderEvents() {
-    const container = document.getElementById('events-list');
-    const events = DATA.events || [];
-
-    container.innerHTML = events.map((ev, idx) => {
-      const uid = 'ev-' + ev.id;
-      const nameFr = (ev.name && ev.name.fr) || ev.id;
-      return `
-        <div class="item-card" data-id="${ev.id}">
-          <div class="item-card-header">
-            <div class="item-card-title">
-              <span class="item-card-meta">[${ev.type}]</span>
-              <span>${nameFr}</span>
-            </div>
-            <div class="item-card-actions">
-              <button class="small toggle-expand">Éditer</button>
-              <button class="small delete-event danger">Suppr.</button>
-            </div>
-          </div>
-          <div class="item-card-body">
-            <div class="grid-2">
-              <div>
-                <label>Type</label>
-                <select class="f-ev-type">
-                  ${EVENT_TYPES.map(t => `<option value="${t.value}" ${ev.type===t.value?'selected':''}>${t.label}</option>`).join('')}
-                </select>
-              </div>
-              <div>
-                <label>Date / fréquence (texte libre, affiché tel quel)</label>
-                <input type="text" class="f-ev-date" value="${ev.date || ''}" />
-              </div>
-            </div>
-
-            ${langTabsHtml(uid)}
-            ${LANGS.map((l, i) => `
-              <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
-                <label>Tag (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-ev-tag" data-lang="${l.code}" value="${(ev.tag && ev.tag[l.code]) || ''}" />
-                <label>Nom (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-ev-name" data-lang="${l.code}" value="${(ev.name && ev.name[l.code]) || ''}" />
-                <label>Description (${l.code.toUpperCase()})</label>
-                <textarea class="f-ev-desc" data-lang="${l.code}">${(ev.desc && ev.desc[l.code]) || ''}</textarea>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    bindLangTabs(container);
-
-    container.querySelectorAll('.item-card').forEach(card => {
-      const id = card.dataset.id;
-      const ev = DATA.events.find(e => e.id === id);
-
-      card.querySelector('.toggle-expand').addEventListener('click', () => card.classList.toggle('expanded'));
-      card.querySelector('.delete-event').addEventListener('click', () => {
-        if (confirm(`Supprimer l'événement "${id}" ?`)) {
-          DATA.events = DATA.events.filter(e => e.id !== id);
-          renderEvents();
-        }
-      });
-
-      card.querySelector('.f-ev-type').addEventListener('change', e => { ev.type = e.target.value; renderEvents(); });
-      card.querySelector('.f-ev-date').addEventListener('input', e => ev.date = e.target.value);
-
-      card.querySelectorAll('.f-ev-tag').forEach(inp => inp.addEventListener('input', e => {
-        if (!ev.tag) ev.tag = {};
-        ev.tag[e.target.dataset.lang] = e.target.value;
-      }));
-      card.querySelectorAll('.f-ev-name').forEach(inp => inp.addEventListener('input', e => {
-        if (!ev.name) ev.name = {};
-        ev.name[e.target.dataset.lang] = e.target.value;
-      }));
-      card.querySelectorAll('.f-ev-desc').forEach(inp => inp.addEventListener('input', e => {
-        if (!ev.desc) ev.desc = {};
-        ev.desc[e.target.dataset.lang] = e.target.value;
-      }));
-    });
-  }
-
-  document.getElementById('add-event-btn').addEventListener('click', () => {
-    const id = 'event_' + Date.now();
-    DATA.events.push({
-      id, type: 'war', date: '',
-      tag: {}, name: {}, desc: {}
-    });
-    renderEvents();
-  });
-
-  // ───────────────────────────────────────────
-  // UI TEXTS PANEL
-  // ───────────────────────────────────────────
-  const UI_FIELDS = [
-    { key: 'footer', label: 'Texte du pied de page' },
-    { key: 'tier1', label: 'Tier 1 (Récoltes)' },
-    { key: 'tier2', label: 'Tier 2 (Arène)' },
-    { key: 'tier3', label: 'Tier 3 (Solo)' },
-    { key: 'tier4', label: 'Tier 4 (Ralliements)' },
-    { key: 'troop1_name', label: 'Nom carte Récolteurs' },
-    { key: 'troop1_desc', label: 'Description carte Récolteurs', textarea: true },
-    { key: 'troop2_desc1', label: 'Description carte Arène 1', textarea: true },
-    { key: 'troop2_desc2', label: 'Description carte Arène 2', textarea: true },
-    { key: 'troop3_name', label: 'Nom carte Solo' },
-    { key: 'troop3_desc', label: 'Description carte Solo', textarea: true },
-    { key: 'troop4_name', label: 'Nom carte Ralliements' },
-    { key: 'troop4_desc', label: 'Description carte Ralliements', textarea: true },
-    { key: 'stat_role', label: 'Libellé "Rôle"' },
-    { key: 'stat_rec', label: 'Libellé "Recommandation"' },
-    { key: 'role_farm', label: 'Valeur rôle "Collecte"' },
-    { key: 'rec_no', label: 'Valeur "Pas de combat"' },
-    { key: 'troops_def', label: 'Libellé Déflecteurs' },
-    { key: 'troops_bomber', label: 'Libellé Bombardiers' },
-    { key: 'troops_tir', label: 'Libellé Tireurs' },
-    { key: 'troops_table_title', label: 'Titre tableau comparatif héros' },
-    { key: 'col_tier', label: 'Colonne "Héros"' },
-    { key: 'col_name', label: 'Colonne "Nom"' },
-    { key: 'col_rally', label: 'Colonne "Rally Cage"' },
-    { key: 'col_rejoin', label: 'Colonne "Rejoindre Cage"' },
-    { key: 'first_line', label: 'Libellé "Première ligne"' },
-    { key: 'robots', label: 'Libellé "Robots"' },
-    { key: 'second_line', label: 'Libellé "Seconde ligne"' },
-    { key: 'heroes_label', label: 'Libellé "Héros" (strip)' },
-    { key: 'events_table_title', label: 'Titre tableau événements' },
-    { key: 'col_day', label: 'Colonne "Jour"' },
-    { key: 'col_event', label: 'Colonne "Événement"' },
-    { key: 'col_type', label: 'Colonne "Type"' },
-    { key: 'col_req', label: 'Colonne "Requis"' },
-    { key: 'req_yes', label: 'Valeur "Oui"' },
-    { key: 'req_rec', label: 'Valeur "Recommandé"' },
-    { key: 'req_opt', label: 'Valeur "Optionnel"' },
-    { key: 'home_ql_troops', label: 'Sous-texte lien rapide Héros' },
-    { key: 'home_ql_events', label: 'Sous-texte lien rapide Événements' }
-  ];
-
-  function renderUi() {
-    const container = document.getElementById('ui-editor');
-    const uid = 'ui-editor';
-    container.innerHTML = `
-      ${langTabsHtml(uid)}
-      ${LANGS.map((l, i) => `
-        <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
-          ${UI_FIELDS.map(f => `
-            <label>${f.label}</label>
-            ${f.textarea
-              ? `<textarea class="f-ui" data-key="${f.key}" data-lang="${l.code}">${(DATA.ui[l.code] && DATA.ui[l.code][f.key]) || ''}</textarea>`
-              : `<input type="text" class="f-ui" data-key="${f.key}" data-lang="${l.code}" value="${(DATA.ui[l.code] && DATA.ui[l.code][f.key]) || ''}" />`
-            }
-          `).join('')}
-        </div>
-      `).join('')}
+  function renderCustomSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    return `
+      <div class="section-title">${i.title || tab.id}</div>
+      ${i.sub ? `<div class="section-sub">${i.sub}</div>` : ''}
+      ${i.desc ? `<div class="welcome-banner"><p style="white-space:pre-line;">${i.desc}</p></div>` : ''}
     `;
+  }
 
-    bindLangTabs(container);
+  function renderRichtextSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const blocks = tab.blocks || [];
+    const blocksHtml = blocks.map(b => {
+      const title = t(b.title, currentLang);
+      const text = t(b.text, currentLang);
+      const cls = b.style === 'callout' ? 'content-block callout' : 'content-block';
+      return `<div class="${cls}">
+        ${title ? `<h3>${title}</h3>` : ''}
+        ${text ? `<p>${text}</p>` : ''}
+      </div>`;
+    }).join('');
+    return `
+      <div class="section-title">${i.title || tab.id}</div>
+      ${i.sub ? `<div class="section-sub">${i.sub}</div>` : ''}
+      ${blocksHtml}
+    `;
+  }
 
-    container.querySelectorAll('.f-ui').forEach(input => {
-      input.addEventListener('input', e => {
-        const lang = e.target.dataset.lang;
-        const key = e.target.dataset.key;
-        if (!DATA.ui[lang]) DATA.ui[lang] = {};
-        DATA.ui[lang][key] = e.target.value;
-      });
+  function renderGallerySection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const images = tab.images || [];
+    const itemsHtml = images.map(img => {
+      const caption = t(img.caption, currentLang);
+      return `<div class="gallery-item">
+        <img src="${img.src || ''}" alt="${caption || ''}" loading="lazy">
+        ${caption ? `<div class="caption">${caption}</div>` : ''}
+      </div>`;
+    }).join('');
+    return `
+      <div class="section-title">${i.title || tab.id}</div>
+      ${i.sub ? `<div class="section-sub">${i.sub}</div>` : ''}
+      <div class="gallery-grid">${itemsHtml}</div>
+    `;
+  }
+
+  function renderLinksSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const links = tab.links || [];
+    const linksHtml = links.map(lk => {
+      const title = t(lk.title, currentLang);
+      const sub = t(lk.sub, currentLang);
+      const url = lk.url || '#';
+      const external = /^https?:\/\//i.test(url);
+      return `<a class="link-card" href="${url}" ${external ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+        <span class="lk-icon">${lk.icon || '🔗'}</span>
+        <div class="lk-text">
+          <strong>${title || url}</strong>
+          ${sub ? `<span>${sub}</span>` : ''}
+        </div>
+      </a>`;
+    }).join('');
+    return `
+      <div class="section-title">${i.title || tab.id}</div>
+      ${i.sub ? `<div class="section-sub">${i.sub}</div>` : ''}
+      ${i.desc ? `<div class="welcome-banner"><p style="white-space:pre-line;">${i.desc}</p></div>` : ''}
+      <div class="links-grid">${linksHtml}</div>
+    `;
+  }
+
+  function renderSectionContent(tab) {
+    switch (tab.type) {
+      case 'home': return renderHomeSection(tab);
+      case 'troops': return renderTroopsSection(tab);
+      case 'events': return renderEventsSection(tab);
+      case 'richtext': return renderRichtextSection(tab);
+      case 'gallery': return renderGallerySection(tab);
+      case 'links': return renderLinksSection(tab);
+      case 'custom': return renderCustomSection(tab);
+      default: return renderCustomSection(tab);
+    }
+  }
+
+  function renderMain() {
+    const main = document.getElementById('main');
+    const tabs = (DATA.tabs || []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
+    main.innerHTML = tabs.map((tab, i) => `
+      <div id="section-${tab.id}" class="section ${i === 0 ? 'active' : ''}">
+        ${renderSectionContent(tab)}
+      </div>
+    `).join('');
+
+    // quick-link clicks
+    main.querySelectorAll('.quick-link[data-tab]').forEach(el => {
+      el.addEventListener('click', () => showSection(el.dataset.tab));
     });
   }
 
-  // ───────────────────────────────────────────
-  // IMPORT / EXPORT / SEED
-  // ───────────────────────────────────────────
-  document.getElementById('export-btn').addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nk2-wiki-export-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  function renderFooter() {
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    document.getElementById('footer').innerHTML = `<span>${ui.footer || ''}</span>`;
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const sec = document.getElementById('section-' + id);
+    if (sec) sec.classList.add('active');
+    const btn = document.querySelector(`.nav-btn[data-tab="${id}"]`);
+    if (btn) btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function render() {
+    renderNav();
+    renderMain();
+    renderFooter();
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  }
+
+  // language switching
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentLang = btn.dataset.lang;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    });
   });
 
-  document.getElementById('import-btn').addEventListener('click', () => {
-    const raw = document.getElementById('import-textarea').value.trim();
-    if (!raw) return;
-    try {
-      const parsed = JSON.parse(raw);
-      if (!confirm("Ceci va remplacer TOUTES les données actuelles. Continuer ?")) return;
-      DATA = parsed;
-      renderAll();
-      showToast("Données importées (n'oubliez pas d'enregistrer)");
-    } catch (e) {
-      showToast("JSON invalide : " + e.message, true);
-    }
-  });
-
-  document.getElementById('seed-btn').addEventListener('click', async () => {
-    if (!confirm("Charger les données par défaut ? Ceci écrasera les données actuelles si elles existent.")) return;
-    try {
-      const resp = await fetch('seed-data.json');
-      if (!resp.ok) throw new Error('seed-data.json introuvable');
-      DATA = await resp.json();
-      renderAll();
-      showToast("Données par défaut chargées (cliquez sur Enregistrer)");
-    } catch (e) {
-      showToast("Erreur : " + e.message, true);
-    }
-  });
+  loadData();
 </script>
 </body>
 </html>
