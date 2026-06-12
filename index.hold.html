@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NK2 Wiki — Land of Jail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0a0c0f;
+      --surface:   #111418;
+      --card:      #161b22;
+      --border:    #2a3040;
+      --accent:    #c8960a;
+      --accent2:   #e8b420;
+      --danger:    #c0392b;
+      --text:      #d4d8e0;
+      --muted:     #6b7280;
+      --green:     #2ecc71;
+      --blue:      #3498db;
+      --violet:    #9b59b6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+
+    header {
+      position: relative;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #0d1117 0%, var(--bg) 100%);
+      overflow: hidden;
+    }
+    .header-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.15;
+    }
+    .header-inner {
+      position: relative; max-width: 1100px; margin: 0 auto;
+      padding: 48px 24px 40px; display: flex; align-items: center; gap: 24px;
+    }
+    .header-emblem {
+      width: 72px; height: 72px; border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 2rem;
+      background: rgba(200,150,10,0.08); flex-shrink: 0;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+    .header-text h1 {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 6vw, 3.4rem);
+      letter-spacing: 4px; color: #fff; line-height: 1;
+    }
+    .header-text h1 span { color: var(--accent); }
+    .header-text p {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+      color: var(--muted); letter-spacing: 2px; margin-top: 6px;
+    }
+
+    .lang-bar { background: var(--surface); border-bottom: 1px solid var(--border); }
+    .lang-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; gap: 0; overflow-x: auto;
+    }
+    .lang-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted);
+      letter-spacing: 2px; padding-right: 16px; border-right: 1px solid var(--border);
+      margin-right: 4px; white-space: nowrap;
+    }
+    .lang-btn {
+      background: none; border: none; color: var(--muted); font-family: 'Barlow', sans-serif;
+      font-size: 0.82rem; font-weight: 600; padding: 10px 14px; cursor: pointer;
+      letter-spacing: 1px; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;
+    }
+    .lang-btn:hover { color: var(--text); }
+    .lang-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    nav { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 2px; overflow-x: auto; }
+    .nav-btn {
+      background: none; border: none; color: var(--muted); font-family: 'Barlow', sans-serif;
+      font-size: 0.85rem; font-weight: 600; padding: 14px 20px; cursor: pointer; letter-spacing: 1px;
+      text-transform: uppercase; border-bottom: 3px solid transparent; transition: all 0.2s;
+      white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    }
+    .nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+    .section { display: none; animation: fadeIn 0.3s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.6rem, 4vw, 2.4rem);
+      letter-spacing: 4px; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 14px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--accent) 0%, transparent 100%); }
+    .section-sub { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 32px; }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .card { background: var(--card); border: 1px solid var(--border); padding: 24px; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), transparent); }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card-tier { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 2px; padding: 3px 8px; border: 1px solid; display: inline-block; margin-bottom: 12px; }
+    .tier-1 { color: var(--blue); border-color: var(--blue); }
+    .tier-2 { color: var(--accent); border-color: var(--accent); }
+    .tier-3 { color: var(--danger); border-color: var(--danger); }
+    .tier-4 { color: var(--danger); border-color: var(--danger); }
+    .card-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 2px; color: #fff; margin-bottom: 8px; }
+    .card-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; }
+    .stat-value { color: var(--text); font-weight: 600; }
+    .stat-value.good { color: var(--green); }
+    .stat-value.warn { color: var(--accent); }
+    .stat-value.bad  { color: var(--danger); }
+
+    .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .event-card { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 20px 24px; position: relative; transition: border-color 0.2s; }
+    .event-card.type-war  { border-left-color: var(--danger); }
+    .event-card.type-rally{ border-left-color: #9b59b6; }
+    .event-card.type-resource { border-left-color: var(--green); }
+    .event-date { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 8px; }
+    .event-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; color: #fff; margin-bottom: 6px; }
+    .event-desc { font-size: 0.83rem; color: var(--muted); }
+    .event-tag { position: absolute; top: 20px; right: 20px; font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; padding: 3px 8px; border: 1px solid currentColor; }
+    .tag-war      { color: var(--danger); }
+    .tag-rally    { color: #9b59b6; }
+    .tag-resource { color: var(--green); }
+    .tag-alliance { color: var(--accent); }
+
+    .callout { border: 1px solid var(--border); border-left: 4px solid var(--accent); background: rgba(200,150,10,0.05); padding: 16px 20px; margin-bottom: 24px; font-size: 0.88rem; }
+    .callout.danger { border-left-color: var(--danger); background: rgba(192,57,43,0.06); }
+    .callout strong { color: var(--accent2); }
+    .callout.danger strong { color: var(--danger); }
+
+    .data-table { width: 100%; border-collapse: separate; font-size: 0.85rem; margin-bottom: 32px; overflow-x: auto; display: block; }
+    .data-table th { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 2px; color: var(--accent); border-bottom: 1px solid var(--accent); padding: 10px 14px; text-align: center; background: var(--card); }
+    .data-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: center; color: var(--text); }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .welcome-banner { background: var(--card); border: 1px solid var(--border); padding: 32px; margin-bottom: 32px; position: relative; overflow: hidden; }
+    .welcome-banner::after { content: '⚔'; position: absolute; right: 32px; top: 50%; transform: translateY(-50%); font-size: 6rem; opacity: 0.04; }
+    .welcome-banner h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 3px; color: var(--accent2); margin-bottom: 10px; }
+    .welcome-banner p { font-size: 0.92rem; color: var(--text); max-width: 600px; }
+
+    .quick-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .quick-link { background: var(--card); border: 1px solid var(--border); padding: 18px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+    .quick-link:hover { border-color: var(--accent); }
+    .quick-link .ql-icon { font-size: 1.6rem; }
+    .quick-link .ql-text strong { display: block; font-size: 0.88rem; color: #fff; font-weight: 700; letter-spacing: 0.5px; }
+    .quick-link .ql-text span { font-size: 0.75rem; color: var(--muted); }
+
+    .hero-strip { margin: 12px 0 4px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
+    .hero-strip-label { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 2px; color: var(--muted); display: block; margin-bottom: 8px; }
+    .hero-strip-imgs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .hero-thumb { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .hero-thumb img { width: 56px; height: 56px; object-fit: cover; object-position: top; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); transition: border-color 0.2s, transform 0.2s; }
+    .hero-thumb img:hover { border-color: var(--accent); transform: scale(1.2); }
+    .hero-thumb span { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--muted); letter-spacing: 0.5px; text-align: center; }
+
+    footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; }
+
+    .loading-screen {
+      position: fixed; inset: 0; background: var(--bg); z-index: 999;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Share Tech Mono', monospace; color: var(--accent); letter-spacing: 3px; font-size: 0.9rem;
+    }
+    .admin-link {
+      position: fixed; bottom: 16px; right: 16px;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      color: var(--muted); text-decoration: none; opacity: 0.4; letter-spacing: 1px;
+      border: 1px solid var(--border); padding: 4px 8px; transition: opacity 0.2s;
+    }
+    .admin-link:hover { opacity: 1; color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .header-inner { padding: 28px 16px 24px; }
+      .lang-inner, .nav-inner { padding: 0 12px; }
+      main { padding: 24px 16px 60px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .calendar-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading" class="loading-screen">CHARGEMENT...</div>
+
+<header>
+  <div class="header-grid"></div>
+  <div class="header-inner">
+    <div class="header-emblem">⚔️</div>
+    <div class="header-text">
+      <h1>NK2 <span>WIKI</span></h1>
+      <p>// LAND OF JAIL</p>
+    </div>
+  </div>
+</header>
+
+<div class="lang-bar">
+  <div class="lang-inner">
+    <span class="lang-label">LANG</span>
+    <button class="lang-btn active" data-lang="fr">🇫🇷</button>
+    <button class="lang-btn" data-lang="en">🇬🇧</button>
+    <button class="lang-btn" data-lang="it">🇮🇹</button>
+    <button class="lang-btn" data-lang="pt">🇧🇷</button>
+    <button class="lang-btn" data-lang="ar">🇸🇦</button>
+    <button class="lang-btn" data-lang="ja">🇯🇵</button>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-inner" id="nav-inner"></div>
+</nav>
+
+<main id="main"></main>
+
+<footer id="footer"></footer>
+
+<a href="admin.html" class="admin-link">ADMIN</a>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCWADXq-C8yTrc3XeO7GI44bYQo8inatQk",
+    authDomain: "nk2-wiki.firebaseapp.com",
+    projectId: "nk2-wiki",
+    storageBucket: "nk2-wiki.firebasestorage.app",
+    messagingSenderId: "93044027032",
+    appId: "1:93044027032:web:9daf883017bef141466aed"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const IMAGES_BASE = "images/heros/";
+
+  let DATA = null;
+  let currentLang = 'fr';
+
+  async function loadData() {
+    const snap = await getDoc(doc(db, "site", "content"));
+    if (snap.exists()) {
+      DATA = snap.data();
+    } else {
+      document.getElementById('loading').textContent = "ERREUR: données introuvables. Lancez l'import depuis admin.html.";
+      return;
+    }
+    render();
+    document.getElementById('loading').style.display = 'none';
+  }
+
+  function t(obj, lang, fallback) {
+    if (!obj) return fallback || '';
+    return obj[lang] !== undefined ? obj[lang] : (obj['fr'] !== undefined ? obj['fr'] : (fallback || ''));
+  }
+
+  function heroThumb(key, label) {
+    const name = (DATA.heroNames && DATA.heroNames[key]) || key;
+    return `<div class="hero-thumb"><img src="${IMAGES_BASE}${key}.jpg" alt="${key}">${label !== false ? `<span>${name}</span>` : ''}</div>`;
+  }
+
+  function renderNav() {
+    const navInner = document.getElementById('nav-inner');
+    const tabs = (DATA.tabs || []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
+    navInner.innerHTML = tabs.map((tab, i) => {
+      const label = t(tab.i18n && tab.i18n[currentLang], currentLang, tab.id).label || tab.id;
+      return `<button class="nav-btn ${i === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.icon || ''} <span>${label}</span></button>`;
+    }).join('');
+
+    navInner.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => showSection(btn.dataset.tab));
+    });
+
+    if (tabs.length) showSection(tabs[0].id);
+  }
+
+  function renderHomeSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    const otherTabs = (DATA.tabs || []).filter(tb => tb.enabled && tb.id !== tab.id).sort((a,b) => a.order - b.order);
+
+    const quickLinks = otherTabs.map(ot => {
+      const oi = t(ot.i18n, currentLang, {});
+      const subLabel = ot.type === 'troops' ? ui.home_ql_troops : (ot.type === 'events' ? ui.home_ql_events : (oi.label || ''));
+      return `
+        <div class="quick-link" data-tab="${ot.id}">
+          <span class="ql-icon">${ot.icon || ''}</span>
+          <div class="ql-text">
+            <strong>${oi.label || ot.id}</strong>
+            <span>${subLabel}</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="welcome-banner">
+        <h2>${i.title || ''}</h2>
+        <p>${i.desc || ''}</p>
+      </div>
+      <div class="quick-links">${quickLinks}</div>
+      <div class="callout">
+        <strong>${i.noticeTitle || ''}</strong>
+        <span>${i.noticeText || ''}</span>
+      </div>
+    `;
+  }
+
+  function renderTroopsSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    const groups = DATA.heroGroups || {};
+    const heroTable = DATA.heroTable || {};
+    const heroNames = DATA.heroNames || {};
+
+    const gatherersStrip = (groups.gatherers || []).map(k => heroThumb(k)).join('');
+    const frontlineStrip = (groups.frontline || []).map(k => heroThumb(k)).join('');
+    const backlineStrip = (groups.backline || []).map(k => heroThumb(k)).join('');
+
+    const tableRows = Object.keys(heroTable).sort().map(key => {
+      const row = heroTable[key];
+      const name = heroNames[key] || key;
+      const mark = v => v ? '✔️' : '❌';
+      return `<tr>
+        <td>${heroThumb(key, false)}</td>
+        <td>${name}</td>
+        <td>${mark(row.solo)}</td>
+        <td>${mark(row.rally)}</td>
+        <td>${mark(row.rallyCage)}</td>
+        <td>${mark(row.rejoinCage)}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+      <div class="section-title">${i.title || ''}</div>
+      <div class="section-sub">${i.sub || ''}</div>
+
+      <div class="callout">
+        <strong>${i.tipTitle || ''}</strong>
+        <span>${i.tipText || ''}</span>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-tier tier-1">${ui.tier1}</div>
+          <div class="card-name">${ui.troop1_name}</div>
+          <div class="card-desc">${ui.troop1_desc}</div>
+          <div class="hero-strip">
+            <span class="hero-strip-label">${ui.heroes_label}</span>
+            <div class="hero-strip-imgs">${gatherersStrip}</div>
+          </div>
+          <div class="stat-row"><span class="stat-label">${ui.stat_role}</span><span class="stat-value warn">${ui.role_farm}</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.stat_rec}</span><span class="stat-value bad">${ui.rec_no}</span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-tier tier-2">${ui.tier2}</div>
+          <div class="card-desc">${ui.troop2_desc1}</div>
+          <div class="card-desc">${ui.troop2_desc2}</div>
+          <div class="hero-strip">
+            <span class="hero-strip-label">${ui.first_line}</span>
+            <div class="hero-strip-imgs">${frontlineStrip}</div>
+          </div>
+          <div class="hero-strip">
+            <span class="hero-strip-label">${ui.robots}</span>
+          </div>
+          <div class="hero-strip">
+            <span class="hero-strip-label">${ui.second_line}</span>
+            <div class="hero-strip-imgs">${backlineStrip}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-tier tier-3">${ui.tier3}</div>
+          <div class="card-name">${ui.troop3_name}</div>
+          <div class="card-desc">${ui.troop3_desc}</div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_def}</span><span class="stat-value">20%</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_bomber}</span><span class="stat-value">20%</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_tir}</span><span class="stat-value">60%</span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-tier tier-4">${ui.tier4}</div>
+          <div class="card-name">${ui.troop4_name}</div>
+          <div class="card-desc">${ui.troop4_desc}</div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_def}</span><span class="stat-value">20%</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_bomber}</span><span class="stat-value">20%</span></div>
+          <div class="stat-row"><span class="stat-label">${ui.troops_tir}</span><span class="stat-value">60%</span></div>
+        </div>
+      </div>
+
+      <div class="section-title" style="font-size:1.4rem;">${ui.troops_table_title}</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>${ui.col_tier}</th>
+            <th>${ui.col_name}</th>
+            <th>${ui.troop3_name}</th>
+            <th>${ui.troop4_name}</th>
+            <th>${ui.col_rally}</th>
+            <th>${ui.col_rejoin}</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    `;
+  }
+
+  function renderEventsSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    const events = DATA.events || [];
+
+    const cards = events.map(ev => {
+      const name = t(ev.name, currentLang);
+      const desc = t(ev.desc, currentLang);
+      const tag = t(ev.tag, currentLang);
+      return `
+        <div class="event-card type-${ev.type}">
+          <div class="event-tag tag-${ev.type}">${tag}</div>
+          <div class="event-date">${ev.date || ''}</div>
+          <div class="event-name">${name}</div>
+          <div class="event-desc">${desc}</div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="section-title">${i.title || ''}</div>
+      <div class="section-sub">${i.sub || ''}</div>
+
+      <div class="callout danger">
+        <strong>${i.warningTitle || ''}</strong>
+        <span>${i.warningText || ''}</span>
+      </div>
+
+      <div class="calendar-grid">${cards}</div>
+
+      <div class="section-title" style="font-size:1.4rem;">${ui.events_table_title}</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>${ui.col_day}</th>
+            <th>${ui.col_event}</th>
+            <th>${ui.col_type}</th>
+            <th>${ui.col_req}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${events.map(ev => `
+            <tr>
+              <td>${ev.date || ''}</td>
+              <td>${t(ev.name, currentLang)}</td>
+              <td>${t(ev.tag, currentLang)}</td>
+              <td>${ui.req_rec}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function renderSectionContent(tab) {
+    switch (tab.type) {
+      case 'home': return renderHomeSection(tab);
+      case 'troops': return renderTroopsSection(tab);
+      case 'events': return renderEventsSection(tab);
+      default: return `<div class="section-title">${t(tab.i18n, currentLang, {}).title || tab.id}</div>`;
+    }
+  }
+
+  function renderMain() {
+    const main = document.getElementById('main');
+    const tabs = (DATA.tabs || []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
+    main.innerHTML = tabs.map((tab, i) => `
+      <div id="section-${tab.id}" class="section ${i === 0 ? 'active' : ''}">
+        ${renderSectionContent(tab)}
+      </div>
+    `).join('');
+
+    // quick-link clicks
+    main.querySelectorAll('.quick-link[data-tab]').forEach(el => {
+      el.addEventListener('click', () => showSection(el.dataset.tab));
+    });
+  }
+
+  function renderFooter() {
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    document.getElementById('footer').innerHTML = `<span>${ui.footer || ''}</span>`;
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const sec = document.getElementById('section-' + id);
+    if (sec) sec.classList.add('active');
+    const btn = document.querySelector(`.nav-btn[data-tab="${id}"]`);
+    if (btn) btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function render() {
+    renderNav();
+    renderMain();
+    renderFooter();
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  }
+
+  // language switching
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentLang = btn.dataset.lang;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    });
+  });
+
+  loadData();
+</script>
+</body>
+</html>
