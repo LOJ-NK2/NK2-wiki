@@ -181,6 +181,26 @@
 
     footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; }
 
+    /* ── CUSTOM SECTION TYPES ── */
+    .content-block { background: var(--card); border: 1px solid var(--border); padding: 20px 24px; margin-bottom: 16px; }
+    .content-block.callout { border-left: 4px solid var(--accent); background: rgba(200,150,10,0.05); }
+    .content-block h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 1.5px; color: #fff; margin-bottom: 8px; }
+    .content-block.callout h3 { color: var(--accent2); }
+    .content-block p { font-size: 0.9rem; color: var(--text); white-space: pre-line; }
+
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .gallery-item { background: var(--card); border: 1px solid var(--border); overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
+    .gallery-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .gallery-item img { width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover; background: var(--surface); }
+    .gallery-item .caption { padding: 10px 14px; font-size: 0.82rem; color: var(--muted); }
+
+    .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .link-card { background: var(--card); border: 1px solid var(--border); padding: 18px 20px; display: flex; align-items: center; gap: 12px; text-decoration: none; transition: all 0.2s; }
+    .link-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .link-card .lk-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .link-card .lk-text strong { display: block; font-size: 0.9rem; color: #fff; font-weight: 700; letter-spacing: 0.5px; }
+    .link-card .lk-text span { font-size: 0.76rem; color: var(--muted); }
+
     .loading-screen {
       position: fixed; inset: 0; background: var(--bg); z-index: 999;
       display: flex; align-items: center; justify-content: center;
@@ -263,19 +283,38 @@
   let currentLang = 'fr';
 
   async function loadData() {
-    const snap = await getDoc(doc(db, "site", "content"));
-    if (snap.exists()) {
-      DATA = snap.data();
-    } else {
-      document.getElementById('loading').textContent = "ERREUR: données introuvables. Lancez l'import depuis admin.html.";
-      return;
+    const loadingEl = document.getElementById('loading');
+    try {
+      const snap = await getDoc(doc(db, "site", "content"));
+      if (snap.exists() && snap.data() && (snap.data().tabs || []).length) {
+        DATA = snap.data();
+      } else {
+        // Firestore vide → bascule sur les données par défaut du repo
+        DATA = await loadFallback();
+      }
+    } catch (e) {
+      // Erreur de lecture (réseau, règles...) → tente le fallback local
+      console.error("Firestore indisponible :", e);
+      try {
+        DATA = await loadFallback();
+      } catch (e2) {
+        loadingEl.innerHTML = "ERREUR DE CHARGEMENT<br><span style='font-size:0.7rem'>Vérifiez la connexion ou chargez les données via admin.html</span>";
+        return;
+      }
     }
     render();
-    document.getElementById('loading').style.display = 'none';
+    loadingEl.style.display = 'none';
+  }
+
+  async function loadFallback() {
+    const resp = await fetch('seed-data.json', { cache: 'no-store' });
+    if (!resp.ok) throw new Error('seed-data.json introuvable');
+    return await resp.json();
   }
 
   function t(obj, lang, fallback) {
-    if (!obj) return fallback || '';
+    if (obj === null || obj === undefined) return fallback || '';
+    if (typeof obj === 'string') return obj;
     return obj[lang] !== undefined ? obj[lang] : (obj['fr'] !== undefined ? obj['fr'] : (fallback || ''));
   }
 
@@ -288,7 +327,8 @@
     const navInner = document.getElementById('nav-inner');
     const tabs = (DATA.tabs || []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
     navInner.innerHTML = tabs.map((tab, i) => {
-      const label = t(tab.i18n && tab.i18n[currentLang], currentLang, tab.id).label || tab.id;
+      const langData = (tab.i18n && (tab.i18n[currentLang] || tab.i18n.fr)) || {};
+      const label = langData.label || tab.id;
       return `<button class="nav-btn ${i === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.icon || ''} <span>${label}</span></button>`;
     }).join('');
 
@@ -442,7 +482,7 @@
       return `
         <div class="event-card type-${ev.type}">
           <div class="event-tag tag-${ev.type}">${tag}</div>
-          <div class="event-date">${ev.date || ''}</div>
+          <div class="event-date">${t(ev.date, currentLang)}</div>
           <div class="event-name">${name}</div>
           <div class="event-desc">${desc}</div>
         </div>`;
@@ -472,7 +512,7 @@
         <tbody>
           ${events.map(ev => `
             <tr>
-              <td>${ev.date || ''}</td>
+              <td>${t(ev.date, currentLang)}</td>
               <td>${t(ev.name, currentLang)}</td>
               <td>${t(ev.tag, currentLang)}</td>
               <td>${ui.req_rec}</td>
@@ -482,12 +522,85 @@
     `;
   }
 
+  function renderCustomSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    return `
+      <div class="section-title">${i.title || tab.id}</div>
+      ${i.sub ? `<div class="section-sub">${i.sub}</div>` : ''}
+      ${i.desc ? `<div class="welcome-banner"><p style="white-space:pre-line;">${i.desc}</p></div>` : ''}
+    `;
+  }
+
+  function renderRichtextSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const blocks = tab.blocks || [];
+    const blocksHtml = blocks.map(b => {
+      const title = t(b.title, currentLang);
+      const text = t(b.text, currentLang);
+      const cls = b.style === 'callout' ? 'content-block callout' : 'content-block';
+      return `<div class="${cls}">
+        ${title ? `<h3>${title}</h3>` : ''}
+        ${text ? `<p>${text}</p>` : ''}
+      </div>`;
+    }).join('');
+    return `
+      <div class="section-title">${i.title || tab.id}</div>
+      ${i.sub ? `<div class="section-sub">${i.sub}</div>` : ''}
+      ${blocksHtml}
+    `;
+  }
+
+  function renderGallerySection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const images = tab.images || [];
+    const itemsHtml = images.map(img => {
+      const caption = t(img.caption, currentLang);
+      return `<div class="gallery-item">
+        <img src="${img.src || ''}" alt="${caption || ''}" loading="lazy">
+        ${caption ? `<div class="caption">${caption}</div>` : ''}
+      </div>`;
+    }).join('');
+    return `
+      <div class="section-title">${i.title || tab.id}</div>
+      ${i.sub ? `<div class="section-sub">${i.sub}</div>` : ''}
+      <div class="gallery-grid">${itemsHtml}</div>
+    `;
+  }
+
+  function renderLinksSection(tab) {
+    const i = t(tab.i18n, currentLang, {});
+    const links = tab.links || [];
+    const linksHtml = links.map(lk => {
+      const title = t(lk.title, currentLang);
+      const sub = t(lk.sub, currentLang);
+      const url = lk.url || '#';
+      const external = /^https?:\/\//i.test(url);
+      return `<a class="link-card" href="${url}" ${external ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+        <span class="lk-icon">${lk.icon || '🔗'}</span>
+        <div class="lk-text">
+          <strong>${title || url}</strong>
+          ${sub ? `<span>${sub}</span>` : ''}
+        </div>
+      </a>`;
+    }).join('');
+    return `
+      <div class="section-title">${i.title || tab.id}</div>
+      ${i.sub ? `<div class="section-sub">${i.sub}</div>` : ''}
+      ${i.desc ? `<div class="welcome-banner"><p style="white-space:pre-line;">${i.desc}</p></div>` : ''}
+      <div class="links-grid">${linksHtml}</div>
+    `;
+  }
+
   function renderSectionContent(tab) {
     switch (tab.type) {
       case 'home': return renderHomeSection(tab);
       case 'troops': return renderTroopsSection(tab);
       case 'events': return renderEventsSection(tab);
-      default: return `<div class="section-title">${t(tab.i18n, currentLang, {}).title || tab.id}</div>`;
+      case 'richtext': return renderRichtextSection(tab);
+      case 'gallery': return renderGallerySection(tab);
+      case 'links': return renderLinksSection(tab);
+      case 'custom': return renderCustomSection(tab);
+      default: return renderCustomSection(tab);
     }
   }
 
