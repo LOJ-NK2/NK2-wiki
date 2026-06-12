@@ -129,6 +129,27 @@
     table.hero-table input[type="text"] { width: 100px; padding: 4px 6px; font-size: 0.75rem; }
 
     .hidden { display: none !important; }
+
+    /* ── AUTO-TRADUCTION ── */
+    .tr-btn {
+      margin: 2px 0 12px; padding: 3px 10px; font-size: 0.66rem; letter-spacing: 0.5px;
+      border-color: var(--border); color: var(--accent2); background: var(--surface); text-transform: none;
+    }
+    .tr-btn:hover { background: var(--accent); color: #0a0c0f; border-color: var(--accent); }
+    .tr-btn:disabled { opacity: 0.5; }
+    .tr-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 2000;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .tr-modal {
+      background: var(--card); border: 1px solid var(--accent); max-width: 580px; width: 100%;
+      max-height: 86vh; overflow: auto; padding: 24px;
+    }
+    .tr-modal h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; color: var(--accent2); margin-bottom: 12px; font-size: 1.3rem; }
+    .tr-src { background: var(--surface); border: 1px solid var(--border); padding: 10px 12px; margin-bottom: 10px; font-size: 0.88rem; color: var(--text); }
+    .tr-src span { display: block; font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; }
+    .tr-prop { min-height: 42px; margin-bottom: 4px; }
+    .tr-row-status { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--danger); letter-spacing: 1px; margin-bottom: 8px; min-height: 0.7rem; }
   </style>
 </head>
 <body>
@@ -297,7 +318,17 @@
     } else {
       DATA = emptyData();
     }
+    migrateData();
     renderAll();
+  }
+
+  function migrateData() {
+    (DATA.events || []).forEach(ev => {
+      if (typeof ev.date === 'string') {
+        ev.date = { fr: ev.date };
+      }
+      if (!ev.date) ev.date = {};
+    });
   }
 
   function emptyData() {
@@ -404,6 +435,22 @@
       { key: 'title', label: 'Titre principal' },
       { key: 'sub', label: 'Sous-titre' },
       { key: 'desc', label: 'Description', textarea: true }
+    ],
+    richtext: [
+      { key: 'label', label: 'Libellé navigation' },
+      { key: 'title', label: 'Titre principal' },
+      { key: 'sub', label: 'Sous-titre' }
+    ],
+    gallery: [
+      { key: 'label', label: 'Libellé navigation' },
+      { key: 'title', label: 'Titre principal' },
+      { key: 'sub', label: 'Sous-titre' }
+    ],
+    links: [
+      { key: 'label', label: 'Libellé navigation' },
+      { key: 'title', label: 'Titre principal' },
+      { key: 'sub', label: 'Sous-titre' },
+      { key: 'desc', label: 'Description', textarea: true }
     ]
   };
 
@@ -445,6 +492,9 @@
                   <option value="home" ${tab.type==='home'?'selected':''}>Accueil</option>
                   <option value="troops" ${tab.type==='troops'?'selected':''}>Héros</option>
                   <option value="events" ${tab.type==='events'?'selected':''}>Événements</option>
+                  <option value="richtext" ${tab.type==='richtext'?'selected':''}>Texte riche (blocs/FAQ)</option>
+                  <option value="gallery" ${tab.type==='gallery'?'selected':''}>Galerie d'images</option>
+                  <option value="links" ${tab.type==='links'?'selected':''}>Liste de liens</option>
                   <option value="custom" ${tab.type==='custom'?'selected':''}>Personnalisé (texte libre)</option>
                 </select>
               </div>
@@ -466,6 +516,8 @@
                 `).join('')}
               </div>
             `).join('')}
+
+            ${renderTabContentEditor(tab, uid)}
           </div>
         </div>
       `;
@@ -510,6 +562,8 @@
           tab.i18n[lang][key] = e.target.value;
         });
       });
+
+      bindTabContentEditor(card, tab);
     });
   }
 
@@ -522,6 +576,312 @@
     tabs[idx].order = tabs[swapIdx].order;
     tabs[swapIdx].order = tmp;
     renderTabs();
+  }
+
+  // ───────────────────────────────────────────
+  // TAB CONTENT EDITORS (par type de section)
+  // ───────────────────────────────────────────
+  function renderTabContentEditor(tab, uid) {
+    if (tab.type === 'richtext') return renderBlocksEditor(tab, uid);
+    if (tab.type === 'gallery') return renderGalleryEditor(tab, uid);
+    if (tab.type === 'links') return renderLinksEditor(tab, uid);
+    return '';
+  }
+
+  function bindTabContentEditor(card, tab) {
+    if (tab.type === 'richtext') return bindBlocksEditor(card, tab);
+    if (tab.type === 'gallery') return bindGalleryEditor(card, tab);
+    if (tab.type === 'links') return bindLinksEditor(card, tab);
+  }
+
+  // ── RICHTEXT (blocs de contenu / FAQ) ──
+  function renderBlocksEditor(tab, uid) {
+    if (!tab.blocks) tab.blocks = [];
+    const blocks = tab.blocks;
+    return `
+      <div class="section-label" style="margin-top:20px;">Blocs de contenu</div>
+      <div class="help-text">Chaque bloc a un titre et un texte, traduisibles par langue. Utile pour des pages d'info, règles, FAQ...</div>
+      <div class="blocks-list">
+        ${blocks.map((b, bidx) => `
+          <div class="item-card" data-bidx="${bidx}" style="padding:12px 16px;">
+            <div class="item-card-header" style="margin:0;">
+              <div class="item-card-title" style="font-size:0.95rem;">
+                <span class="item-card-meta">Bloc ${bidx + 1}</span>
+                <span>${(b.title && b.title.fr) || ''}</span>
+              </div>
+              <div class="item-card-actions">
+                <div class="order-controls">
+                  <button class="small block-up" ${bidx===0?'disabled':''}>▲</button>
+                  <button class="small block-down" ${bidx===blocks.length-1?'disabled':''}>▼</button>
+                </div>
+                <button class="small block-toggle-style">${b.style === 'callout' ? '📦 Encadré' : '📄 Texte'}</button>
+                <button class="small block-delete danger">Suppr.</button>
+              </div>
+            </div>
+            <div class="item-card-body" style="margin-top:10px; padding-top:10px;">
+              ${langTabsHtml(uid + '-block-' + bidx)}
+              ${LANGS.map((l, i) => `
+                <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-block-${bidx}" data-lang="${l.code}">
+                  <label>Titre (${l.code.toUpperCase()})</label>
+                  <input type="text" class="f-block-title" data-lang="${l.code}" value="${(b.title && b.title[l.code]) || ''}" />
+                  <label>Texte (${l.code.toUpperCase()})</label>
+                  <textarea class="f-block-text" data-lang="${l.code}">${(b.text && b.text[l.code]) || ''}</textarea>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="small add-block" style="margin-top:8px;">+ Ajouter un bloc</button>
+    `;
+  }
+
+  function bindBlocksEditor(card, tab) {
+    const listEl = card.querySelector('.blocks-list');
+    if (!listEl) return;
+
+    bindLangTabs(card);
+
+    listEl.querySelectorAll('.item-card[data-bidx]').forEach(bcard => {
+      const bidx = parseInt(bcard.dataset.bidx, 10);
+      const block = tab.blocks[bidx];
+      // expand body by default (no toggle button for blocks)
+      bcard.classList.add('expanded');
+
+      bcard.querySelector('.block-delete').addEventListener('click', () => {
+        if (confirm('Supprimer ce bloc ?')) {
+          tab.blocks.splice(bidx, 1);
+          renderTabs();
+        }
+      });
+      bcard.querySelector('.block-up').addEventListener('click', () => {
+        if (bidx > 0) {
+          [tab.blocks[bidx-1], tab.blocks[bidx]] = [tab.blocks[bidx], tab.blocks[bidx-1]];
+          renderTabs();
+        }
+      });
+      bcard.querySelector('.block-down').addEventListener('click', () => {
+        if (bidx < tab.blocks.length - 1) {
+          [tab.blocks[bidx+1], tab.blocks[bidx]] = [tab.blocks[bidx], tab.blocks[bidx+1]];
+          renderTabs();
+        }
+      });
+      bcard.querySelector('.block-toggle-style').addEventListener('click', () => {
+        block.style = block.style === 'callout' ? 'text' : 'callout';
+        renderTabs();
+      });
+
+      bcard.querySelectorAll('.f-block-title').forEach(inp => inp.addEventListener('input', e => {
+        if (!block.title) block.title = {};
+        block.title[e.target.dataset.lang] = e.target.value;
+        const titleSpan = bcard.querySelector('.item-card-title span:last-child');
+        if (e.target.dataset.lang === 'fr' && titleSpan) titleSpan.textContent = e.target.value;
+      }));
+      bcard.querySelectorAll('.f-block-text').forEach(inp => inp.addEventListener('input', e => {
+        if (!block.text) block.text = {};
+        block.text[e.target.dataset.lang] = e.target.value;
+      }));
+    });
+
+    const addBtn = card.querySelector('.add-block');
+    if (addBtn) addBtn.addEventListener('click', () => {
+      tab.blocks.push({ style: 'text', title: {}, text: {} });
+      renderTabs();
+      // re-expand this tab card after rerender
+      const newCard = document.querySelector(`.item-card[data-id="${tab.id}"]`);
+      if (newCard) newCard.classList.add('expanded');
+    });
+  }
+
+  // ── GALERIE D'IMAGES ──
+  function renderGalleryEditor(tab, uid) {
+    if (!tab.images) tab.images = [];
+    const images = tab.images;
+    return `
+      <div class="section-label" style="margin-top:20px;">Images de la galerie</div>
+      <div class="help-text">Indiquez le chemin de chaque image (ex: images/galerie/exemple.jpg) et une légende traduisible.</div>
+      <div class="gallery-list">
+        ${images.map((img, iidx) => `
+          <div class="item-card" data-iidx="${iidx}" style="padding:12px 16px;">
+            <div class="item-card-header" style="margin:0;">
+              <div class="item-card-title" style="font-size:0.95rem; flex:1;">
+                <span class="item-card-meta">Image ${iidx + 1}</span>
+                <input type="text" class="f-img-src" placeholder="images/galerie/fichier.jpg" value="${img.src || ''}" style="flex:1; max-width:320px;" />
+              </div>
+              <div class="item-card-actions">
+                <div class="order-controls">
+                  <button class="small img-up" ${iidx===0?'disabled':''}>▲</button>
+                  <button class="small img-down" ${iidx===images.length-1?'disabled':''}>▼</button>
+                </div>
+                <button class="small img-delete danger">Suppr.</button>
+              </div>
+            </div>
+            <div class="item-card-body" style="margin-top:10px; padding-top:10px;">
+              ${langTabsHtml(uid + '-img-' + iidx)}
+              ${LANGS.map((l, i) => `
+                <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-img-${iidx}" data-lang="${l.code}">
+                  <label>Légende (${l.code.toUpperCase()})</label>
+                  <input type="text" class="f-img-caption" data-lang="${l.code}" value="${(img.caption && img.caption[l.code]) || ''}" />
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="small add-image" style="margin-top:8px;">+ Ajouter une image</button>
+    `;
+  }
+
+  function bindGalleryEditor(card, tab) {
+    const listEl = card.querySelector('.gallery-list');
+    if (!listEl) return;
+
+    bindLangTabs(card);
+
+    listEl.querySelectorAll('.item-card[data-iidx]').forEach(icard => {
+      const iidx = parseInt(icard.dataset.iidx, 10);
+      const img = tab.images[iidx];
+      icard.classList.add('expanded');
+
+      icard.querySelector('.f-img-src').addEventListener('input', e => img.src = e.target.value);
+
+      icard.querySelector('.img-delete').addEventListener('click', () => {
+        if (confirm('Supprimer cette image ?')) {
+          tab.images.splice(iidx, 1);
+          renderTabs();
+        }
+      });
+      icard.querySelector('.img-up').addEventListener('click', () => {
+        if (iidx > 0) {
+          [tab.images[iidx-1], tab.images[iidx]] = [tab.images[iidx], tab.images[iidx-1]];
+          renderTabs();
+        }
+      });
+      icard.querySelector('.img-down').addEventListener('click', () => {
+        if (iidx < tab.images.length - 1) {
+          [tab.images[iidx+1], tab.images[iidx]] = [tab.images[iidx], tab.images[iidx+1]];
+          renderTabs();
+        }
+      });
+
+      icard.querySelectorAll('.f-img-caption').forEach(inp => inp.addEventListener('input', e => {
+        if (!img.caption) img.caption = {};
+        img.caption[e.target.dataset.lang] = e.target.value;
+      }));
+    });
+
+    const addBtn = card.querySelector('.add-image');
+    if (addBtn) addBtn.addEventListener('click', () => {
+      tab.images.push({ src: '', caption: {} });
+      renderTabs();
+      const newCard = document.querySelector(`.item-card[data-id="${tab.id}"]`);
+      if (newCard) newCard.classList.add('expanded');
+    });
+  }
+
+  // ── LISTE DE LIENS ──
+  function renderLinksEditor(tab, uid) {
+    if (!tab.links) tab.links = [];
+    const links = tab.links;
+    return `
+      <div class="section-label" style="margin-top:20px;">Liens</div>
+      <div class="help-text">Liste de liens externes ou internes affichés comme des cartes cliquables (icône + titre + sous-texte + URL).</div>
+      <div class="links-list">
+        ${links.map((lk, lidx) => `
+          <div class="item-card" data-lidx="${lidx}" style="padding:12px 16px;">
+            <div class="item-card-header" style="margin:0;">
+              <div class="item-card-title" style="font-size:0.95rem;">
+                <span class="item-card-meta">Lien ${lidx + 1}</span>
+                <span>${(lk.title && lk.title.fr) || ''}</span>
+              </div>
+              <div class="item-card-actions">
+                <div class="order-controls">
+                  <button class="small link-up" ${lidx===0?'disabled':''}>▲</button>
+                  <button class="small link-down" ${lidx===links.length-1?'disabled':''}>▼</button>
+                </div>
+                <button class="small link-delete danger">Suppr.</button>
+              </div>
+            </div>
+            <div class="item-card-body" style="margin-top:10px; padding-top:10px;">
+              <div class="grid-2">
+                <div>
+                  <label>Icône (emoji)</label>
+                  <input type="text" class="f-link-icon" value="${lk.icon || ''}" />
+                </div>
+                <div>
+                  <label>URL</label>
+                  <input type="text" class="f-link-url" value="${lk.url || ''}" placeholder="https://..." />
+                </div>
+              </div>
+              ${langTabsHtml(uid + '-link-' + lidx)}
+              ${LANGS.map((l, i) => `
+                <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-link-${lidx}" data-lang="${l.code}">
+                  <label>Titre (${l.code.toUpperCase()})</label>
+                  <input type="text" class="f-link-title" data-lang="${l.code}" value="${(lk.title && lk.title[l.code]) || ''}" />
+                  <label>Sous-texte (${l.code.toUpperCase()})</label>
+                  <input type="text" class="f-link-sub" data-lang="${l.code}" value="${(lk.sub && lk.sub[l.code]) || ''}" />
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="small add-link" style="margin-top:8px;">+ Ajouter un lien</button>
+    `;
+  }
+
+  function bindLinksEditor(card, tab) {
+    const listEl = card.querySelector('.links-list');
+    if (!listEl) return;
+
+    bindLangTabs(card);
+
+    listEl.querySelectorAll('.item-card[data-lidx]').forEach(lcard => {
+      const lidx = parseInt(lcard.dataset.lidx, 10);
+      const lk = tab.links[lidx];
+      lcard.classList.add('expanded');
+
+      lcard.querySelector('.f-link-icon').addEventListener('input', e => lk.icon = e.target.value);
+      lcard.querySelector('.f-link-url').addEventListener('input', e => lk.url = e.target.value);
+
+      lcard.querySelector('.link-delete').addEventListener('click', () => {
+        if (confirm('Supprimer ce lien ?')) {
+          tab.links.splice(lidx, 1);
+          renderTabs();
+        }
+      });
+      lcard.querySelector('.link-up').addEventListener('click', () => {
+        if (lidx > 0) {
+          [tab.links[lidx-1], tab.links[lidx]] = [tab.links[lidx], tab.links[lidx-1]];
+          renderTabs();
+        }
+      });
+      lcard.querySelector('.link-down').addEventListener('click', () => {
+        if (lidx < tab.links.length - 1) {
+          [tab.links[lidx+1], tab.links[lidx]] = [tab.links[lidx], tab.links[lidx+1]];
+          renderTabs();
+        }
+      });
+
+      lcard.querySelectorAll('.f-link-title').forEach(inp => inp.addEventListener('input', e => {
+        if (!lk.title) lk.title = {};
+        lk.title[e.target.dataset.lang] = e.target.value;
+        const titleSpan = lcard.querySelector('.item-card-title span:last-child');
+        if (e.target.dataset.lang === 'fr' && titleSpan) titleSpan.textContent = e.target.value;
+      }));
+      lcard.querySelectorAll('.f-link-sub').forEach(inp => inp.addEventListener('input', e => {
+        if (!lk.sub) lk.sub = {};
+        lk.sub[e.target.dataset.lang] = e.target.value;
+      }));
+    });
+
+    const addBtn = card.querySelector('.add-link');
+    if (addBtn) addBtn.addEventListener('click', () => {
+      tab.links.push({ icon: '🔗', url: '', title: {}, sub: {} });
+      renderTabs();
+      const newCard = document.querySelector(`.item-card[data-id="${tab.id}"]`);
+      if (newCard) newCard.classList.add('expanded');
+    });
   }
 
   document.getElementById('add-tab-btn').addEventListener('click', () => {
@@ -710,15 +1070,13 @@
                   ${EVENT_TYPES.map(t => `<option value="${t.value}" ${ev.type===t.value?'selected':''}>${t.label}</option>`).join('')}
                 </select>
               </div>
-              <div>
-                <label>Date / fréquence (texte libre, affiché tel quel)</label>
-                <input type="text" class="f-ev-date" value="${ev.date || ''}" />
-              </div>
             </div>
 
             ${langTabsHtml(uid)}
             ${LANGS.map((l, i) => `
               <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
+                <label>Date / fréquence (${l.code.toUpperCase()}) — texte libre, affiché tel quel</label>
+                <input type="text" class="f-ev-date" data-lang="${l.code}" value="${(typeof ev.date === 'object' ? (ev.date && ev.date[l.code]) : (l.code === 'fr' ? (ev.date || '') : '')) || ''}" />
                 <label>Tag (${l.code.toUpperCase()})</label>
                 <input type="text" class="f-ev-tag" data-lang="${l.code}" value="${(ev.tag && ev.tag[l.code]) || ''}" />
                 <label>Nom (${l.code.toUpperCase()})</label>
@@ -747,7 +1105,11 @@
       });
 
       card.querySelector('.f-ev-type').addEventListener('change', e => { ev.type = e.target.value; renderEvents(); });
-      card.querySelector('.f-ev-date').addEventListener('input', e => ev.date = e.target.value);
+
+      card.querySelectorAll('.f-ev-date').forEach(inp => inp.addEventListener('input', e => {
+        if (typeof ev.date !== 'object' || ev.date === null) ev.date = {};
+        ev.date[e.target.dataset.lang] = e.target.value;
+      }));
 
       card.querySelectorAll('.f-ev-tag').forEach(inp => inp.addEventListener('input', e => {
         if (!ev.tag) ev.tag = {};
@@ -767,7 +1129,7 @@
   document.getElementById('add-event-btn').addEventListener('click', () => {
     const id = 'event_' + Date.now();
     DATA.events.push({
-      id, type: 'war', date: '',
+      id, type: 'war', date: {},
       tag: {}, name: {}, desc: {}
     });
     renderEvents();
@@ -868,6 +1230,7 @@
       const parsed = JSON.parse(raw);
       if (!confirm("Ceci va remplacer TOUTES les données actuelles. Continuer ?")) return;
       DATA = parsed;
+      migrateData();
       renderAll();
       showToast("Données importées (n'oubliez pas d'enregistrer)");
     } catch (e) {
@@ -887,6 +1250,201 @@
       showToast("Erreur : " + e.message, true);
     }
   });
+  // ───────────────────────────────────────────
+  // AUTO-TRADUCTION (FR → autres langues)
+  // ───────────────────────────────────────────
+  const TR_TARGETS = ['en', 'it', 'pt', 'ar', 'ja'];
+
+  // ===== QUALITÉ DE TRADUCTION =====
+  // Vide  = MyMemory (gratuit, qualité moyenne, aucune installation).
+  // Rempli = DeepL via votre Worker Cloudflare (bien meilleure qualité).
+  //          Collez l'URL du Worker, ex : 'https://nk2-translate.xxxx.workers.dev'
+  const TRANSLATE_PROXY_URL = '';
+
+  // Codes attendus par l'API MyMemory (repli)
+  const MM_LANG = { en: 'en-GB', it: 'it-IT', pt: 'pt-BR', ar: 'ar-SA', ja: 'ja-JP' };
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // MyMemory renvoie parfois des entités HTML (&#39;, &quot;...) → on les décode.
+  function decodeEntities(str) {
+    const ta = document.createElement('textarea');
+    ta.innerHTML = String(str == null ? '' : str);
+    return ta.value;
+  }
+
+  // Traduit le texte FR vers toutes les langues cibles.
+  // → Utilise le proxy DeepL si configuré, sinon MyMemory. Repli auto en cas d'échec.
+  async function translateAll(text) {
+    if (TRANSLATE_PROXY_URL) {
+      try {
+        const r = await fetch(TRANSLATE_PROXY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targets: TR_TARGETS })
+        });
+        if (!r.ok) throw new Error('Proxy HTTP ' + r.status);
+        const d = await r.json();
+        const props = {}, errs = {};
+        TR_TARGETS.forEach(L => {
+          props[L] = decodeEntities((d.translations && d.translations[L]) || '');
+          if (d.errors && d.errors[L]) errs[L] = d.errors[L];
+          if (!props[L] && !errs[L]) errs[L] = 'vide';
+        });
+        return { props, errs };
+      } catch (e) {
+        // Proxy injoignable → repli MyMemory
+        return translateAllMyMemory(text, 'proxy KO, repli MyMemory');
+      }
+    }
+    return translateAllMyMemory(text);
+  }
+
+  async function translateAllMyMemory(text, note) {
+    const props = {}, errs = {};
+    for (const L of TR_TARGETS) {
+      try {
+        props[L] = await translateMyMemory(text, L);
+      } catch (e) {
+        props[L] = '';
+        errs[L] = (note ? note + ' · ' : '') + (e.message || 'erreur');
+      }
+    }
+    return { props, errs };
+  }
+
+  async function translateMyMemory(text, target) {
+    const pair = 'fr|' + (MM_LANG[target] || target);
+    const url = 'https://api.mymemory.translated.net/get?q=' +
+      encodeURIComponent(text) + '&langpair=' + encodeURIComponent(pair);
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const status = data.responseStatus;
+    if (status && String(status) !== '200') {
+      throw new Error(data.responseDetails || ('Statut ' + status));
+    }
+    return decodeEntities((data.responseData && data.responseData.translatedText) || '');
+  }
+
+  // Ajoute un bouton "Traduire" sous chaque champ français traduisible.
+  function injectTranslateButtons(root) {
+    (root || document).querySelectorAll('.lang-fields[data-lang="fr"]').forEach(frPanel => {
+      const uid = frPanel.dataset.uid || '';
+      frPanel.querySelectorAll('input[type="text"], textarea').forEach(field => {
+        const next = field.nextElementSibling;
+        if (next && next.classList && next.classList.contains('tr-btn')) return; // déjà présent
+        const cls = [...field.classList].find(c => c.startsWith('f-'));
+        if (!cls) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tr-btn';
+        btn.textContent = '🌐 Traduire';
+        btn.title = 'Traduire ce champ français vers les autres langues';
+        btn.dataset.uid = uid;
+        btn.dataset.cls = cls;
+        btn.dataset.key = field.dataset.key || '';
+        field.insertAdjacentElement('afterend', btn);
+      });
+    });
+  }
+
+  // Retrouve, pour un champ FR donné, les champs équivalents des autres langues.
+  function findTargetFields(uid, cls, key) {
+    const map = {};
+    TR_TARGETS.forEach(L => {
+      const panel = document.querySelector('.lang-fields[data-uid="' + uid + '"][data-lang="' + L + '"]');
+      if (!panel) return;
+      const candidates = [...panel.querySelectorAll('.' + cls)];
+      const el = candidates.find(e => (e.dataset.key || '') === (key || ''));
+      if (el) map[L] = el;
+    });
+    return map;
+  }
+
+  // Délégation : clic sur un bouton "Traduire"
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.tr-btn');
+    if (!btn) return;
+
+    const srcField = btn.previousElementSibling;
+    const text = (srcField && srcField.value || '').trim();
+    if (!text) { alert("Remplissez d'abord le champ français."); return; }
+
+    const targets = findTargetFields(btn.dataset.uid, btn.dataset.cls, btn.dataset.key);
+    if (!Object.keys(targets).length) { alert("Aucun champ cible trouvé."); return; }
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Traduction...';
+
+    const { props, errs } = await translateAll(text);
+    // ne garder que les langues ayant un champ cible présent
+    const proposals = {}, errors = {};
+    TR_TARGETS.forEach(L => {
+      if (!targets[L]) return;
+      proposals[L] = props[L] || '';
+      if (errs[L]) errors[L] = errs[L];
+    });
+
+    btn.disabled = false;
+    btn.textContent = original;
+    openTranslateModal(text, proposals, errors, targets);
+  });
+
+  // Fenêtre d'approbation : l'utilisateur vérifie/corrige puis applique.
+  function openTranslateModal(source, proposals, errors, targets) {
+    const overlay = document.createElement('div');
+    overlay.className = 'tr-modal-overlay';
+    const rows = TR_TARGETS.filter(L => targets[L]).map(L => `
+      <label>${L.toUpperCase()}</label>
+      <textarea class="tr-prop" data-lang="${L}">${escapeHtml(proposals[L] || '')}</textarea>
+      <div class="tr-row-status">${errors[L] ? ('⚠ ' + escapeHtml(errors[L]) + ' — saisie manuelle possible') : ''}</div>
+    `).join('');
+    overlay.innerHTML = `
+      <div class="tr-modal">
+        <h3>🌐 Traduction automatique</h3>
+        <div class="tr-src"><span>FRANÇAIS (SOURCE)</span>${escapeHtml(source)}</div>
+        <div class="help-text">Vérifiez et corrigez chaque traduction si nécessaire, puis cliquez sur « Appliquer ». Rien n'est modifié tant que vous n'avez pas approuvé.</div>
+        ${rows}
+        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:16px;">
+          <button class="tr-cancel">Annuler</button>
+          <button class="primary tr-apply">✔ Appliquer</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const close = () => overlay.remove();
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    overlay.querySelector('.tr-cancel').addEventListener('click', close);
+    overlay.querySelector('.tr-apply').addEventListener('click', () => {
+      overlay.querySelectorAll('.tr-prop').forEach(ta => {
+        const L = ta.dataset.lang;
+        const field = targets[L];
+        if (field) {
+          field.value = ta.value;
+          // déclenche les écouteurs 'input' existants → met à jour DATA
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+      close();
+      showToast("Traductions appliquées (pensez à Enregistrer)");
+    });
+  }
+
+  // Injecte les boutons à chaque (re)rendu de l'interface.
+  let trScheduled = false;
+  const trObserver = new MutationObserver(() => {
+    if (trScheduled) return;
+    trScheduled = true;
+    requestAnimationFrame(() => { trScheduled = false; injectTranslateButtons(document); });
+  });
+  trObserver.observe(document.body, { childList: true, subtree: true });
+  injectTranslateButtons(document);
 </script>
 </body>
 </html>
