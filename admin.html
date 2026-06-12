@@ -297,17 +297,7 @@
     } else {
       DATA = emptyData();
     }
-    migrateData();
     renderAll();
-  }
-
-  function migrateData() {
-    (DATA.events || []).forEach(ev => {
-      if (typeof ev.date === 'string') {
-        ev.date = { fr: ev.date };
-      }
-      if (!ev.date) ev.date = {};
-    });
   }
 
   function emptyData() {
@@ -414,22 +404,6 @@
       { key: 'title', label: 'Titre principal' },
       { key: 'sub', label: 'Sous-titre' },
       { key: 'desc', label: 'Description', textarea: true }
-    ],
-    richtext: [
-      { key: 'label', label: 'Libellé navigation' },
-      { key: 'title', label: 'Titre principal' },
-      { key: 'sub', label: 'Sous-titre' }
-    ],
-    gallery: [
-      { key: 'label', label: 'Libellé navigation' },
-      { key: 'title', label: 'Titre principal' },
-      { key: 'sub', label: 'Sous-titre' }
-    ],
-    links: [
-      { key: 'label', label: 'Libellé navigation' },
-      { key: 'title', label: 'Titre principal' },
-      { key: 'sub', label: 'Sous-titre' },
-      { key: 'desc', label: 'Description', textarea: true }
     ]
   };
 
@@ -471,9 +445,6 @@
                   <option value="home" ${tab.type==='home'?'selected':''}>Accueil</option>
                   <option value="troops" ${tab.type==='troops'?'selected':''}>Héros</option>
                   <option value="events" ${tab.type==='events'?'selected':''}>Événements</option>
-                  <option value="richtext" ${tab.type==='richtext'?'selected':''}>Texte riche (blocs/FAQ)</option>
-                  <option value="gallery" ${tab.type==='gallery'?'selected':''}>Galerie d'images</option>
-                  <option value="links" ${tab.type==='links'?'selected':''}>Liste de liens</option>
                   <option value="custom" ${tab.type==='custom'?'selected':''}>Personnalisé (texte libre)</option>
                 </select>
               </div>
@@ -495,8 +466,6 @@
                 `).join('')}
               </div>
             `).join('')}
-
-            ${renderTabContentEditor(tab, uid)}
           </div>
         </div>
       `;
@@ -541,8 +510,6 @@
           tab.i18n[lang][key] = e.target.value;
         });
       });
-
-      bindTabContentEditor(card, tab);
     });
   }
 
@@ -555,312 +522,6 @@
     tabs[idx].order = tabs[swapIdx].order;
     tabs[swapIdx].order = tmp;
     renderTabs();
-  }
-
-  // ───────────────────────────────────────────
-  // TAB CONTENT EDITORS (par type de section)
-  // ───────────────────────────────────────────
-  function renderTabContentEditor(tab, uid) {
-    if (tab.type === 'richtext') return renderBlocksEditor(tab, uid);
-    if (tab.type === 'gallery') return renderGalleryEditor(tab, uid);
-    if (tab.type === 'links') return renderLinksEditor(tab, uid);
-    return '';
-  }
-
-  function bindTabContentEditor(card, tab) {
-    if (tab.type === 'richtext') return bindBlocksEditor(card, tab);
-    if (tab.type === 'gallery') return bindGalleryEditor(card, tab);
-    if (tab.type === 'links') return bindLinksEditor(card, tab);
-  }
-
-  // ── RICHTEXT (blocs de contenu / FAQ) ──
-  function renderBlocksEditor(tab, uid) {
-    if (!tab.blocks) tab.blocks = [];
-    const blocks = tab.blocks;
-    return `
-      <div class="section-label" style="margin-top:20px;">Blocs de contenu</div>
-      <div class="help-text">Chaque bloc a un titre et un texte, traduisibles par langue. Utile pour des pages d'info, règles, FAQ...</div>
-      <div class="blocks-list">
-        ${blocks.map((b, bidx) => `
-          <div class="item-card" data-bidx="${bidx}" style="padding:12px 16px;">
-            <div class="item-card-header" style="margin:0;">
-              <div class="item-card-title" style="font-size:0.95rem;">
-                <span class="item-card-meta">Bloc ${bidx + 1}</span>
-                <span>${(b.title && b.title.fr) || ''}</span>
-              </div>
-              <div class="item-card-actions">
-                <div class="order-controls">
-                  <button class="small block-up" ${bidx===0?'disabled':''}>▲</button>
-                  <button class="small block-down" ${bidx===blocks.length-1?'disabled':''}>▼</button>
-                </div>
-                <button class="small block-toggle-style">${b.style === 'callout' ? '📦 Encadré' : '📄 Texte'}</button>
-                <button class="small block-delete danger">Suppr.</button>
-              </div>
-            </div>
-            <div class="item-card-body" style="margin-top:10px; padding-top:10px;">
-              ${langTabsHtml(uid + '-block-' + bidx)}
-              ${LANGS.map((l, i) => `
-                <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-block-${bidx}" data-lang="${l.code}">
-                  <label>Titre (${l.code.toUpperCase()})</label>
-                  <input type="text" class="f-block-title" data-lang="${l.code}" value="${(b.title && b.title[l.code]) || ''}" />
-                  <label>Texte (${l.code.toUpperCase()})</label>
-                  <textarea class="f-block-text" data-lang="${l.code}">${(b.text && b.text[l.code]) || ''}</textarea>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
-      <button class="small add-block" style="margin-top:8px;">+ Ajouter un bloc</button>
-    `;
-  }
-
-  function bindBlocksEditor(card, tab) {
-    const listEl = card.querySelector('.blocks-list');
-    if (!listEl) return;
-
-    bindLangTabs(card);
-
-    listEl.querySelectorAll('.item-card[data-bidx]').forEach(bcard => {
-      const bidx = parseInt(bcard.dataset.bidx, 10);
-      const block = tab.blocks[bidx];
-      // expand body by default (no toggle button for blocks)
-      bcard.classList.add('expanded');
-
-      bcard.querySelector('.block-delete').addEventListener('click', () => {
-        if (confirm('Supprimer ce bloc ?')) {
-          tab.blocks.splice(bidx, 1);
-          renderTabs();
-        }
-      });
-      bcard.querySelector('.block-up').addEventListener('click', () => {
-        if (bidx > 0) {
-          [tab.blocks[bidx-1], tab.blocks[bidx]] = [tab.blocks[bidx], tab.blocks[bidx-1]];
-          renderTabs();
-        }
-      });
-      bcard.querySelector('.block-down').addEventListener('click', () => {
-        if (bidx < tab.blocks.length - 1) {
-          [tab.blocks[bidx+1], tab.blocks[bidx]] = [tab.blocks[bidx], tab.blocks[bidx+1]];
-          renderTabs();
-        }
-      });
-      bcard.querySelector('.block-toggle-style').addEventListener('click', () => {
-        block.style = block.style === 'callout' ? 'text' : 'callout';
-        renderTabs();
-      });
-
-      bcard.querySelectorAll('.f-block-title').forEach(inp => inp.addEventListener('input', e => {
-        if (!block.title) block.title = {};
-        block.title[e.target.dataset.lang] = e.target.value;
-        const titleSpan = bcard.querySelector('.item-card-title span:last-child');
-        if (e.target.dataset.lang === 'fr' && titleSpan) titleSpan.textContent = e.target.value;
-      }));
-      bcard.querySelectorAll('.f-block-text').forEach(inp => inp.addEventListener('input', e => {
-        if (!block.text) block.text = {};
-        block.text[e.target.dataset.lang] = e.target.value;
-      }));
-    });
-
-    const addBtn = card.querySelector('.add-block');
-    if (addBtn) addBtn.addEventListener('click', () => {
-      tab.blocks.push({ style: 'text', title: {}, text: {} });
-      renderTabs();
-      // re-expand this tab card after rerender
-      const newCard = document.querySelector(`.item-card[data-id="${tab.id}"]`);
-      if (newCard) newCard.classList.add('expanded');
-    });
-  }
-
-  // ── GALERIE D'IMAGES ──
-  function renderGalleryEditor(tab, uid) {
-    if (!tab.images) tab.images = [];
-    const images = tab.images;
-    return `
-      <div class="section-label" style="margin-top:20px;">Images de la galerie</div>
-      <div class="help-text">Indiquez le chemin de chaque image (ex: images/galerie/exemple.jpg) et une légende traduisible.</div>
-      <div class="gallery-list">
-        ${images.map((img, iidx) => `
-          <div class="item-card" data-iidx="${iidx}" style="padding:12px 16px;">
-            <div class="item-card-header" style="margin:0;">
-              <div class="item-card-title" style="font-size:0.95rem; flex:1;">
-                <span class="item-card-meta">Image ${iidx + 1}</span>
-                <input type="text" class="f-img-src" placeholder="images/galerie/fichier.jpg" value="${img.src || ''}" style="flex:1; max-width:320px;" />
-              </div>
-              <div class="item-card-actions">
-                <div class="order-controls">
-                  <button class="small img-up" ${iidx===0?'disabled':''}>▲</button>
-                  <button class="small img-down" ${iidx===images.length-1?'disabled':''}>▼</button>
-                </div>
-                <button class="small img-delete danger">Suppr.</button>
-              </div>
-            </div>
-            <div class="item-card-body" style="margin-top:10px; padding-top:10px;">
-              ${langTabsHtml(uid + '-img-' + iidx)}
-              ${LANGS.map((l, i) => `
-                <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-img-${iidx}" data-lang="${l.code}">
-                  <label>Légende (${l.code.toUpperCase()})</label>
-                  <input type="text" class="f-img-caption" data-lang="${l.code}" value="${(img.caption && img.caption[l.code]) || ''}" />
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
-      <button class="small add-image" style="margin-top:8px;">+ Ajouter une image</button>
-    `;
-  }
-
-  function bindGalleryEditor(card, tab) {
-    const listEl = card.querySelector('.gallery-list');
-    if (!listEl) return;
-
-    bindLangTabs(card);
-
-    listEl.querySelectorAll('.item-card[data-iidx]').forEach(icard => {
-      const iidx = parseInt(icard.dataset.iidx, 10);
-      const img = tab.images[iidx];
-      icard.classList.add('expanded');
-
-      icard.querySelector('.f-img-src').addEventListener('input', e => img.src = e.target.value);
-
-      icard.querySelector('.img-delete').addEventListener('click', () => {
-        if (confirm('Supprimer cette image ?')) {
-          tab.images.splice(iidx, 1);
-          renderTabs();
-        }
-      });
-      icard.querySelector('.img-up').addEventListener('click', () => {
-        if (iidx > 0) {
-          [tab.images[iidx-1], tab.images[iidx]] = [tab.images[iidx], tab.images[iidx-1]];
-          renderTabs();
-        }
-      });
-      icard.querySelector('.img-down').addEventListener('click', () => {
-        if (iidx < tab.images.length - 1) {
-          [tab.images[iidx+1], tab.images[iidx]] = [tab.images[iidx], tab.images[iidx+1]];
-          renderTabs();
-        }
-      });
-
-      icard.querySelectorAll('.f-img-caption').forEach(inp => inp.addEventListener('input', e => {
-        if (!img.caption) img.caption = {};
-        img.caption[e.target.dataset.lang] = e.target.value;
-      }));
-    });
-
-    const addBtn = card.querySelector('.add-image');
-    if (addBtn) addBtn.addEventListener('click', () => {
-      tab.images.push({ src: '', caption: {} });
-      renderTabs();
-      const newCard = document.querySelector(`.item-card[data-id="${tab.id}"]`);
-      if (newCard) newCard.classList.add('expanded');
-    });
-  }
-
-  // ── LISTE DE LIENS ──
-  function renderLinksEditor(tab, uid) {
-    if (!tab.links) tab.links = [];
-    const links = tab.links;
-    return `
-      <div class="section-label" style="margin-top:20px;">Liens</div>
-      <div class="help-text">Liste de liens externes ou internes affichés comme des cartes cliquables (icône + titre + sous-texte + URL).</div>
-      <div class="links-list">
-        ${links.map((lk, lidx) => `
-          <div class="item-card" data-lidx="${lidx}" style="padding:12px 16px;">
-            <div class="item-card-header" style="margin:0;">
-              <div class="item-card-title" style="font-size:0.95rem;">
-                <span class="item-card-meta">Lien ${lidx + 1}</span>
-                <span>${(lk.title && lk.title.fr) || ''}</span>
-              </div>
-              <div class="item-card-actions">
-                <div class="order-controls">
-                  <button class="small link-up" ${lidx===0?'disabled':''}>▲</button>
-                  <button class="small link-down" ${lidx===links.length-1?'disabled':''}>▼</button>
-                </div>
-                <button class="small link-delete danger">Suppr.</button>
-              </div>
-            </div>
-            <div class="item-card-body" style="margin-top:10px; padding-top:10px;">
-              <div class="grid-2">
-                <div>
-                  <label>Icône (emoji)</label>
-                  <input type="text" class="f-link-icon" value="${lk.icon || ''}" />
-                </div>
-                <div>
-                  <label>URL</label>
-                  <input type="text" class="f-link-url" value="${lk.url || ''}" placeholder="https://..." />
-                </div>
-              </div>
-              ${langTabsHtml(uid + '-link-' + lidx)}
-              ${LANGS.map((l, i) => `
-                <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-link-${lidx}" data-lang="${l.code}">
-                  <label>Titre (${l.code.toUpperCase()})</label>
-                  <input type="text" class="f-link-title" data-lang="${l.code}" value="${(lk.title && lk.title[l.code]) || ''}" />
-                  <label>Sous-texte (${l.code.toUpperCase()})</label>
-                  <input type="text" class="f-link-sub" data-lang="${l.code}" value="${(lk.sub && lk.sub[l.code]) || ''}" />
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
-      <button class="small add-link" style="margin-top:8px;">+ Ajouter un lien</button>
-    `;
-  }
-
-  function bindLinksEditor(card, tab) {
-    const listEl = card.querySelector('.links-list');
-    if (!listEl) return;
-
-    bindLangTabs(card);
-
-    listEl.querySelectorAll('.item-card[data-lidx]').forEach(lcard => {
-      const lidx = parseInt(lcard.dataset.lidx, 10);
-      const lk = tab.links[lidx];
-      lcard.classList.add('expanded');
-
-      lcard.querySelector('.f-link-icon').addEventListener('input', e => lk.icon = e.target.value);
-      lcard.querySelector('.f-link-url').addEventListener('input', e => lk.url = e.target.value);
-
-      lcard.querySelector('.link-delete').addEventListener('click', () => {
-        if (confirm('Supprimer ce lien ?')) {
-          tab.links.splice(lidx, 1);
-          renderTabs();
-        }
-      });
-      lcard.querySelector('.link-up').addEventListener('click', () => {
-        if (lidx > 0) {
-          [tab.links[lidx-1], tab.links[lidx]] = [tab.links[lidx], tab.links[lidx-1]];
-          renderTabs();
-        }
-      });
-      lcard.querySelector('.link-down').addEventListener('click', () => {
-        if (lidx < tab.links.length - 1) {
-          [tab.links[lidx+1], tab.links[lidx]] = [tab.links[lidx], tab.links[lidx+1]];
-          renderTabs();
-        }
-      });
-
-      lcard.querySelectorAll('.f-link-title').forEach(inp => inp.addEventListener('input', e => {
-        if (!lk.title) lk.title = {};
-        lk.title[e.target.dataset.lang] = e.target.value;
-        const titleSpan = lcard.querySelector('.item-card-title span:last-child');
-        if (e.target.dataset.lang === 'fr' && titleSpan) titleSpan.textContent = e.target.value;
-      }));
-      lcard.querySelectorAll('.f-link-sub').forEach(inp => inp.addEventListener('input', e => {
-        if (!lk.sub) lk.sub = {};
-        lk.sub[e.target.dataset.lang] = e.target.value;
-      }));
-    });
-
-    const addBtn = card.querySelector('.add-link');
-    if (addBtn) addBtn.addEventListener('click', () => {
-      tab.links.push({ icon: '🔗', url: '', title: {}, sub: {} });
-      renderTabs();
-      const newCard = document.querySelector(`.item-card[data-id="${tab.id}"]`);
-      if (newCard) newCard.classList.add('expanded');
-    });
   }
 
   document.getElementById('add-tab-btn').addEventListener('click', () => {
@@ -1049,13 +710,15 @@
                   ${EVENT_TYPES.map(t => `<option value="${t.value}" ${ev.type===t.value?'selected':''}>${t.label}</option>`).join('')}
                 </select>
               </div>
+              <div>
+                <label>Date / fréquence (texte libre, affiché tel quel)</label>
+                <input type="text" class="f-ev-date" value="${ev.date || ''}" />
+              </div>
             </div>
 
             ${langTabsHtml(uid)}
             ${LANGS.map((l, i) => `
               <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
-                <label>Date / fréquence (${l.code.toUpperCase()}) — texte libre, affiché tel quel</label>
-                <input type="text" class="f-ev-date" data-lang="${l.code}" value="${(typeof ev.date === 'object' ? (ev.date && ev.date[l.code]) : (l.code === 'fr' ? (ev.date || '') : '')) || ''}" />
                 <label>Tag (${l.code.toUpperCase()})</label>
                 <input type="text" class="f-ev-tag" data-lang="${l.code}" value="${(ev.tag && ev.tag[l.code]) || ''}" />
                 <label>Nom (${l.code.toUpperCase()})</label>
@@ -1084,11 +747,7 @@
       });
 
       card.querySelector('.f-ev-type').addEventListener('change', e => { ev.type = e.target.value; renderEvents(); });
-
-      card.querySelectorAll('.f-ev-date').forEach(inp => inp.addEventListener('input', e => {
-        if (typeof ev.date !== 'object' || ev.date === null) ev.date = {};
-        ev.date[e.target.dataset.lang] = e.target.value;
-      }));
+      card.querySelector('.f-ev-date').addEventListener('input', e => ev.date = e.target.value);
 
       card.querySelectorAll('.f-ev-tag').forEach(inp => inp.addEventListener('input', e => {
         if (!ev.tag) ev.tag = {};
@@ -1108,7 +767,7 @@
   document.getElementById('add-event-btn').addEventListener('click', () => {
     const id = 'event_' + Date.now();
     DATA.events.push({
-      id, type: 'war', date: {},
+      id, type: 'war', date: '',
       tag: {}, name: {}, desc: {}
     });
     renderEvents();
@@ -1209,7 +868,6 @@
       const parsed = JSON.parse(raw);
       if (!confirm("Ceci va remplacer TOUTES les données actuelles. Continuer ?")) return;
       DATA = parsed;
-      migrateData();
       renderAll();
       showToast("Données importées (n'oubliez pas d'enregistrer)");
     } catch (e) {
