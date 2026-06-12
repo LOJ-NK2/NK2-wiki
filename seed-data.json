@@ -1,0 +1,283 @@
+{
+  "tabs": [
+    {
+      "id": "home",
+      "icon": "🏠",
+      "order": 0,
+      "enabled": true,
+      "type": "home",
+      "i18n": {
+        "fr": { "label": "Accueil", "title": "BIENVENUE", "desc": "Ce wiki est le manuel de terrain officiel de notre alliance. Retrouvez ici les guides de troupes et toutes les informations stratégiques.", "noticeTitle": "📢 NOTE :", "noticeText": " Pour toute suggestion, contactez Schnereux23." },
+        "en": { "label": "Home", "title": "WELCOME", "desc": "This wiki is the official field manual of our alliance. Find hero guides and all strategic information here.", "noticeTitle": "📢 NOTE:", "noticeText": " For any suggestion, contact Schnereux23." },
+        "it": { "label": "Home", "title": "BENVENUTO", "desc": "Questo wiki è il manuale ufficiale della nostra alleanza. Trova guide agli eroi e tutte le informazioni strategiche.", "noticeTitle": "📢 NOTA:", "noticeText": " Per qualsiasi suggerimento, contatta Schnereux23." },
+        "pt": { "label": "Início", "title": "BEM-VINDO", "desc": "Este wiki é o manual de campo oficial da nossa aliança. Encontre guias de heróis e todas as informações estratégicas.", "noticeTitle": "📢 NOTA:", "noticeText": " Para qualquer sugestão, contate Schnereux23." },
+        "ar": { "label": "الرئيسية", "title": "مرحباً", "desc": "هذا الويكي هو الدليل الرسمي للتحالف. ستجد هنا أدلة الأبطال وجميع المعلومات الاستراتيجية.", "noticeTitle": "📢 ملاحظة:", "noticeText": " لأي اقتراح، تواصل مع Schnereux23." },
+        "ja": { "label": "ホーム", "title": "ようこそ", "desc": "このWikiはアライアンスの公式フィールドマニュアルです。ヒーローガイドと戦略情報をここで確認できます。", "noticeTitle": "📢 お知らせ：", "noticeText": " ご提案はSchnereux23にご連絡ください。" }
+      }
+    },
+    {
+      "id": "troops",
+      "icon": "⚔️",
+      "order": 1,
+      "enabled": true,
+      "type": "troops",
+      "i18n": {
+        "fr": { "label": "Héros", "title": "GUIDE DES HEROS", "sub": "// RECOMMANDATIONS DES HEROS", "tipTitle": "💡 CONSEIL :", "tipText": " N'utilisez JAMAIS MIA ni les Récolteurs pour les combats." },
+        "en": { "label": "Heroes", "title": "HERO GUIDE", "sub": "// HERO RECOMMENDATIONS", "tipTitle": "💡 TIP:", "tipText": " NEVER use MIA in combat." },
+        "it": { "label": "Eroi", "title": "GUIDA AGLI EROI", "sub": "// CONSIGLI SUGLI EROI", "tipTitle": "💡 CONSIGLIO:", "tipText": " Non usare MAI MIA in combattimento." },
+        "pt": { "label": "Heróis", "title": "GUIA DE HERÓIS", "sub": "// RECOMENDAÇÕES DE HERÓIS", "tipTitle": "💡 DICA:", "tipText": " NUNCA use MIA em combate." },
+        "ar": { "label": "الأبطال", "title": "دليل الأبطال", "sub": "// توصيات الأبطال", "tipTitle": "💡 نصيحة:", "tipText": " لا تستخدم MIA أبداً في القتال." },
+        "ja": { "label": "ヒーロー", "title": "ヒーローガイド", "sub": "// ヒーロー推奨事項", "tipTitle": "💡 ヒント：", "tipText": " MIAを戦闘で絶対に使わないでください。" }
+      }
+    },
+    {
+      "id": "events",
+      "icon": "📅",
+      "order": 2,
+      "enabled": false,
+      "type": "events",
+      "i18n": {
+        "fr": { "label": "Événements", "title": "ÉVÉNEMENTS", "sub": "// CALENDRIER ET GUIDES DE L'ALLIANCE", "warningTitle": "⚠️ PRIORITÉ :", "warningText": " Tous les membres actifs sont requis lors des guerres d'alliance." },
+        "en": { "label": "Events", "title": "EVENTS", "sub": "// ALLIANCE CALENDAR AND GUIDES", "warningTitle": "⚠️ PRIORITY:", "warningText": " All active members are required during alliance wars." },
+        "it": { "label": "Eventi", "title": "EVENTI", "sub": "// CALENDARIO E GUIDE DELL'ALLEANZA", "warningTitle": "⚠️ PRIORITÀ:", "warningText": " Tutti i membri attivi sono richiesti durante le guerre." },
+        "pt": { "label": "Eventos", "title": "EVENTOS", "sub": "// CALENDÁRIO E GUIAS DA ALIANÇA", "warningTitle": "⚠️ PRIORIDADE:", "warningText": " Todos os membros ativos são necessários durante as guerras." },
+        "ar": { "label": "الأحداث", "title": "الأحداث", "sub": "// تقويم التحالف وأدلته", "warningTitle": "⚠️ أولوية:", "warningText": " جميع الأعضاء النشطين مطلوبون خلال حروب التحالف." },
+        "ja": { "label": "イベント", "title": "イベント", "sub": "// アライアンスカレンダーとガイド", "warningTitle": "⚠️ 優先：", "warningText": " アライアンス戦争中はすべてのアクティブメンバーが必要です。" }
+      }
+    }
+  ],
+
+  "heroNames": {
+    "ada": "Ada", "aiksen": "Aiksen", "alph": "Alph", "cesar": "Cesar", "devilian": "Devilian",
+    "drake": "Drake", "durga": "Durga", "edwin": "Edwin", "ekko": "Ekko", "flamme": "Flamme",
+    "flora": "Flora", "gerd": "Gerd", "gimes": "Gimes", "harton": "Harton", "inata": "Inata",
+    "ito": "ITO", "koschevoi": "Koschevoi", "lanchester": "Lanchester", "lee": "Lee",
+    "lofili": "Lofili", "lunarl": "Lunarl", "marcus": "Marcus", "mia": "Mia", "mireya": "Mireya",
+    "pasino": "Pasino", "phenix": "Phenix", "platos": "Platos", "samir": "Samir",
+    "sawyer": "Sawyer", "sumo": "Sumo", "terry": "Terry", "tormund": "Tormund",
+    "tyronn": "Tyronn", "veronica": "Veronica", "vesaryon": "Vesaryon", "vivian": "Vivian",
+    "whisper": "Whisper", "xuanming": "Xuanming", "zoltan": "Zoltan"
+  },
+
+  "heroGroups": {
+    "gatherers": ["aiksen", "durga", "harton", "pasino"],
+    "frontline": ["marcus","tyronn","phenix","koschevoi","tormund","xuanming","cesar","ito","lanchester","zoltan","whisper","vivian","gerd"],
+    "backline": ["drake","mireya","sawyer","inata","ito","koschevoi","vivian","veronica","lee","ada","edwin","devilian"]
+  },
+
+  "heroTable": {
+    "ada":        {"solo": true,  "rally": true,  "rallyCage": false, "rejoinCage": false},
+    "aiksen":     {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "alph":       {"solo": true,  "rally": false, "rallyCage": true,  "rejoinCage": false},
+    "cesar":      {"solo": true,  "rally": true,  "rallyCage": false, "rejoinCage": false},
+    "devilian":   {"solo": true,  "rally": true,  "rallyCage": false, "rejoinCage": true},
+    "drake":      {"solo": true,  "rally": false, "rallyCage": true,  "rejoinCage": false},
+    "durga":      {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "edwin":      {"solo": true,  "rally": true,  "rallyCage": false, "rejoinCage": false},
+    "ekko":       {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": true},
+    "flamme":     {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "flora":      {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "gerd":       {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "gimes":      {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "harton":     {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "inata":      {"solo": true,  "rally": false, "rallyCage": false, "rejoinCage": false},
+    "ito":        {"solo": true,  "rally": false, "rallyCage": false, "rejoinCage": false},
+    "koschevoi":  {"solo": true,  "rally": false, "rallyCage": true,  "rejoinCage": true},
+    "lanchester": {"solo": true,  "rally": true,  "rallyCage": false, "rejoinCage": false},
+    "lee":        {"solo": true,  "rally": true,  "rallyCage": false, "rejoinCage": false},
+    "lofili":     {"solo": true,  "rally": true,  "rallyCage": true,  "rejoinCage": true},
+    "lunarl":     {"solo": true,  "rally": true,  "rallyCage": true,  "rejoinCage": true},
+    "marcus":     {"solo": true,  "rally": false, "rallyCage": false, "rejoinCage": false},
+    "mia":        {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "mireya":     {"solo": true,  "rally": true,  "rallyCage": true,  "rejoinCage": false},
+    "pasino":     {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "phenix":     {"solo": true,  "rally": false, "rallyCage": true,  "rejoinCage": true},
+    "platos":     {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "samir":      {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": true},
+    "sawyer":     {"solo": true,  "rally": true,  "rallyCage": true,  "rejoinCage": false},
+    "sumo":       {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "terry":      {"solo": true,  "rally": true,  "rallyCage": true,  "rejoinCage": true},
+    "tormund":    {"solo": true,  "rally": false, "rallyCage": false, "rejoinCage": false},
+    "tyronn":     {"solo": true,  "rally": true,  "rallyCage": true,  "rejoinCage": true},
+    "veronica":   {"solo": true,  "rally": false, "rallyCage": true,  "rejoinCage": true},
+    "vesaryon":   {"solo": false, "rally": false, "rallyCage": false, "rejoinCage": false},
+    "vivian":     {"solo": true,  "rally": true,  "rallyCage": false, "rejoinCage": false},
+    "whisper":    {"solo": true,  "rally": false, "rallyCage": true,  "rejoinCage": false},
+    "xuanming":   {"solo": true,  "rally": true,  "rallyCage": true,  "rejoinCage": true},
+    "zoltan":     {"solo": true,  "rally": false, "rallyCage": false, "rejoinCage": false}
+  },
+
+  "events": [
+    {
+      "id": "event1",
+      "type": "war",
+      "tag": { "fr": "GUERRE", "en": "WAR", "it": "GUERRA", "pt": "GUERRA", "ar": "حرب", "ja": "戦争" },
+      "date": "LUN — MER // SEMAINE",
+      "name": { "fr": "GUERRE D'ALLIANCE", "en": "Alliance War", "it": "Guerra d'Alleanza", "pt": "Guerra de Aliança", "ar": "حرب التحالف", "ja": "アライアンス戦争" },
+      "desc": {
+        "fr": "Affrontement inter-alliances. Mobilisez vos troupes T3/T4. Suivez les ordres des officiers.",
+        "en": "Inter-alliance battle. Deploy your heroes. Follow officer orders.",
+        "it": "Scontro inter-alleanze. Mobilita i tuoi eroi. Segui gli ordini degli ufficiali.",
+        "pt": "Confronto entre alianças. Mobilize seus heróis. Siga as ordens dos oficiais.",
+        "ar": "مواجهة بين التحالفات. حرّك أبطالك. اتبع أوامر الضباط.",
+        "ja": "アライアンス間の対戦。ヒーローを展開し、役員の指示に従ってください。"
+      }
+    },
+    {
+      "id": "event2",
+      "type": "rally",
+      "tag": { "fr": "RALLY", "en": "RALLY", "it": "RALLY", "pt": "RALLY", "ar": "تجمع", "ja": "ラリー" },
+      "date": "JEU // HEBDOMADAIRE",
+      "name": { "fr": "ASSAUT COLLECTIF", "en": "Collective Assault", "it": "Assalto Collettivo", "pt": "Assalto Coletivo", "ar": "الهجوم الجماعي", "ja": "集団攻撃" },
+      "desc": {
+        "fr": "Rally sur boss ou bâtiment ennemi. Rejoignez le rally du leader pour maximiser les dégâts.",
+        "en": "Rally on boss or enemy building. Join the leader's rally to maximize damage.",
+        "it": "Rally su boss o edificio nemico. Unisciti al rally del leader per massimizzare i danni.",
+        "pt": "Rally em boss ou edifício inimigo. Junte-se ao rally do líder para maximizar o dano.",
+        "ar": "هجوم على رئيس أو مبنى العدو. انضم إلى تجمع القائد لتعظيم الضرر.",
+        "ja": "ボスまたは敵の建物へのラリー。リーダーのラリーに参加してダメージを最大化しましょう。"
+      }
+    },
+    {
+      "id": "event3",
+      "type": "resource",
+      "tag": { "fr": "RESSOURCES", "en": "RESOURCES", "it": "RISORSE", "pt": "RECURSOS", "ar": "موارد", "ja": "資源" },
+      "date": "SAM — DIM // WEEKEND",
+      "name": { "fr": "COLLECTE INTENSIVE", "en": "Intensive Gathering", "it": "Raccolta Intensiva", "pt": "Coleta Intensiva", "ar": "الجمع المكثف", "ja": "集中採集" },
+      "desc": {
+        "fr": "Profitez du bonus de ressources du weekend. Envoyez vos troupes T1 sur les mines et fermes.",
+        "en": "Take advantage of the weekend resource bonus. Send gathering heroes to mines and farms.",
+        "it": "Approfitta del bonus risorse del weekend. Manda gli eroi raccoglitori a miniere e fattorie.",
+        "pt": "Aproveite o bônus de recursos do fim de semana. Envie heróis coletores para minas e fazendas.",
+        "ar": "استفد من مكافأة موارد نهاية الأسبوع. أرسل أبطال الجمع إلى المناجم والمزارع.",
+        "ja": "週末の資源ボーナスを活用しましょう。採集ヒーローを鉱山や農場に送りましょう。"
+      }
+    },
+    {
+      "id": "event4",
+      "type": "alliance",
+      "tag": { "fr": "ALLIANCE", "en": "ALLIANCE", "it": "ALLEANZA", "pt": "ALIANÇA", "ar": "تحالف", "ja": "アライアンス" },
+      "date": "VEN // HEBDOMADAIRE",
+      "name": { "fr": "AIDE ENTRE MEMBRES", "en": "Member Assistance Day", "it": "Giornata di Aiuto", "pt": "Dia de Ajuda", "ar": "يوم المساعدة", "ja": "援助の日" },
+      "desc": {
+        "fr": "Journée d'aide mutuelle. Accélérez les constructions et recherches de vos alliés.",
+        "en": "Mutual aid day. Speed up the constructions and research of your allies.",
+        "it": "Giornata di aiuto reciproco. Accelera le costruzioni e le ricerche dei tuoi alleati.",
+        "pt": "Dia de ajuda mútua. Acelere construções e pesquisas de seus aliados.",
+        "ar": "يوم المساعدة المتبادلة. سرّع بناءات وأبحاث حلفائك.",
+        "ja": "相互援助の日。アライアンスメンバーの建設や研究を加速しましょう。"
+      }
+    }
+  ],
+
+  "ui": {
+    "fr": {
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // LECTURE SEULE // MISE À JOUR PAR Schnereux23",
+      "tier1": "Récoltes", "tier2": "Arène/Arrestation/...", "tier3": "Attaques", "tier4": "Attaques",
+      "troop1_name": "Récolteurs", "troop1_desc": "Idéal pour collecter des ressources uniquement.",
+      "troop2_desc1": "Concerne tous les combats où l'on doit placer 5 héros et 2 robots (Arène, arrestation, légende KOF, bataille de l'alliance...)",
+      "troop2_desc2": "Prendre en compte uniquement les compétences d'arrestation.",
+      "troop3_name": "SOLO", "troop3_desc": "Privilégier des héros ayant des bonus de dégats ou de létalités, ainsi qu'un equipement exclusif pour les attaques en solo.",
+      "troop4_name": "RALLIEMENTS", "troop4_desc": "Privilégier des héros ayant des bonus affectant tout les alliés, ainsi qu'un equipement exclusif pour les attaques groupées.",
+      "stat_role": "RÔLE", "stat_rec": "RECOMMANDATION", "role_farm": "Collecte", "rec_no": "PAS DE COMBAT",
+      "troops_def": "Déflecteurs", "troops_bomber": "Bombardiers", "troops_tir": "Tirreurs",
+      "troops_table_title": "COMPARATIF RAPIDE",
+      "col_tier": "HÉROS", "col_name": "NOM", "col_rally": "RALLY CAGE", "col_rejoin": "REJOINDE CAGE",
+      "first_line": "Première ligne", "robots": "Robots", "second_line": "Seconde ligne", "heroes_label": "HÉROS",
+      "events_table_title": "RÉCAPITULATIF HEBDOMADAIRE",
+      "col_day": "JOUR", "col_event": "ÉVÉNEMENT", "col_type": "TYPE", "col_req": "REQUIS",
+      "req_yes": "✔ Oui", "req_rec": "Recommandé", "req_opt": "Optionnel",
+      "home_ql_troops": "Stratégies", "home_ql_events": "Guides"
+    },
+    "en": {
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // READ ONLY // UPDATED BY Schnereux23",
+      "tier1": "Gatherers", "tier2": "Arena/Arrest/...", "tier3": "Attacks", "tier4": "Attacks",
+      "troop1_name": "Gatherers", "troop1_desc": "Ideal for resource collection only.",
+      "troop2_desc1": "Concerns all battles requiring 5 heroes and 2 robots (Arena, arrest, KOF legend, alliance battle...)",
+      "troop2_desc2": "Only consider arrest-related skills.",
+      "troop3_name": "SOLO", "troop3_desc": "Prefer heroes with damage or lethality bonuses, along with exclusive equipment for solo attacks.",
+      "troop4_name": "RALLIES", "troop4_desc": "Prefer heroes with bonuses affecting all allies, along with exclusive equipment for group attacks.",
+      "stat_role": "ROLE", "stat_rec": "RECOMMENDATION", "role_farm": "Gathering", "rec_no": "NO COMBAT",
+      "troops_def": "Deflectors", "troops_bomber": "Bombers", "troops_tir": "Shooters",
+      "troops_table_title": "QUICK COMPARISON",
+      "col_tier": "HEROES", "col_name": "NAME", "col_rally": "RALLY CAGE", "col_rejoin": "JOIN CAGE",
+      "first_line": "Front line", "robots": "Robots", "second_line": "Back line", "heroes_label": "HEROES",
+      "events_table_title": "WEEKLY SUMMARY",
+      "col_day": "DAY", "col_event": "EVENT", "col_type": "TYPE", "col_req": "REQUIRED",
+      "req_yes": "✔ Yes", "req_rec": "Recommended", "req_opt": "Optional",
+      "home_ql_troops": "Strategies", "home_ql_events": "Guides"
+    },
+    "it": {
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // SOLO LETTURA // AGGIORNATO DA Schnereux23",
+      "tier1": "Raccoglitori", "tier2": "Arena/Arresto/...", "tier3": "Attacchi", "tier4": "Attacchi",
+      "troop1_name": "Raccoglitori", "troop1_desc": "Ideale solo per raccogliere risorse.",
+      "troop2_desc1": "Riguarda tutti i combattimenti con 5 eroi e 2 robot (Arena, arresto, leggenda KOF, battaglia di alleanza...)",
+      "troop2_desc2": "Considera solo le abilità legate all'arresto.",
+      "troop3_name": "SOLO", "troop3_desc": "Preferisci eroi con bonus ai danni o alla letalità, con equipaggiamento esclusivo per attacchi singoli.",
+      "troop4_name": "RADUNI", "troop4_desc": "Preferisci eroi con bonus che influenzano tutti gli alleati, con equipaggiamento esclusivo per attacchi di gruppo.",
+      "stat_role": "RUOLO", "stat_rec": "RACCOMANDAZIONE", "role_farm": "Raccolta", "rec_no": "NESSUN COMBATTIMENTO",
+      "troops_def": "Deflettori", "troops_bomber": "Bombardieri", "troops_tir": "Tiratori",
+      "troops_table_title": "CONFRONTO RAPIDO",
+      "col_tier": "EROI", "col_name": "NOME", "col_rally": "RALLY CAGE", "col_rejoin": "UNISCITI CAGE",
+      "first_line": "Prima linea", "robots": "Robot", "second_line": "Seconda linea", "heroes_label": "EROI",
+      "events_table_title": "RIEPILOGO SETTIMANALE",
+      "col_day": "GIORNO", "col_event": "EVENTO", "col_type": "TIPO", "col_req": "RICHIESTO",
+      "req_yes": "✔ Sì", "req_rec": "Consigliato", "req_opt": "Facoltativo",
+      "home_ql_troops": "Strategie", "home_ql_events": "Guide"
+    },
+    "pt": {
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // SOMENTE LEITURA // ATUALIZADO POR Schnereux23",
+      "tier1": "Coletores", "tier2": "Arena/Prisão/...", "tier3": "Ataques", "tier4": "Ataques",
+      "troop1_name": "Coletores", "troop1_desc": "Ideal apenas para coletar recursos.",
+      "troop2_desc1": "Refere-se a todas as batalhas com 5 heróis e 2 robôs (Arena, prisão, lenda KOF, batalha de aliança...)",
+      "troop2_desc2": "Considere apenas as habilidades de prisão.",
+      "troop3_name": "SOLO", "troop3_desc": "Prefira heróis com bônus de dano ou letalidade, com equipamento exclusivo para ataques solo.",
+      "troop4_name": "RALLIES", "troop4_desc": "Prefira heróis com bônus que afetam todos os aliados, com equipamento exclusivo para ataques em grupo.",
+      "stat_role": "FUNÇÃO", "stat_rec": "RECOMENDAÇÃO", "role_farm": "Coleta", "rec_no": "SEM COMBATE",
+      "troops_def": "Defletores", "troops_bomber": "Bombardeiros", "troops_tir": "Atiradores",
+      "troops_table_title": "COMPARATIVO RÁPIDO",
+      "col_tier": "HERÓIS", "col_name": "NOME", "col_rally": "RALLY CAGE", "col_rejoin": "ENTRAR CAGE",
+      "first_line": "Linha de frente", "robots": "Robôs", "second_line": "Linha de trás", "heroes_label": "HERÓIS",
+      "events_table_title": "RESUMO SEMANAL",
+      "col_day": "DIA", "col_event": "EVENTO", "col_type": "TIPO", "col_req": "OBRIGATÓRIO",
+      "req_yes": "✔ Sim", "req_rec": "Recomendado", "req_opt": "Opcional",
+      "home_ql_troops": "Estratégias", "home_ql_events": "Guias"
+    },
+    "ar": {
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // قراءة فقط // يُحدَّث بواسطة Schnereux23",
+      "tier1": "الجامعون", "tier2": "الحلبة/الاعتقال/...", "tier3": "الهجمات", "tier4": "الهجمات",
+      "troop1_name": "الجامعون", "troop1_desc": "مثالي فقط لجمع الموارد.",
+      "troop2_desc1": "يتعلق بكل المعارك التي تتطلب 5 أبطال و2 روبوت (الحلبة، الاعتقال، أسطورة KOF، معركة التحالف...)",
+      "troop2_desc2": "أخذ مهارات الاعتقال بعين الاعتبار فقط.",
+      "troop3_name": "فردي", "troop3_desc": "فضّل الأبطال ذوي مكافآت الضرر أو الإماتة، مع معدات حصرية للهجمات الفردية.",
+      "troop4_name": "التجمعات", "troop4_desc": "فضّل الأبطال ذوي المكافآت التي تؤثر على جميع الحلفاء، مع معدات حصرية للهجمات الجماعية.",
+      "stat_role": "الدور", "stat_rec": "التوصية", "role_farm": "جمع الموارد", "rec_no": "لا قتال",
+      "troops_def": "الصاطعون", "troops_bomber": "القاذفون", "troops_tir": "المطلقون",
+      "troops_table_title": "مقارنة سريعة",
+      "col_tier": "الأبطال", "col_name": "الاسم", "col_rally": "تجمع السجن", "col_rejoin": "الانضمام",
+      "first_line": "الصف الأمامي", "robots": "الروبوتات", "second_line": "الصف الخلفي", "heroes_label": "الأبطال",
+      "events_table_title": "ملخص أسبوعي",
+      "col_day": "اليوم", "col_event": "الحدث", "col_type": "النوع", "col_req": "مطلوب",
+      "req_yes": "✔ نعم", "req_rec": "موصى به", "req_opt": "اختياري",
+      "home_ql_troops": "الاستراتيجيات", "home_ql_events": "الأدلة"
+    },
+    "ja": {
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // 閲覧専用 // Schnereux23が更新",
+      "tier1": "採集者", "tier2": "アリーナ/逮捕/...", "tier3": "攻撃", "tier4": "攻撃",
+      "troop1_name": "採集者", "troop1_desc": "資源収集専用。",
+      "troop2_desc1": "5人のヒーローと2台のロボットを配置する全ての戦闘に関連します（アリーナ、逮捕、KOFレジェンド、アライアンス戦...）",
+      "troop2_desc2": "逮捕スキルのみを考慮してください。",
+      "troop3_name": "ソロ", "troop3_desc": "ダメージや致死性ボーナスを持つヒーローを優先し、ソロ攻撃専用の装備を使用してください。",
+      "troop4_name": "ラリー", "troop4_desc": "全ての味方に影響するボーナスを持つヒーローを優先し、集団攻撃専用の装備を使用してください。",
+      "stat_role": "役割", "stat_rec": "推奨", "role_farm": "採集", "rec_no": "戦闘不可",
+      "troops_def": "反射手", "troops_bomber": "爆撃手", "troops_tir": "射手",
+      "troops_table_title": "クイック比較",
+      "col_tier": "ヒーロー", "col_name": "名前", "col_rally": "ラリーケージ", "col_rejoin": "参加ケージ",
+      "first_line": "前衛", "robots": "ロボット", "second_line": "後衛", "heroes_label": "ヒーロー",
+      "events_table_title": "週間サマリー",
+      "col_day": "曜日", "col_event": "イベント", "col_type": "種類", "col_req": "必須",
+      "req_yes": "✔ はい", "req_rec": "推奨", "req_opt": "任意",
+      "home_ql_troops": "戦略", "home_ql_events": "ガイド"
+    }
+  }
+}
