@@ -198,14 +198,18 @@
 
     <!-- HEROS -->
     <div class="admin-panel" id="panel-heroes">
-      <div class="help-text">Catalogue global des héros (nom + image) et matrice du tableau comparatif. Le regroupement des héros en bandes d'images se fait désormais carte par carte, dans chaque onglet de type « Héros ».</div>
+      <div class="help-text">Gérez la liste des héros, leurs groupes (récolteurs / 1ère ligne / 2ème ligne) et le tableau comparatif.</div>
 
       <div class="section-label">Liste des héros</div>
       <div id="heroes-list"></div>
       <button id="add-hero-btn" style="margin-top:12px;">+ Ajouter un héros</button>
 
+      <div class="section-label">Groupes de héros</div>
+      <div class="help-text">Sélectionnez les héros appartenant à chaque groupe (cartes de la section Héros).</div>
+      <div id="hero-groups"></div>
+
       <div class="section-label">Tableau comparatif</div>
-      <div class="help-text">Cochez les capacités de chaque héros pour le tableau "Comparatif rapide". Ce tableau est global ; chaque onglet Héros choisit de l'afficher ou non.</div>
+      <div class="help-text">Cochez les capacités de chaque héros pour le tableau "Comparatif rapide".</div>
       <div id="hero-table-editor"></div>
     </div>
 
@@ -374,6 +378,7 @@
   function renderAll() {
     renderTabs();
     renderHeroes();
+    renderHeroGroups();
     renderHeroTable();
     renderEvents();
     renderUi();
@@ -577,7 +582,6 @@
   // TAB CONTENT EDITORS (par type de section)
   // ───────────────────────────────────────────
   function renderTabContentEditor(tab, uid) {
-    if (tab.type === 'troops') return renderTroopsEditor(tab, uid);
     if (tab.type === 'richtext') return renderBlocksEditor(tab, uid);
     if (tab.type === 'gallery') return renderGalleryEditor(tab, uid);
     if (tab.type === 'links') return renderLinksEditor(tab, uid);
@@ -585,274 +589,9 @@
   }
 
   function bindTabContentEditor(card, tab) {
-    if (tab.type === 'troops') return bindTroopsEditor(card, tab);
     if (tab.type === 'richtext') return bindBlocksEditor(card, tab);
     if (tab.type === 'gallery') return bindGalleryEditor(card, tab);
     if (tab.type === 'links') return bindLinksEditor(card, tab);
-  }
-
-  // ── SECTION HÉROS (par onglet : cartes + tableau optionnel) ──
-  const TIER_COLORS = [
-    { value: 'tier-1', label: 'Bleu' },
-    { value: 'tier-2', label: 'Or' },
-    { value: 'tier-3', label: 'Rouge' },
-    { value: 'tier-4', label: 'Rouge (2)' }
-  ];
-  const STAT_TONES = [
-    { value: '', label: 'Normal' },
-    { value: 'good', label: 'Vert' },
-    { value: 'warn', label: 'Or' },
-    { value: 'bad', label: 'Rouge' }
-  ];
-
-  // Construit un objet i18n {fr:..,en:..} à partir d'une clé des textes UI globaux.
-  function uiI18n(key) {
-    const o = {};
-    LANGS.forEach(l => {
-      const v = (DATA.ui[l.code] || {})[key];
-      if (v) o[l.code] = v;
-    });
-    return o;
-  }
-
-  // Migration : reconstruit les cartes par défaut depuis l'ancien format global.
-  function buildDefaultTroopsCards() {
-    const g = DATA.heroGroups || {};
-    const desc2 = {};
-    LANGS.forEach(l => {
-      const a = (DATA.ui[l.code] || {}).troop2_desc1 || '';
-      const b = (DATA.ui[l.code] || {}).troop2_desc2 || '';
-      const c = [a, b].filter(Boolean).join('\n');
-      if (c) desc2[l.code] = c;
-    });
-    return [
-      {
-        tier: 'tier-1', tierLabel: uiI18n('tier1'), name: uiI18n('troop1_name'), desc: uiI18n('troop1_desc'),
-        strips: [{ label: uiI18n('heroes_label'), heroes: (g.gatherers || []).slice() }],
-        stats: [
-          { label: uiI18n('stat_role'), value: uiI18n('role_farm'), tone: 'warn' },
-          { label: uiI18n('stat_rec'), value: uiI18n('rec_no'), tone: 'bad' }
-        ]
-      },
-      {
-        tier: 'tier-2', tierLabel: uiI18n('tier2'), name: {}, desc: desc2,
-        strips: [
-          { label: uiI18n('first_line'), heroes: (g.frontline || []).slice() },
-          { label: uiI18n('robots'), heroes: [] },
-          { label: uiI18n('second_line'), heroes: (g.backline || []).slice() }
-        ],
-        stats: []
-      },
-      {
-        tier: 'tier-3', tierLabel: uiI18n('tier3'), name: uiI18n('troop3_name'), desc: uiI18n('troop3_desc'),
-        strips: [],
-        stats: [
-          { label: uiI18n('troops_def'), value: { fr: '20%' }, tone: '' },
-          { label: uiI18n('troops_bomber'), value: { fr: '20%' }, tone: '' },
-          { label: uiI18n('troops_tir'), value: { fr: '60%' }, tone: '' }
-        ]
-      },
-      {
-        tier: 'tier-4', tierLabel: uiI18n('tier4'), name: uiI18n('troop4_name'), desc: uiI18n('troop4_desc'),
-        strips: [],
-        stats: [
-          { label: uiI18n('troops_def'), value: { fr: '20%' }, tone: '' },
-          { label: uiI18n('troops_bomber'), value: { fr: '20%' }, tone: '' },
-          { label: uiI18n('troops_tir'), value: { fr: '60%' }, tone: '' }
-        ]
-      }
-    ];
-  }
-
-  function ensureTroopsCards(tab) {
-    if (!Array.isArray(tab.cards)) tab.cards = buildDefaultTroopsCards();
-    if (typeof tab.showTable === 'undefined') tab.showTable = true;
-  }
-
-  function renderTroopsEditor(tab, uid) {
-    ensureTroopsCards(tab);
-    const heroKeys = Object.keys(DATA.heroNames || {}).sort();
-    return `
-      <div class="section-label" style="margin-top:20px;">Section Héros — contenu de cet onglet</div>
-      <div class="checkbox-row">
-        <input type="checkbox" class="f-show-table" id="showtable-${tab.id}" ${tab.showTable !== false ? 'checked' : ''}/>
-        <label for="showtable-${tab.id}">Afficher le tableau comparatif (matrice globale) sous les cartes</label>
-      </div>
-      <div class="help-text">Chaque carte : une couleur, des textes par langue, des bandes d'images de héros et des lignes de stats. Tout est propre à cet onglet.</div>
-      <div class="cards-editor">
-        ${tab.cards.map((c, cidx) => renderOneTroopCard(tab, uid, c, cidx, heroKeys)).join('')}
-      </div>
-      <button class="small add-troop-card" style="margin-top:8px;">+ Ajouter une carte</button>
-    `;
-  }
-
-  function renderOneTroopCard(tab, uid, c, cidx, heroKeys) {
-    const cuid = uid + '-card-' + cidx;
-    return `
-      <div class="item-card troop-card" data-cidx="${cidx}" style="padding:12px 16px;">
-        <div class="item-card-header" style="margin:0;">
-          <div class="item-card-title" style="font-size:0.95rem;">
-            <span class="item-card-meta">Carte ${cidx + 1}</span>
-            <span>${(c.name && c.name.fr) || (c.tierLabel && c.tierLabel.fr) || ''}</span>
-          </div>
-          <div class="item-card-actions">
-            <div class="order-controls">
-              <button class="small card-up" ${cidx === 0 ? 'disabled' : ''}>▲</button>
-              <button class="small card-down" ${cidx === tab.cards.length - 1 ? 'disabled' : ''}>▼</button>
-            </div>
-            <button class="small card-delete danger">Suppr.</button>
-          </div>
-        </div>
-        <div class="item-card-body" style="display:block; margin-top:10px; padding-top:10px;">
-          <label>Couleur de l'étiquette</label>
-          <select class="f-card-tier" style="width:auto;">
-            ${TIER_COLORS.map(tc => `<option value="${tc.value}" ${c.tier === tc.value ? 'selected' : ''}>${tc.label}</option>`).join('')}
-          </select>
-
-          <div class="section-label" style="margin-top:14px;">Bandes d'images (héros)</div>
-          <div class="strips-list">
-            ${(c.strips || []).map((s, sidx) => `
-              <div class="strip-row" data-sidx="${sidx}" style="border:1px solid var(--border); padding:8px 10px; margin-bottom:8px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span class="item-card-meta">Bande ${sidx + 1} — héros affichés</span>
-                  <button class="small strip-delete danger">Retirer</button>
-                </div>
-                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">
-                  ${heroKeys.map(k => `
-                    <label class="checkbox-row" style="background:var(--surface); border:1px solid var(--border); padding:2px 8px; border-radius:2px; font-size:0.7rem; margin:0;">
-                      <input type="checkbox" class="f-strip-hero" data-sidx="${sidx}" data-key="${k}" ${(s.heroes || []).includes(k) ? 'checked' : ''}/>
-                      ${DATA.heroNames[k]}
-                    </label>`).join('')}
-                </div>
-              </div>`).join('')}
-          </div>
-          <button class="small strip-add">+ Ajouter une bande</button>
-
-          <div class="section-label" style="margin-top:14px;">Statistiques</div>
-          <div class="stats-list">
-            ${(c.stats || []).map((st, stidx) => `
-              <div class="stat-edit-row" data-stidx="${stidx}" style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                <span class="item-card-meta">Stat ${stidx + 1}</span>
-                <label style="margin:0;">couleur valeur</label>
-                <select class="f-stat-tone" data-stidx="${stidx}" style="width:auto;">
-                  ${STAT_TONES.map(tn => `<option value="${tn.value}" ${(st.tone || '') === tn.value ? 'selected' : ''}>${tn.label}</option>`).join('')}
-                </select>
-                <button class="small stat-delete danger">Retirer</button>
-              </div>`).join('')}
-          </div>
-          <button class="small stat-add">+ Ajouter une stat</button>
-
-          <div class="section-label" style="margin-top:14px;">Textes (par langue)</div>
-          ${langTabsHtml(cuid)}
-          ${LANGS.map((l, i) => `
-            <div class="lang-fields ${i === 0 ? 'active' : ''}" data-uid="${cuid}" data-lang="${l.code}">
-              <label>Étiquette de couleur (${l.code.toUpperCase()})</label>
-              <input type="text" class="f-card-tierlabel" data-lang="${l.code}" value="${(c.tierLabel && c.tierLabel[l.code]) || ''}"/>
-              <label>Nom de la carte (${l.code.toUpperCase()})</label>
-              <input type="text" class="f-card-name" data-lang="${l.code}" value="${(c.name && c.name[l.code]) || ''}"/>
-              <label>Description (${l.code.toUpperCase()})</label>
-              <textarea class="f-card-desc" data-lang="${l.code}">${(c.desc && c.desc[l.code]) || ''}</textarea>
-              ${(c.strips || []).map((s, sidx) => `
-                <label>Libellé bande ${sidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-strip-label" data-sidx="${sidx}" data-key="strip${sidx}" data-lang="${l.code}" value="${(s.label && s.label[l.code]) || ''}"/>
-              `).join('')}
-              ${(c.stats || []).map((st, stidx) => `
-                <label>Libellé stat ${stidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-stat-label" data-stidx="${stidx}" data-key="statl${stidx}" data-lang="${l.code}" value="${(st.label && st.label[l.code]) || ''}"/>
-                <label>Valeur stat ${stidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-stat-value" data-stidx="${stidx}" data-key="statv${stidx}" data-lang="${l.code}" value="${(st.value && st.value[l.code]) || ''}"/>
-              `).join('')}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  function bindTroopsEditor(card, tab) {
-    ensureTroopsCards(tab);
-    bindLangTabs(card);
-    const reexpand = () => {
-      renderTabs();
-      const nc = document.querySelector('.item-card[data-id="' + tab.id + '"]');
-      if (nc) nc.classList.add('expanded');
-    };
-
-    const showCb = card.querySelector('.f-show-table');
-    if (showCb) showCb.addEventListener('change', e => { tab.showTable = e.target.checked; });
-
-    card.querySelectorAll('.troop-card').forEach(cc => {
-      const cidx = parseInt(cc.dataset.cidx, 10);
-      const c = tab.cards[cidx];
-
-      cc.querySelector('.f-card-tier').addEventListener('change', e => { c.tier = e.target.value; });
-      cc.querySelector('.card-delete').addEventListener('click', () => {
-        if (confirm('Supprimer cette carte ?')) { tab.cards.splice(cidx, 1); reexpand(); }
-      });
-      cc.querySelector('.card-up').addEventListener('click', () => {
-        if (cidx > 0) { [tab.cards[cidx - 1], tab.cards[cidx]] = [tab.cards[cidx], tab.cards[cidx - 1]]; reexpand(); }
-      });
-      cc.querySelector('.card-down').addEventListener('click', () => {
-        if (cidx < tab.cards.length - 1) { [tab.cards[cidx + 1], tab.cards[cidx]] = [tab.cards[cidx], tab.cards[cidx + 1]]; reexpand(); }
-      });
-
-      // Bandes
-      cc.querySelector('.strip-add').addEventListener('click', () => {
-        c.strips = c.strips || []; c.strips.push({ label: {}, heroes: [] }); reexpand();
-      });
-      cc.querySelectorAll('.strip-row').forEach(sr => {
-        const sidx = parseInt(sr.dataset.sidx, 10);
-        sr.querySelector('.strip-delete').addEventListener('click', () => { c.strips.splice(sidx, 1); reexpand(); });
-        sr.querySelectorAll('.f-strip-hero').forEach(cb => cb.addEventListener('change', e => {
-          const k = e.target.dataset.key; const s = c.strips[sidx]; s.heroes = s.heroes || [];
-          if (e.target.checked) { if (!s.heroes.includes(k)) s.heroes.push(k); }
-          else s.heroes = s.heroes.filter(x => x !== k);
-        }));
-      });
-
-      // Stats
-      cc.querySelector('.stat-add').addEventListener('click', () => {
-        c.stats = c.stats || []; c.stats.push({ label: {}, value: {}, tone: '' }); reexpand();
-      });
-      cc.querySelectorAll('.stat-edit-row').forEach(strow => {
-        const stidx = parseInt(strow.dataset.stidx, 10);
-        strow.querySelector('.stat-delete').addEventListener('click', () => { c.stats.splice(stidx, 1); reexpand(); });
-        strow.querySelector('.f-stat-tone').addEventListener('change', e => { c.stats[stidx].tone = e.target.value; });
-      });
-
-      // Textes i18n
-      cc.querySelectorAll('.f-card-tierlabel').forEach(inp => inp.addEventListener('input', e => {
-        c.tierLabel = c.tierLabel || {}; c.tierLabel[e.target.dataset.lang] = e.target.value;
-      }));
-      cc.querySelectorAll('.f-card-name').forEach(inp => inp.addEventListener('input', e => {
-        c.name = c.name || {}; c.name[e.target.dataset.lang] = e.target.value;
-        if (e.target.dataset.lang === 'fr') {
-          const sp = cc.querySelector('.item-card-title span:last-child');
-          if (sp) sp.textContent = e.target.value;
-        }
-      }));
-      cc.querySelectorAll('.f-card-desc').forEach(inp => inp.addEventListener('input', e => {
-        c.desc = c.desc || {}; c.desc[e.target.dataset.lang] = e.target.value;
-      }));
-      cc.querySelectorAll('.f-strip-label').forEach(inp => inp.addEventListener('input', e => {
-        const sidx = parseInt(inp.dataset.sidx, 10); const s = c.strips[sidx];
-        s.label = s.label || {}; s.label[e.target.dataset.lang] = e.target.value;
-      }));
-      cc.querySelectorAll('.f-stat-label').forEach(inp => inp.addEventListener('input', e => {
-        const stidx = parseInt(inp.dataset.stidx, 10); const st = c.stats[stidx];
-        st.label = st.label || {}; st.label[e.target.dataset.lang] = e.target.value;
-      }));
-      cc.querySelectorAll('.f-stat-value').forEach(inp => inp.addEventListener('input', e => {
-        const stidx = parseInt(inp.dataset.stidx, 10); const st = c.stats[stidx];
-        st.value = st.value || {}; st.value[e.target.dataset.lang] = e.target.value;
-      }));
-    });
-
-    const addCardBtn = card.querySelector('.add-troop-card');
-    if (addCardBtn) addCardBtn.addEventListener('click', () => {
-      tab.cards.push({ tier: 'tier-1', tierLabel: {}, name: {}, desc: {}, strips: [], stats: [] });
-      reexpand();
-    });
   }
 
   // ── RICHTEXT (blocs de contenu / FAQ) ──

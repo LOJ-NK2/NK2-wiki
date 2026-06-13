@@ -126,7 +126,7 @@
     .tier-3 { color: var(--danger); border-color: var(--danger); }
     .tier-4 { color: var(--danger); border-color: var(--danger); }
     .card-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 2px; color: #fff; margin-bottom: 8px; }
-    .card-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; white-space: pre-line; }
+    .card-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
     .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; }
     .stat-row:last-child { border-bottom: none; }
     .stat-label { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; }
@@ -142,14 +142,14 @@
     .event-card.type-resource { border-left-color: var(--green); }
     .event-date { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 8px; }
     .event-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; color: #fff; margin-bottom: 6px; }
-    .event-desc { font-size: 0.83rem; color: var(--muted); white-space: pre-line; }
+    .event-desc { font-size: 0.83rem; color: var(--muted); }
     .event-tag { position: absolute; top: 20px; right: 20px; font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; padding: 3px 8px; border: 1px solid currentColor; }
     .tag-war      { color: var(--danger); }
     .tag-rally    { color: #9b59b6; }
     .tag-resource { color: var(--green); }
     .tag-alliance { color: var(--accent); }
 
-    .callout { border: 1px solid var(--border); border-left: 4px solid var(--accent); background: rgba(200,150,10,0.05); padding: 16px 20px; margin-bottom: 24px; font-size: 0.88rem; white-space: pre-line; }
+    .callout { border: 1px solid var(--border); border-left: 4px solid var(--accent); background: rgba(200,150,10,0.05); padding: 16px 20px; margin-bottom: 24px; font-size: 0.88rem; }
     .callout.danger { border-left-color: var(--danger); background: rgba(192,57,43,0.06); }
     .callout strong { color: var(--accent2); }
     .callout.danger strong { color: var(--danger); }
@@ -370,95 +370,7 @@
     `;
   }
 
-  function heroTableHtml() {
-    const ui = DATA.ui[currentLang] || DATA.ui.fr;
-    const heroTable = DATA.heroTable || {};
-    const heroNames = DATA.heroNames || {};
-    const rows = Object.keys(heroTable).sort().map(key => {
-      const row = heroTable[key];
-      const name = heroNames[key] || key;
-      const mark = v => v ? '✔️' : '❌';
-      return `<tr>
-        <td>${heroThumb(key, false)}</td>
-        <td>${name}</td>
-        <td>${mark(row.solo)}</td>
-        <td>${mark(row.rally)}</td>
-        <td>${mark(row.rallyCage)}</td>
-        <td>${mark(row.rejoinCage)}</td>
-      </tr>`;
-    }).join('');
-    return `
-      <div class="section-title" style="font-size:1.4rem;">${ui.troops_table_title || ''}</div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>${ui.col_tier || ''}</th>
-            <th>${ui.col_name || ''}</th>
-            <th>${ui.troop3_name || 'Solo'}</th>
-            <th>${ui.troop4_name || 'Rally'}</th>
-            <th>${ui.col_rally || ''}</th>
-            <th>${ui.col_rejoin || ''}</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
-  }
-
-  function heroCardHtml(c) {
-    const tier = c.tier || 'tier-1';
-    const tierLabel = t(c.tierLabel, currentLang);
-    const name = t(c.name, currentLang);
-    const desc = t(c.desc, currentLang);
-    const stripsHtml = (c.strips || []).map(s => {
-      const label = t(s.label, currentLang);
-      const imgs = (s.heroes || []).map(k => heroThumb(k)).join('');
-      return `<div class="hero-strip">
-        ${label ? `<span class="hero-strip-label">${label}</span>` : ''}
-        ${imgs ? `<div class="hero-strip-imgs">${imgs}</div>` : ''}
-      </div>`;
-    }).join('');
-    const statsHtml = (c.stats || []).map(st => {
-      const label = t(st.label, currentLang);
-      const value = t(st.value, currentLang);
-      const tone = st.tone ? (' ' + st.tone) : '';
-      return `<div class="stat-row"><span class="stat-label">${label}</span><span class="stat-value${tone}">${value}</span></div>`;
-    }).join('');
-    return `
-      <div class="card">
-        ${tierLabel ? `<div class="card-tier ${tier}">${tierLabel}</div>` : ''}
-        ${name ? `<div class="card-name">${name}</div>` : ''}
-        ${desc ? `<div class="card-desc">${desc}</div>` : ''}
-        ${stripsHtml}
-        ${statsHtml}
-      </div>
-    `;
-  }
-
   function renderTroopsSection(tab) {
-    // Ancien format (pas de cartes par onglet) → rendu hérité
-    if (!Array.isArray(tab.cards)) return renderTroopsSectionLegacy(tab);
-
-    const i = t(tab.i18n, currentLang, {});
-    const cardsHtml = tab.cards.map(c => heroCardHtml(c)).join('');
-    const tableHtml = (tab.showTable !== false) ? heroTableHtml() : '';
-
-    return `
-      <div class="section-title">${i.title || ''}</div>
-      <div class="section-sub">${i.sub || ''}</div>
-
-      ${(i.tipTitle || i.tipText) ? `<div class="callout">
-        <strong>${i.tipTitle || ''}</strong>
-        <span>${i.tipText || ''}</span>
-      </div>` : ''}
-
-      <div class="cards-grid">${cardsHtml}</div>
-
-      ${tableHtml}
-    `;
-  }
-
-  function renderTroopsSectionLegacy(tab) {
     const i = t(tab.i18n, currentLang, {});
     const ui = DATA.ui[currentLang] || DATA.ui.fr;
     const groups = DATA.heroGroups || {};
