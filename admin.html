@@ -372,11 +372,12 @@
   // RENDER ALL
   // ───────────────────────────────────────────
   function renderAll() {
-    renderTabs();
-    renderHeroes();
-    renderHeroTable();
-    renderEvents();
-    renderUi();
+    const safe = (name, fn) => { try { fn(); } catch (e) { console.error('Erreur de rendu (' + name + ') :', e); } };
+    safe('onglets', renderTabs);
+    safe('héros', renderHeroes);
+    safe('tableau', renderHeroTable);
+    safe('événements', renderEvents);
+    safe('textes UI', renderUi);
   }
 
   function langTabsHtml(uid, fields, getCurrentLang) {
@@ -522,8 +523,10 @@
 
     // bindings — uniquement les cartes d'onglet de 1er niveau (pas les cartes imbriquées)
     container.querySelectorAll(':scope > .item-card').forEach(card => {
+     try {
       const id = card.dataset.id;
       const tab = DATA.tabs.find(t => t.id === id);
+      if (!tab) return;
 
       card.querySelector('.toggle-expand').addEventListener('click', () => card.classList.toggle('expanded'));
 
@@ -559,6 +562,7 @@
       });
 
       bindTabContentEditor(card, tab);
+     } catch (e) { console.error('Erreur de binding onglet', card.dataset.id, e); }
     });
   }
 
@@ -666,6 +670,7 @@
 
   function ensureTroopsCards(tab) {
     if (!Array.isArray(tab.cards)) tab.cards = buildDefaultTroopsCards();
+    tab.cards = tab.cards.filter(c => c && typeof c === 'object');
     if (typeof tab.showTable === 'undefined') tab.showTable = true;
   }
 
