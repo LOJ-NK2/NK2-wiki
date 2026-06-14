@@ -671,6 +671,10 @@
   function ensureTroopsCards(tab) {
     if (!Array.isArray(tab.cards)) tab.cards = buildDefaultTroopsCards();
     tab.cards = tab.cards.filter(c => c && typeof c === 'object');
+    tab.cards.forEach(c => {
+      if (!c.carousel || typeof c.carousel !== 'object') c.carousel = { enabled: false, images: [] };
+      if (!Array.isArray(c.carousel.images)) c.carousel.images = [];
+    });
     if (typeof tab.showTable === 'undefined') tab.showTable = true;
   }
 
@@ -746,6 +750,21 @@
               </div>`).join('')}
           </div>
           <button class="small stat-add">+ Ajouter une stat</button>
+
+          <div class="section-label" style="margin-top:14px;">Carrousel d'images (bas de carte)</div>
+          <div class="checkbox-row">
+            <input type="checkbox" class="f-carousel-enabled" id="carousel-${cuid}" ${c.carousel && c.carousel.enabled ? 'checked' : ''}/>
+            <label for="carousel-${cuid}">Activer le carrousel d'images</label>
+          </div>
+          <div class="carousel-list ${c.carousel && c.carousel.enabled ? '' : 'hidden'}">
+            <div class="help-text">URL ou chemin d'image (ex : images/carrousel/photo1.jpg). Les images défilent en bas de la carte.</div>
+            ${((c.carousel && c.carousel.images) || []).map((im, imidx) => `
+              <div class="carousel-row" data-imidx="${imidx}" style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                <input type="text" class="f-carousel-src" data-imidx="${imidx}" value="${(im && im.src) || ''}" placeholder="images/carrousel/...jpg ou https://..."/>
+                <button class="small carousel-del danger">Retirer</button>
+              </div>`).join('')}
+            <button class="small carousel-add">+ Ajouter une image</button>
+          </div>
 
           <div class="section-label" style="margin-top:14px;">Textes (par langue)</div>
           ${langTabsHtml(cuid)}
@@ -823,6 +842,27 @@
         const stidx = parseInt(strow.dataset.stidx, 10);
         strow.querySelector('.stat-delete').addEventListener('click', () => { c.stats.splice(stidx, 1); reexpand(); });
         strow.querySelector('.f-stat-tone').addEventListener('change', e => { c.stats[stidx].tone = e.target.value; });
+      });
+
+      // Carrousel
+      if (!c.carousel || typeof c.carousel !== 'object') c.carousel = { enabled: false, images: [] };
+      const carEnabled = cc.querySelector('.f-carousel-enabled');
+      if (carEnabled) carEnabled.addEventListener('change', e => {
+        c.carousel.enabled = e.target.checked; reexpand();
+      });
+      cc.querySelectorAll('.f-carousel-src').forEach(inp => inp.addEventListener('input', e => {
+        const i = parseInt(inp.dataset.imidx, 10);
+        if (c.carousel.images[i]) c.carousel.images[i].src = e.target.value;
+      }));
+      cc.querySelectorAll('.carousel-del').forEach(btn => btn.addEventListener('click', e => {
+        const row = e.target.closest('.carousel-row');
+        const i = parseInt(row.dataset.imidx, 10);
+        c.carousel.images.splice(i, 1); reexpand();
+      }));
+      const carAdd = cc.querySelector('.carousel-add');
+      if (carAdd) carAdd.addEventListener('click', () => {
+        c.carousel.images = c.carousel.images || [];
+        c.carousel.images.push({ src: '' }); reexpand();
       });
 
       // Textes i18n
