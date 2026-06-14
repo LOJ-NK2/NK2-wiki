@@ -520,8 +520,8 @@
 
     bindLangTabs(container);
 
-    // bindings
-    container.querySelectorAll('.item-card').forEach(card => {
+    // bindings — uniquement les cartes d'onglet de 1er niveau (pas les cartes imbriquées)
+    container.querySelectorAll(':scope > .item-card').forEach(card => {
       const id = card.dataset.id;
       const tab = DATA.tabs.find(t => t.id === id);
 
