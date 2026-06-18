@@ -1015,7 +1015,108 @@
     });
   });
 
+  // ── Suivi de fréquentation (anonyme, sans inscription ni connexion) ──
+  function parseUA(ua) {
+    ua = ua || '';
+    let device = 'desktop';
+    if (/ipad|tablet|playbook|silk|(android(?!.*mobile))/i.test(ua)) device = 'tablet';
+    else if (/mobile|iphone|ipod|android.*mobile|windows phone|blackberry|bb10|opera mini/i.test(ua)) device = 'mobile';
+
+    let os = 'Autre';
+    if (/windows nt/i.test(ua)) os = 'Windows';
+    else if (/iphone|ipad|ipod/i.test(ua)) os = 'iOS';
+    else if (/mac os x/i.test(ua)) os = 'macOS';
+    else if (/android/i.test(ua)) os = 'Android';
+    else if (/linux/i.test(ua)) os = 'Linux';
+
+    let browser = 'Autre';
+    if (/edg\//i.test(ua)) browser = 'Edge';
+    else if (/opr\/|opera/i.test(ua)) browser = 'Opera';
+    else if (/samsungbrowser/i.test(ua)) browser = 'Samsung';
+    else if (/chrome\/|crios/i.test(ua) && !/edg\//i.test(ua)) browser = 'Chrome';
+    else if (/firefox\/|fxios/i.test(ua)) browser = 'Firefox';
+    else if (/safari/i.test(ua) && !/chrome|crios|android/i.test(ua)) browser = 'Safari';
+
+    return { device, browser, os };
+  }
+
+  // Récupère le code pays (ISO 2 lettres) du visiteur, sans clé ni donnée stockée chez nous.
+  async function getCountry() {
+    const TIMEOUT = 1800;
+    const WORKER_GEO = "https://nk2-translate.yannalogik.workers.dev/geo"; 
+
+    async function tryFetch(url, pick) {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), TIMEOUT);
+      try {
+        const r = await fetch(url, { signal: ctrl.signal });
+        clearTimeout(to);
+        if (!r.ok) return '';
+        const j = await r.json();
+        const v = pick(j);
+        return v ? String(v).toUpperCase().slice(0, 2) : '';
+      } catch (e) { clearTimeout(to); return ''; }
+    }
+
+    if (WORKER_GEO) {
+      const c = await tryFetch(WORKER_GEO, j => j && (j.country || j.countryCode));
+      if (c) return c;
+    }
+    // 2) Repli sans configuration (service public gratuit, sans clé).
+    //return await tryFetch('https://ipwho.is/?fields=country_code', j => j && j.country_code);
+  }
+
+  async function trackVisit() {
+    try {
+      // une seule visite par session de navigation
+      if (sessionStorage.getItem('nk2_visit_logged')) return;
+
+      // identifiant visiteur anonyme persistant (pour distinguer les visiteurs uniques)
+      let vid = '', returning = false;
+      try {
+        vid = localStorage.getItem('nk2_vid') || '';
+        if (vid) { returning = true; }
+        else {
+          vid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+                : 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+          localStorage.setItem('nk2_vid', vid);
+        }
+      } catch (e) { /* navigation privée : pas d'identifiant persistant */ }
+
+      const info = parseUA(navigator.userAgent || '');
+
+      let country = '';
+      try { country = await getCountry(); } catch (e) {}
+
+      let ref = '';
+      try {
+        ref = document.referrer ? new URL(document.referrer).hostname : '';
+        if (ref && ref === location.hostname) ref = '(interne)';
+      } catch (e) {}
+      if (!ref) ref = '(direct)';
+
+      await addDoc(collection(db, 'visits'), {
+        ts: Date.now(),
+        createdAt: serverTimestamp(),
+        vid: String(vid).slice(0, 40),
+        returning: returning,
+        bl: (navigator.language || '').slice(0, 12),
+        ref: ref.slice(0, 80),
+        device: info.device,
+        browser: info.browser,
+        os: info.os,
+        country: country,
+        scr: (window.screen ? window.screen.width + 'x' + window.screen.height : '').slice(0, 16)
+      });
+      sessionStorage.setItem('nk2_visit_logged', '1');
+    } catch (e) {
+      // échec silencieux : le suivi ne doit jamais gêner l'affichage du wiki
+      console.debug('Suivi de visite ignoré :', e && e.message);
+    }
+  }
+
   loadData();
+  trackVisit();
 </script>
 </body>
 </html>

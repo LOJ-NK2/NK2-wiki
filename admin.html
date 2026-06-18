@@ -183,6 +183,29 @@
     .tr-src span { display: block; font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; }
     .tr-prop { min-height: 42px; margin-bottom: 4px; }
     .tr-row-status { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--danger); letter-spacing: 1px; margin-bottom: 8px; min-height: 0.7rem; }
+    /* ── Statistiques ── */
+    .stats-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:26px; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-left:3px solid var(--accent); padding:14px 16px; }
+    .stat-card .sc-val { font-family:'Bebas Neue',sans-serif; font-size:2rem; line-height:1; color:#fff; letter-spacing:1px; }
+    .stat-card .sc-label { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; margin-top:6px; }
+    .stats-chart { display:flex; align-items:flex-end; gap:3px; height:170px; border:1px solid var(--border); background:var(--surface); padding:12px 12px 4px; margin-bottom:26px; overflow-x:auto; }
+    .chart-bar { flex:1 0 8px; min-width:8px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%; }
+    .chart-bar .cb-fill { width:100%; background:var(--accent); min-height:2px; }
+    .chart-bar:hover .cb-fill { background:var(--accent2); }
+    .chart-bar .cb-cap { font-family:'Share Tech Mono',monospace; font-size:0.5rem; color:var(--muted); margin-top:5px; white-space:nowrap; transform:rotate(0deg); }
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:10px; }
+    .stats-box { background:var(--card); border:1px solid var(--border); padding:14px 16px; }
+    .bk-row { display:flex; align-items:center; gap:8px; margin-bottom:9px; }
+    .bk-name { flex:0 0 92px; font-size:0.78rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .bk-bar { flex:1; height:8px; background:var(--surface); border:1px solid var(--border); }
+    .bk-bar i { display:block; height:100%; background:var(--accent); }
+    .bk-val { flex:0 0 auto; font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--muted); min-width:24px; text-align:right; }
+    .stats-table-wrap { overflow-x:auto; border:1px solid var(--border); }
+    table.stats-table { width:100%; border-collapse:collapse; font-size:0.75rem; }
+    table.stats-table th, table.stats-table td { border-bottom:1px solid var(--border); padding:6px 10px; text-align:left; white-space:nowrap; }
+    table.stats-table th { background:var(--surface); font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:1px; color:var(--accent); text-transform:uppercase; }
+    table.stats-table td { color:var(--text); }
+    .stats-empty { color:var(--muted); font-size:0.8rem; padding:20px; text-align:center; }
   </style>
 </head>
 <body>
@@ -220,6 +243,7 @@
       <button class="admin-tab" data-panel="events">Événements</button>
       <button class="admin-tab" data-panel="ui">Textes UI</button>
       <button class="admin-tab" data-panel="reports">Signalements <span id="reports-badge" class="reports-badge hidden">0</span></button>
+      <button class="admin-tab" data-panel="stats">Statistiques</button>
       <button class="admin-tab" data-panel="import">Import / Export</button>
     </div>
 
@@ -268,6 +292,59 @@
       <div id="reports-list"></div>
     </div>
 
+    <!-- STATISTIQUES -->
+    <div class="admin-panel" id="panel-stats">
+      <div class="help-text">Fréquentation du wiki, collectée de façon anonyme (aucune inscription ni connexion des visiteurs). Un identifiant aléatoire est stocké dans le navigateur du visiteur pour distinguer les visiteurs uniques — aucune adresse IP ni donnée personnelle n'est enregistrée.</div>
+      <div style="display:flex; gap:12px; align-items:center; margin-bottom:18px; flex-wrap:wrap;">
+        <button id="stats-refresh">🔄 Rafraîchir</button>
+        <label class="checkbox-row" style="margin:0; align-items:center;">
+          <span style="margin-right:8px;">Période</span>
+          <select id="stats-period" style="width:auto; padding:6px 10px; margin:0;">
+            <option value="7">7 jours</option>
+            <option value="30" selected>30 jours</option>
+            <option value="90">90 jours</option>
+            <option value="0">Tout</option>
+          </select>
+        </label>
+        <span id="stats-meta" class="item-card-meta"></span>
+      </div>
+
+      <div id="stats-cards" class="stats-cards"></div>
+
+      <div class="section-label">Visites par jour</div>
+      <div id="stats-chart" class="stats-chart"></div>
+
+      <div class="stats-grid">
+        <div class="stats-box">
+          <div class="section-label" style="margin-top:0;">Pays</div>
+          <div id="stats-countries"></div>
+        </div>
+        <div class="stats-box">
+          <div class="section-label" style="margin-top:0;">Langue du navigateur</div>
+          <div id="stats-langs"></div>
+        </div>
+        <div class="stats-box">
+          <div class="section-label" style="margin-top:0;">Appareil</div>
+          <div id="stats-devices"></div>
+        </div>
+        <div class="stats-box">
+          <div class="section-label" style="margin-top:0;">Navigateur</div>
+          <div id="stats-browsers"></div>
+        </div>
+        <div class="stats-box">
+          <div class="section-label" style="margin-top:0;">Système</div>
+          <div id="stats-os"></div>
+        </div>
+        <div class="stats-box">
+          <div class="section-label" style="margin-top:0;">Provenance</div>
+          <div id="stats-refs"></div>
+        </div>
+      </div>
+
+      <div class="section-label">Historique récent</div>
+      <div id="stats-history"></div>
+    </div>
+
     <!-- IMPORT/EXPORT -->
     <div class="admin-panel" id="panel-import">
       <div class="section-label">Exporter</div>
@@ -295,7 +372,8 @@
     getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import {
-    getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, deleteDoc
+    getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, deleteDoc,
+    query, orderBy, limit
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -1724,6 +1802,197 @@
   document.querySelector('.admin-tab[data-panel="reports"]').addEventListener('click', loadReports);
 
   // ───────────────────────────────────────────
+  // STATISTIQUES DE FRÉQUENTATION (visits)
+  // ───────────────────────────────────────────
+  let VISITS = [];
+  let statsLoaded = false;
+
+  function visitTime(v) {
+    if (v && typeof v.ts === 'number') return v.ts;
+    if (v && v.createdAt && typeof v.createdAt.toDate === 'function') return v.createdAt.toDate().getTime();
+    if (v && v.createdAt && v.createdAt.seconds) return v.createdAt.seconds * 1000;
+    return 0;
+  }
+
+  function normLang(bl) {
+    const c = String(bl || '').slice(0, 2).toLowerCase();
+    return ['fr','en','it','pt','ar','ja'].includes(c) ? c : 'autre';
+  }
+  function langLabel(code) {
+    return { fr:'Français', en:'Anglais', it:'Italien', pt:'Portugais', ar:'Arabe', ja:'Japonais', autre:'Autre' }[code] || 'Autre';
+  }
+  const DEV_LABEL = { mobile:'Mobile', tablet:'Tablette', desktop:'Ordinateur' };
+
+  let _regionNames = null;
+  function countryName(code) {
+    if (!code) return 'Inconnu';
+    try {
+      if (!_regionNames) _regionNames = new Intl.DisplayNames(['fr'], { type: 'region' });
+      return _regionNames.of(code) || code;
+    } catch (e) { return code; }
+  }
+  function flagEmoji(code) {
+    if (!code || code.length !== 2) return '🏳';
+    const A = 0x1F1E6;
+    try {
+      return String.fromCodePoint(A + code.charCodeAt(0) - 65, A + code.charCodeAt(1) - 65);
+    } catch (e) { return '🏳'; }
+  }
+
+  async function loadStats() {
+    const cards = document.getElementById('stats-cards');
+    if (cards) cards.innerHTML = '<div class="stats-empty">Chargement…</div>';
+    try {
+      let snap;
+      try {
+        snap = await getDocs(query(collection(db, 'visits'), orderBy('ts', 'desc'), limit(5000)));
+      } catch (e) {
+        snap = await getDocs(collection(db, 'visits'));
+      }
+      VISITS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      VISITS.sort((a, b) => visitTime(b) - visitTime(a));
+      statsLoaded = true;
+      renderStats();
+    } catch (e) {
+      console.error('Chargement des statistiques échoué :', e);
+      if (cards) cards.innerHTML = '<div class="stats-empty">Erreur de chargement : ' + escapeHtml(e.message) + '</div>';
+    }
+  }
+
+  function renderBreakdown(elId, counts, opts) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    opts = opts || {};
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const top = opts.top ? entries.slice(0, opts.top) : entries;
+    if (!top.length) { el.innerHTML = '<div class="stats-empty">—</div>'; return; }
+    const max = top[0][1] || 1;
+    const labelFn = opts.label || (k => k);
+    el.innerHTML = top.map(([k, n]) => {
+      const pct = Math.round(n / max * 100);
+      const name = escapeHtml(labelFn(k));
+      return '<div class="bk-row"><span class="bk-name" title="' + name + '">' + name +
+        '</span><span class="bk-bar"><i style="width:' + pct + '%"></i></span><span class="bk-val">' + n + '</span></div>';
+    }).join('');
+  }
+
+  function renderChart(buckets) {
+    const el = document.getElementById('stats-chart');
+    if (!el) return;
+    if (!buckets.length) { el.innerHTML = '<div class="stats-empty">Aucune donnée</div>'; return; }
+    const max = Math.max(1, ...buckets.map(d => d.count));
+    // n'affiche le libellé que sur ~12 barres réparties, pour rester lisible
+    const step = Math.ceil(buckets.length / 12);
+    el.innerHTML = buckets.map((d, i) => {
+      const h = Math.round(d.count / max * 100);
+      const cap = (i % step === 0) ? d.label : '';
+      return '<div class="chart-bar" title="' + d.label + ' : ' + d.count + ' visite(s)">' +
+        '<span class="cb-fill" style="height:' + h + '%"></span>' +
+        '<span class="cb-cap">' + cap + '</span></div>';
+    }).join('');
+  }
+
+  function renderStats() {
+    const periodSel = document.getElementById('stats-period');
+    const days = periodSel ? parseInt(periodSel.value, 10) : 30;
+    const now = Date.now();
+    const cutoff = days > 0 ? now - days * 86400000 : 0;
+
+    const all = VISITS;
+    const within = cutoff ? all.filter(v => visitTime(v) >= cutoff) : all;
+
+    const startToday = new Date(); startToday.setHours(0, 0, 0, 0);
+    const t0 = startToday.getTime();
+    const d7 = now - 7 * 86400000;
+    const d30 = now - 30 * 86400000;
+
+    const total = all.length;
+    const uniqAll = new Set(all.map(v => v.vid).filter(Boolean)).size;
+    const todayN = all.filter(v => visitTime(v) >= t0).length;
+    const n7 = all.filter(v => visitTime(v) >= d7).length;
+    const n30 = all.filter(v => visitTime(v) >= d30).length;
+    const uniq7 = new Set(all.filter(v => visitTime(v) >= d7).map(v => v.vid).filter(Boolean)).size;
+    const returningN = within.filter(v => v.returning).length;
+    const returnRate = within.length ? Math.round(returningN / within.length * 100) : 0;
+
+    document.getElementById('stats-cards').innerHTML = [
+      ['Aujourd\u2019hui', todayN],
+      ['7 derniers jours', n7],
+      ['30 derniers jours', n30],
+      ['Visites totales', total],
+      ['Visiteurs uniques', uniqAll],
+      ['Uniques (7 j)', uniq7],
+      ['Récurrents', returnRate + '%']
+    ].map(([label, val]) =>
+      '<div class="stat-card"><div class="sc-val">' + val + '</div><div class="sc-label">' + label + '</div></div>'
+    ).join('');
+
+    // graphe par jour
+    let span;
+    if (days > 0) span = days;
+    else {
+      const oldest = all.length ? visitTime(all[all.length - 1]) : now;
+      span = Math.min(120, Math.max(1, Math.ceil((now - oldest) / 86400000) + 1));
+    }
+    const buckets = [];
+    for (let i = span - 1; i >= 0; i--) {
+      const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0); dayStart.setDate(dayStart.getDate() - i);
+      const s = dayStart.getTime(), e = s + 86400000;
+      const count = all.filter(v => { const tt = visitTime(v); return tt >= s && tt < e; }).length;
+      buckets.push({ count, label: dayStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) });
+    }
+    renderChart(buckets);
+
+    // répartitions sur la période
+    const byLang = {}, byDev = {}, byBrow = {}, byOs = {}, byRef = {}, byCountry = {};
+    within.forEach(v => {
+      const lg = normLang(v.bl); byLang[lg] = (byLang[lg] || 0) + 1;
+      const dev = v.device || 'desktop'; byDev[dev] = (byDev[dev] || 0) + 1;
+      byBrow[v.browser || 'Autre'] = (byBrow[v.browser || 'Autre'] || 0) + 1;
+      byOs[v.os || 'Autre'] = (byOs[v.os || 'Autre'] || 0) + 1;
+      byRef[v.ref || '(direct)'] = (byRef[v.ref || '(direct)'] || 0) + 1;
+      const cc = (v.country || '').toUpperCase(); byCountry[cc] = (byCountry[cc] || 0) + 1;
+    });
+    renderBreakdown('stats-countries', byCountry, { top: 10, label: c => flagEmoji(c) + ' ' + countryName(c) });
+    renderBreakdown('stats-langs', byLang, { label: langLabel });
+    renderBreakdown('stats-devices', byDev, { label: k => DEV_LABEL[k] || k });
+    renderBreakdown('stats-browsers', byBrow, { top: 6 });
+    renderBreakdown('stats-os', byOs, { top: 6 });
+    renderBreakdown('stats-refs', byRef, { top: 8 });
+
+    const meta = document.getElementById('stats-meta');
+    if (meta) meta.textContent = within.length + ' visite(s) sur la période · ' + total + ' au total';
+
+    // historique récent
+    const histWrap = document.getElementById('stats-history');
+    const recent = within.slice(0, 100);
+    if (!recent.length) {
+      histWrap.innerHTML = '<div class="stats-empty">Aucune visite enregistrée pour le moment.</div>';
+    } else {
+      histWrap.innerHTML = '<div class="stats-table-wrap"><table class="stats-table"><thead><tr>' +
+        '<th>Date</th><th>Pays</th><th>Langue</th><th>Appareil</th><th>Navigateur</th><th>Système</th><th>Provenance</th><th>Type</th>' +
+        '</tr></thead><tbody>' +
+        recent.map(v => {
+          const dt = visitTime(v);
+          const ds = dt ? new Date(dt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+          return '<tr><td>' + ds + '</td>' +
+            '<td>' + escapeHtml((v.country ? flagEmoji(v.country.toUpperCase()) + ' ' : '') + countryName((v.country || '').toUpperCase())) + '</td>' +
+            '<td>' + escapeHtml(langLabel(normLang(v.bl))) + '</td>' +
+            '<td>' + escapeHtml(DEV_LABEL[v.device] || v.device || '—') + '</td>' +
+            '<td>' + escapeHtml(v.browser || '—') + '</td>' +
+            '<td>' + escapeHtml(v.os || '—') + '</td>' +
+            '<td>' + escapeHtml(v.ref || '—') + '</td>' +
+            '<td>' + (v.returning ? 'Récurrent' : 'Nouveau') + '</td></tr>';
+        }).join('') +
+        '</tbody></table></div>';
+    }
+  }
+
+  document.getElementById('stats-refresh').addEventListener('click', loadStats);
+  document.getElementById('stats-period').addEventListener('change', () => { if (statsLoaded) renderStats(); });
+  document.querySelector('.admin-tab[data-panel="stats"]').addEventListener('click', () => { if (!statsLoaded) loadStats(); });
+
+  // ───────────────────────────────────────────
   // AUTO-TRADUCTION (FR → autres langues)
   // ───────────────────────────────────────────
   const TR_TARGETS = ['en', 'it', 'pt', 'ar', 'ja'];
@@ -1732,7 +2001,7 @@
   // Vide  = MyMemory (gratuit, qualité moyenne, aucune installation).
   // Rempli = DeepL via votre Worker Cloudflare (bien meilleure qualité).
   //          Collez l'URL du Worker, ex : 'https://nk2-translate.xxxx.workers.dev'
-  const TRANSLATE_PROXY_URL = 'https://nk2-translate.yannalogik.workers.dev';
+    const TRANSLATE_PROXY_URL = 'https://nk2-translate.yannalogik.workers.dev';
 
   // Codes attendus par l'API MyMemory (repli)
   const MM_LANG = { en: 'en-GB', it: 'it-IT', pt: 'pt-BR', ar: 'ar-SA', ja: 'ja-JP' };
