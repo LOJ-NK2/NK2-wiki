@@ -126,7 +126,7 @@
     .tier-3 { color: var(--danger); border-color: var(--danger); }
     .tier-4 { color: var(--danger); border-color: var(--danger); }
     .card-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 2px; color: #fff; margin-bottom: 8px; }
-    .card-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
+    .card-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; white-space: pre-line; }
     .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.82rem; }
     .stat-row:last-child { border-bottom: none; }
     .stat-label { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; }
@@ -142,14 +142,14 @@
     .event-card.type-resource { border-left-color: var(--green); }
     .event-date { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 8px; }
     .event-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; color: #fff; margin-bottom: 6px; }
-    .event-desc { font-size: 0.83rem; color: var(--muted); }
+    .event-desc { font-size: 0.83rem; color: var(--muted); white-space: pre-line; }
     .event-tag { position: absolute; top: 20px; right: 20px; font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; padding: 3px 8px; border: 1px solid currentColor; }
     .tag-war      { color: var(--danger); }
     .tag-rally    { color: #9b59b6; }
     .tag-resource { color: var(--green); }
     .tag-alliance { color: var(--accent); }
 
-    .callout { border: 1px solid var(--border); border-left: 4px solid var(--accent); background: rgba(200,150,10,0.05); padding: 16px 20px; margin-bottom: 24px; font-size: 0.88rem; }
+    .callout { border: 1px solid var(--border); border-left: 4px solid var(--accent); background: rgba(200,150,10,0.05); padding: 16px 20px; margin-bottom: 24px; font-size: 0.88rem; white-space: pre-line; }
     .callout.danger { border-left-color: var(--danger); background: rgba(192,57,43,0.06); }
     .callout strong { color: var(--accent2); }
     .callout.danger strong { color: var(--danger); }
@@ -178,6 +178,19 @@
     .hero-thumb img { width: 56px; height: 56px; object-fit: cover; object-position: top; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); transition: border-color 0.2s, transform 0.2s; }
     .hero-thumb img:hover { border-color: var(--accent); transform: scale(1.2); }
     .hero-thumb span { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--muted); letter-spacing: 0.5px; text-align: center; }
+
+    /* ── CARROUSEL DE CARTE ── */
+    .hero-carousel { position: relative; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; }
+    .hc-track { position: relative; width: 100%; aspect-ratio:3/4 ; background: var(--surface); border: 1px solid var(--border); overflow: hidden; }
+    .hc-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.45s ease; }
+    .hc-slide.active { opacity: 1; }
+    .hc-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hc-prev, .hc-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.45); border: none; color: #fff; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 4px 10px; z-index: 2; transition: background 0.2s, color 0.2s; }
+    .hc-prev { left: 6px; } .hc-next { right: 6px; }
+    .hc-prev:hover, .hc-next:hover { background: var(--accent); color: #0a0c0f; }
+    .hc-dots { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+    .hc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s; }
+    .hc-dot.active { background: var(--accent); }
 
     footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; }
 
@@ -370,7 +383,111 @@
     `;
   }
 
+  function heroTableHtml() {
+    const ui = DATA.ui[currentLang] || DATA.ui.fr;
+    const heroTable = DATA.heroTable || {};
+    const heroNames = DATA.heroNames || {};
+    const rows = Object.keys(heroTable).sort().map(key => {
+      const row = heroTable[key];
+      const name = heroNames[key] || key;
+      const mark = v => v ? '✔️' : '❌';
+      return `<tr>
+        <td>${heroThumb(key, false)}</td>
+        <td>${name}</td>
+        <td>${mark(row.solo)}</td>
+        <td>${mark(row.rally)}</td>
+        <td>${mark(row.rallyCage)}</td>
+        <td>${mark(row.rejoinCage)}</td>
+      </tr>`;
+    }).join('');
+    return `
+      <div class="section-title" style="font-size:1.4rem;">${ui.troops_table_title || ''}</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>${ui.col_tier || ''}</th>
+            <th>${ui.col_name || ''}</th>
+            <th>${ui.troop3_name || 'Solo'}</th>
+            <th>${ui.troop4_name || 'Rally'}</th>
+            <th>${ui.col_rally || ''}</th>
+            <th>${ui.col_rejoin || ''}</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  function heroCardHtml(c) {
+    const tier = c.tier || 'tier-1';
+    const tierLabel = t(c.tierLabel, currentLang);
+    const name = t(c.name, currentLang);
+    const desc = t(c.desc, currentLang);
+    const stripsHtml = (c.strips || []).map(s => {
+      const label = t(s.label, currentLang);
+      const imgs = (s.heroes || []).map(k => heroThumb(k)).join('');
+      return `<div class="hero-strip">
+        ${label ? `<span class="hero-strip-label">${label}</span>` : ''}
+        ${imgs ? `<div class="hero-strip-imgs">${imgs}</div>` : ''}
+      </div>`;
+    }).join('');
+    const statsHtml = (c.stats || []).map(st => {
+      const label = t(st.label, currentLang);
+      const value = t(st.value, currentLang);
+      const tone = st.tone ? (' ' + st.tone) : '';
+      return `<div class="stat-row"><span class="stat-label">${label}</span><span class="stat-value${tone}">${value}</span></div>`;
+    }).join('');
+    const carouselImgs = (c.carousel && c.carousel.enabled && Array.isArray(c.carousel.images))
+      ? c.carousel.images.filter(im => im && im.src) : [];
+    const carouselHtml = carouselImgs.length ? heroCarouselHtml(carouselImgs) : '';
+    return `
+      <div class="card">
+        ${tierLabel ? `<div class="card-tier ${tier}">${tierLabel}</div>` : ''}
+        ${name ? `<div class="card-name">${name}</div>` : ''}
+        ${stripsHtml}
+        ${desc ? `<div class="card-desc" style="margin-top:12px;">${desc}</div>` : ''}
+        ${statsHtml}
+        ${carouselHtml}
+      </div>
+    `;
+  }
+
+  function heroCarouselHtml(images) {
+    const multi = images.length > 1;
+    return `<div class="hero-carousel">
+      <div class="hc-track">
+        ${images.map((im, idx) => `<div class="hc-slide ${idx === 0 ? 'active' : ''}"><img src="${im.src}" alt="" loading="lazy"></div>`).join('')}
+      </div>
+      ${multi ? `<button class="hc-prev" type="button" aria-label="Précédent">‹</button>
+      <button class="hc-next" type="button" aria-label="Suivant">›</button>
+      <div class="hc-dots">${images.map((_, idx) => `<span class="hc-dot ${idx === 0 ? 'active' : ''}" data-idx="${idx}"></span>`).join('')}</div>` : ''}
+    </div>`;
+  }
+
   function renderTroopsSection(tab) {
+    // Ancien format (pas de cartes par onglet) → rendu hérité
+    if (!Array.isArray(tab.cards)) return renderTroopsSectionLegacy(tab);
+
+    const i = t(tab.i18n, currentLang, {});
+    const cardsHtml = tab.cards.map(c => heroCardHtml(c)).join('');
+    const tableHtml = (tab.showTable !== false) ? heroTableHtml() : '';
+
+    return `
+      <div class="section-title">${i.title || ''}</div>
+      <div class="section-sub">${i.sub || ''}</div>
+
+      ${(i.tipTitle || i.tipText) ? `<div class="callout">
+        <strong>${i.tipTitle || ''}</strong>
+        <span>${i.tipText || ''}</span>
+      </div>` : ''}
+
+      <div class="cards-grid">${cardsHtml}</div>
+
+      ${tableHtml}
+    `;
+  }
+
+  function renderTroopsSectionLegacy(tab) {
     const i = t(tab.i18n, currentLang, {});
     const ui = DATA.ui[currentLang] || DATA.ui.fr;
     const groups = DATA.heroGroups || {};
@@ -506,7 +623,6 @@
             <th>${ui.col_day}</th>
             <th>${ui.col_event}</th>
             <th>${ui.col_type}</th>
-            <th>${ui.col_req}</th>
           </tr>
         </thead>
         <tbody>
@@ -515,7 +631,6 @@
               <td>${t(ev.date, currentLang)}</td>
               <td>${t(ev.name, currentLang)}</td>
               <td>${t(ev.tag, currentLang)}</td>
-              <td>${ui.req_rec}</td>
             </tr>`).join('')}
         </tbody>
       </table>
@@ -634,10 +749,38 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  let carouselTimers = [];
+  function clearCarousels() {
+    carouselTimers.forEach(id => clearInterval(id));
+    carouselTimers = [];
+  }
+  function initCarousels() {
+    clearCarousels();
+    document.querySelectorAll('.hero-carousel').forEach(car => {
+      const slides = [...car.querySelectorAll('.hc-slide')];
+      const dots = [...car.querySelectorAll('.hc-dot')];
+      if (slides.length <= 1) return;
+      let cur = 0, timer = null;
+      const show = i => {
+        cur = (i + slides.length) % slides.length;
+        slides.forEach((s, idx) => s.classList.toggle('active', idx === cur));
+        dots.forEach((d, idx) => d.classList.toggle('active', idx === cur));
+      };
+      const restart = () => { if (timer) clearInterval(timer); timer = setInterval(() => show(cur + 1), 4500); carouselTimers.push(timer); };
+      const prev = car.querySelector('.hc-prev');
+      const next = car.querySelector('.hc-next');
+      if (prev) prev.addEventListener('click', () => { show(cur - 1); restart(); });
+      if (next) next.addEventListener('click', () => { show(cur + 1); restart(); });
+      dots.forEach((d, idx) => d.addEventListener('click', () => { show(idx); restart(); }));
+      restart();
+    });
+  }
+
   function render() {
     renderNav();
     renderMain();
     renderFooter();
+    initCarousels();
     document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
   }
 

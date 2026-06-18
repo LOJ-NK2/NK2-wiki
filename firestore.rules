@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Contenu du wiki : lecture publique, écriture réservée aux admins connectés
+    match /site/content {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Signalements : création ouverte au public (formulaire), gestion réservée aux admins
+    match /reports/{reportId} {
+      allow read, update, delete: if request.auth != null;
+      allow create: if
+        request.resource.data.status == 'new'
+        && request.resource.data.context is string
+        && request.resource.data.context.size() > 0
+        && request.resource.data.context.size() <= 4000
+        && request.resource.data.proposal is string
+        && request.resource.data.proposal.size() <= 4000
+        && request.resource.data.reporter is string
+        && request.resource.data.reporter.size() <= 60
+        && request.resource.data.lang is string
+        && request.resource.data.tabs is list
+        && request.resource.data.tabs.size() > 0
+        && request.resource.data.tabs.size() <= 20;
+    }
+  }
+}

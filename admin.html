@@ -130,6 +130,39 @@
 
     .hidden { display: none !important; }
 
+    /* ── SIGNALEMENTS ── */
+    .reports-badge {
+      display: inline-block; background: var(--danger); color: #fff; font-family: 'Share Tech Mono', monospace;
+      font-size: 0.62rem; line-height: 1; padding: 3px 6px; border-radius: 10px; margin-left: 6px; vertical-align: middle;
+    }
+    .report-item.done { opacity: 0.6; }
+    .report-pill {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 1px; padding: 3px 8px;
+      border: 1px solid; border-radius: 2px; text-transform: uppercase;
+    }
+    .report-pill.new { color: var(--accent2); border-color: var(--accent); }
+    .report-pill.done { color: var(--green); border-color: var(--green); }
+    .report-lang-pill {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 1px; padding: 3px 8px;
+      border: 1px solid var(--border); border-radius: 2px; color: var(--text);
+    }
+    .report-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+    .report-tag {
+      font-size: 0.7rem; padding: 3px 9px; background: var(--surface); border: 1px solid var(--accent);
+      color: var(--accent2); border-radius: 2px;
+    }
+    .report-block { margin-bottom: 12px; }
+    .report-block .rb-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 1.5px;
+      color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 4px;
+    }
+    .report-block .rb-text {
+      background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--border);
+      padding: 9px 12px; font-size: 0.88rem; white-space: pre-line; color: var(--text);
+    }
+    .report-block.proposal .rb-text { border-left-color: var(--green); }
+    .report-empty { color: var(--muted); font-style: italic; padding: 24px 0; }
+
     /* ── AUTO-TRADUCTION ── */
     .tr-btn {
       margin: 2px 0 12px; padding: 3px 10px; font-size: 0.66rem; letter-spacing: 0.5px;
@@ -186,6 +219,7 @@
       <button class="admin-tab" data-panel="heroes">Héros</button>
       <button class="admin-tab" data-panel="events">Événements</button>
       <button class="admin-tab" data-panel="ui">Textes UI</button>
+      <button class="admin-tab" data-panel="reports">Signalements <span id="reports-badge" class="reports-badge hidden">0</span></button>
       <button class="admin-tab" data-panel="import">Import / Export</button>
     </div>
 
@@ -222,6 +256,18 @@
       <div id="ui-editor"></div>
     </div>
 
+    <!-- SIGNALEMENTS -->
+    <div class="admin-panel" id="panel-reports">
+      <div class="help-text">Signalements d'erreurs et propositions de traduction envoyés par les visiteurs du wiki. Marquez-les comme traités ou supprimez-les une fois pris en compte.</div>
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:16px;">
+        <button id="reports-refresh">🔄 Rafraîchir</button>
+        <label class="checkbox-row" style="margin:0;">
+          <input type="checkbox" id="reports-hide-done"> <span>Masquer les traités</span>
+        </label>
+      </div>
+      <div id="reports-list"></div>
+    </div>
+
     <!-- IMPORT/EXPORT -->
     <div class="admin-panel" id="panel-import">
       <div class="section-label">Exporter</div>
@@ -249,7 +295,7 @@
     getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import {
-    getFirestore, doc, getDoc, setDoc
+    getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -316,6 +362,7 @@
     }
     migrateData();
     renderAll();
+    loadReports();
   }
 
   function migrateData() {
@@ -1556,6 +1603,126 @@
       showToast("Erreur : " + e.message, true);
     }
   });
+  // ───────────────────────────────────────────
+  // SIGNALEMENTS (reports)
+  // ───────────────────────────────────────────
+  let REPORTS = [];
+
+  async function loadReports() {
+    const listEl = document.getElementById('reports-list');
+    if (listEl) listEl.innerHTML = '<div class="report-empty">Chargement…</div>';
+    try {
+      const snap = await getDocs(collection(db, 'reports'));
+      REPORTS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      // tri par date décroissante (plus récents en haut)
+      REPORTS.sort((a, b) => reportTime(b) - reportTime(a));
+      renderReports();
+    } catch (e) {
+      console.error('Chargement des signalements échoué :', e);
+      if (listEl) listEl.innerHTML = '<div class="report-empty">Erreur de chargement : ' + escapeHtml(e.message) + '</div>';
+    }
+  }
+
+  function reportTime(r) {
+    if (r.createdAt && typeof r.createdAt.toDate === 'function') return r.createdAt.toDate().getTime();
+    if (r.createdAt && r.createdAt.seconds) return r.createdAt.seconds * 1000;
+    return 0;
+  }
+
+  function formatReportDate(r) {
+    const ms = reportTime(r);
+    if (!ms) return '—';
+    try { return new Date(ms).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }); }
+    catch (e) { return new Date(ms).toLocaleString(); }
+  }
+
+  function updateReportsBadge() {
+    const badge = document.getElementById('reports-badge');
+    if (!badge) return;
+    const n = REPORTS.filter(r => r.status !== 'done').length;
+    badge.textContent = n;
+    badge.classList.toggle('hidden', n === 0);
+  }
+
+  function renderReports() {
+    const listEl = document.getElementById('reports-list');
+    if (!listEl) return;
+    updateReportsBadge();
+
+    const hideDone = document.getElementById('reports-hide-done');
+    const visible = REPORTS.filter(r => !(hideDone && hideDone.checked && r.status === 'done'));
+
+    if (!visible.length) {
+      listEl.innerHTML = '<div class="report-empty">Aucun signalement' + (REPORTS.length ? ' à afficher.' : ' pour le moment.') + '</div>';
+      return;
+    }
+
+    listEl.innerHTML = visible.map(r => {
+      const done = r.status === 'done';
+      const tags = (r.tabLabels && r.tabLabels.length ? r.tabLabels : (r.tabs || []))
+        .map(l => `<span class="report-tag">${escapeHtml(l)}</span>`).join('');
+      return `
+        <div class="item-card report-item ${done ? 'done' : ''}" data-id="${r.id}">
+          <div class="item-card-header">
+            <div class="item-card-title" style="flex-wrap:wrap; gap:8px;">
+              <span class="report-pill ${done ? 'done' : 'new'}">${done ? 'Traité' : 'Nouveau'}</span>
+              <span class="report-lang-pill">${(r.lang || '?').toUpperCase()}</span>
+              <span class="item-card-meta">${formatReportDate(r)}</span>
+              ${r.reporter ? `<span class="item-card-meta">par ${escapeHtml(r.reporter)}</span>` : ''}
+            </div>
+            <div class="item-card-actions">
+              <button class="small report-toggle">${done ? 'Rouvrir' : '✔ Marquer traité'}</button>
+              <button class="small report-delete danger">Suppr.</button>
+            </div>
+          </div>
+          <div class="report-tags">${tags}</div>
+          <div class="report-block">
+            <span class="rb-label">Texte concerné</span>
+            <div class="rb-text">${escapeHtml(r.context || '')}</div>
+          </div>
+          ${r.proposal ? `<div class="report-block proposal">
+            <span class="rb-label">Proposition</span>
+            <div class="rb-text">${escapeHtml(r.proposal)}</div>
+          </div>` : ''}
+        </div>`;
+    }).join('');
+
+    listEl.querySelectorAll('.report-item').forEach(card => {
+      const id = card.dataset.id;
+      const r = REPORTS.find(x => x.id === id);
+      if (!r) return;
+
+      card.querySelector('.report-toggle').addEventListener('click', async () => {
+        const newStatus = r.status === 'done' ? 'new' : 'done';
+        try {
+          await updateDoc(doc(db, 'reports', id), { status: newStatus });
+          r.status = newStatus;
+          renderReports();
+          showToast(newStatus === 'done' ? 'Signalement marqué traité' : 'Signalement rouvert');
+        } catch (e) {
+          showToast('Erreur : ' + e.message, true);
+        }
+      });
+
+      card.querySelector('.report-delete').addEventListener('click', async () => {
+        if (!confirm('Supprimer définitivement ce signalement ?')) return;
+        try {
+          await deleteDoc(doc(db, 'reports', id));
+          REPORTS = REPORTS.filter(x => x.id !== id);
+          renderReports();
+          showToast('Signalement supprimé');
+        } catch (e) {
+          showToast('Erreur : ' + e.message, true);
+        }
+      });
+    });
+  }
+
+  document.getElementById('reports-refresh').addEventListener('click', loadReports);
+  document.getElementById('reports-hide-done').addEventListener('change', renderReports);
+  // recharge à l'ouverture de l'onglet pour avoir les derniers signalements
+  document.querySelector('.admin-tab[data-panel="reports"]').addEventListener('click', loadReports);
+
   // ───────────────────────────────────────────
   // AUTO-TRADUCTION (FR → autres langues)
   // ───────────────────────────────────────────

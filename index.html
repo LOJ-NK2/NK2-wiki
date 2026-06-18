@@ -227,6 +227,45 @@
     }
     .admin-link:hover { opacity: 1; color: var(--accent); }
 
+    /* ── FORMULAIRE DE SIGNALEMENT ── */
+    .report-form { max-width: 720px; }
+    .report-field { margin-bottom: 22px; }
+    .report-field > label {
+      display: block; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px;
+    }
+    .report-field input[type="text"],
+    .report-field textarea,
+    .report-field select {
+      width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 11px 13px; font-family: 'Barlow', sans-serif; font-size: 0.92rem; border-radius: 2px;
+    }
+    .report-field input[type="text"]:focus,
+    .report-field textarea:focus,
+    .report-field select:focus { outline: none; border-color: var(--accent); }
+    .report-field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    .report-tabs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+    .report-check {
+      display: flex; align-items: center; gap: 9px; background: var(--surface);
+      border: 1px solid var(--border); padding: 9px 12px; cursor: pointer; transition: border-color 0.2s;
+      font-size: 0.86rem; color: var(--text);
+    }
+    .report-check:hover { border-color: var(--accent); }
+    .report-check input { width: auto; accent-color: var(--accent); cursor: pointer; }
+    .report-check.checked { border-color: var(--accent); background: rgba(200,150,10,0.06); }
+    .report-honey { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
+    .report-submit {
+      font-family: 'Barlow', sans-serif; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      background: var(--accent); color: #0a0c0f; border: 1px solid var(--accent); padding: 12px 26px;
+      font-size: 0.88rem; cursor: pointer; border-radius: 2px; transition: background 0.2s;
+    }
+    .report-submit:hover { background: var(--accent2); }
+    .report-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .report-status { margin-top: 16px; font-size: 0.88rem; min-height: 1.2rem; }
+    .report-status.ok { color: var(--green); }
+    .report-status.err { color: var(--danger); }
+    html[dir="rtl"] .report-field > label { text-align: right; }
+
     @media (max-width: 600px) {
       .header-inner { padding: 28px 16px 24px; }
       .lang-inner, .nav-inner { padding: 0 12px; }
@@ -276,7 +315,7 @@
 <!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCWADXq-C8yTrc3XeO7GI44bYQo8inatQk",
@@ -294,6 +333,54 @@
 
   let DATA = null;
   let currentLang = 'fr';
+
+  // ── Traductions du formulaire de signalement (intégrées, indépendantes de DATA) ──
+  const REPORT_I18N = {
+    fr: { navLabel: "Signaler", title: "Signaler une erreur", sub: "// TRADUCTIONS & CORRECTIONS",
+      intro: "Vous avez repéré une faute de traduction ou une information à corriger ? Indiquez le ou les onglets concernés, le texte fautif et, si vous le pouvez, une proposition. Un administrateur la validera.",
+      tabsLabel: "Onglet(s) concerné(s)", langLabel: "Langue concernée", contextLabel: "Texte concerné",
+      contextPh: "Copiez ici le texte erroné ou décrivez où il se trouve", proposalLabel: "Proposition de correction / traduction",
+      proposalPh: "Votre version corrigée (facultatif)", reporterLabel: "Votre pseudo en jeu (facultatif)",
+      submit: "Envoyer le signalement", sending: "Envoi…", success: "Merci ! Votre signalement a bien été envoyé.",
+      error: "Échec de l'envoi. Réessayez plus tard.", needTab: "Sélectionnez au moins un onglet.", needContext: "Indiquez le texte concerné." },
+    en: { navLabel: "Report", title: "Report an issue", sub: "// TRANSLATIONS & FIXES",
+      intro: "Spotted a translation mistake or something to fix? Tell us which tab(s) are affected, the wrong text and, if you can, a suggestion. An admin will review it.",
+      tabsLabel: "Tab(s) concerned", langLabel: "Language concerned", contextLabel: "Text concerned",
+      contextPh: "Paste the incorrect text here or describe where it is", proposalLabel: "Suggested fix / translation",
+      proposalPh: "Your corrected version (optional)", reporterLabel: "Your in-game name (optional)",
+      submit: "Send report", sending: "Sending…", success: "Thank you! Your report has been sent.",
+      error: "Sending failed. Please try again later.", needTab: "Select at least one tab.", needContext: "Please enter the text concerned." },
+    it: { navLabel: "Segnala", title: "Segnala un errore", sub: "// TRADUZIONI & CORREZIONI",
+      intro: "Hai notato un errore di traduzione o qualcosa da correggere? Indica la/e scheda/e, il testo errato e, se puoi, una proposta. Un amministratore la verificherà.",
+      tabsLabel: "Scheda/e interessata/e", langLabel: "Lingua interessata", contextLabel: "Testo interessato",
+      contextPh: "Incolla qui il testo errato o descrivi dove si trova", proposalLabel: "Proposta di correzione / traduzione",
+      proposalPh: "La tua versione corretta (facoltativo)", reporterLabel: "Il tuo nome di gioco (facoltativo)",
+      submit: "Invia segnalazione", sending: "Invio…", success: "Grazie! La tua segnalazione è stata inviata.",
+      error: "Invio non riuscito. Riprova più tardi.", needTab: "Seleziona almeno una scheda.", needContext: "Indica il testo interessato." },
+    pt: { navLabel: "Reportar", title: "Relatar um erro", sub: "// TRADUÇÕES & CORREÇÕES",
+      intro: "Encontrou um erro de tradução ou algo para corrigir? Informe a(s) aba(s), o texto incorreto e, se puder, uma sugestão. Um administrador vai revisar.",
+      tabsLabel: "Aba(s) relacionada(s)", langLabel: "Idioma relacionado", contextLabel: "Texto relacionado",
+      contextPh: "Cole aqui o texto incorreto ou descreva onde está", proposalLabel: "Sugestão de correção / tradução",
+      proposalPh: "Sua versão corrigida (opcional)", reporterLabel: "Seu nome no jogo (opcional)",
+      submit: "Enviar relatório", sending: "Enviando…", success: "Obrigado! Seu relatório foi enviado.",
+      error: "Falha no envio. Tente novamente mais tarde.", needTab: "Selecione pelo menos uma aba.", needContext: "Informe o texto relacionado." },
+    ar: { navLabel: "إبلاغ", title: "الإبلاغ عن خطأ", sub: "// الترجمات والتصحيحات",
+      intro: "هل لاحظت خطأ في الترجمة أو شيئًا يحتاج إلى تصحيح؟ حدد علامة (علامات) التبويب المعنية والنص الخاطئ، وإن أمكن اقتراحًا. سيقوم المشرف بمراجعته.",
+      tabsLabel: "علامة (علامات) التبويب المعنية", langLabel: "اللغة المعنية", contextLabel: "النص المعني",
+      contextPh: "الصق النص الخاطئ هنا أو صف موضعه", proposalLabel: "اقتراح التصحيح / الترجمة",
+      proposalPh: "نسختك المصححة (اختياري)", reporterLabel: "اسمك داخل اللعبة (اختياري)",
+      submit: "إرسال البلاغ", sending: "جارٍ الإرسال…", success: "شكرًا! تم إرسال بلاغك.",
+      error: "فشل الإرسال. حاول مرة أخرى لاحقًا.", needTab: "اختر علامة تبويب واحدة على الأقل.", needContext: "يرجى إدخال النص المعني." },
+    ja: { navLabel: "報告", title: "問題を報告", sub: "// 翻訳・修正",
+      intro: "翻訳の誤りや修正が必要な箇所を見つけましたか？ 該当するタブ、誤った文章、できれば修正案を教えてください。管理者が確認します。",
+      tabsLabel: "該当タブ", langLabel: "該当言語", contextLabel: "該当する文章",
+      contextPh: "誤った文章を貼り付けるか、場所を説明してください", proposalLabel: "修正・翻訳の提案",
+      proposalPh: "あなたの修正版（任意）", reporterLabel: "ゲーム内の名前（任意）",
+      submit: "報告を送信", sending: "送信中…", success: "ありがとうございます！報告を送信しました。",
+      error: "送信に失敗しました。後でもう一度お試しください。", needTab: "少なくとも1つのタブを選択してください。", needContext: "該当する文章を入力してください。" }
+  };
+  const REPORT_TAB_ID = '__report__';
+  function ri(key) { return (REPORT_I18N[currentLang] || REPORT_I18N.fr)[key] || REPORT_I18N.fr[key] || ''; }
 
   async function loadData() {
     const loadingEl = document.getElementById('loading');
@@ -343,7 +430,8 @@
       const langData = (tab.i18n && (tab.i18n[currentLang] || tab.i18n.fr)) || {};
       const label = langData.label || tab.id;
       return `<button class="nav-btn ${i === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.icon || ''} <span>${label}</span></button>`;
-    }).join('');
+    }).join('')
+      + `<button class="nav-btn" data-tab="${REPORT_TAB_ID}">📝 <span>${ri('navLabel')}</span></button>`;
 
     navInner.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => showSection(btn.dataset.tab));
@@ -726,11 +814,144 @@
       <div id="section-${tab.id}" class="section ${i === 0 ? 'active' : ''}">
         ${renderSectionContent(tab)}
       </div>
-    `).join('');
+    `).join('')
+      + `<div id="section-${REPORT_TAB_ID}" class="section">${renderReportSection()}</div>`;
 
     // quick-link clicks
     main.querySelectorAll('.quick-link[data-tab]').forEach(el => {
       el.addEventListener('click', () => showSection(el.dataset.tab));
+    });
+
+    bindReportForm(main);
+  }
+
+  function renderReportSection() {
+    const tabs = (DATA.tabs || []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
+    const checks = tabs.map(tab => {
+      const li = t(tab.i18n, currentLang, {});
+      const label = li.label || tab.id;
+      return `<label class="report-check">
+        <input type="checkbox" value="${tab.id}" data-label="${(li && li.label) ? escapeAttr((tab.i18n && tab.i18n.fr && tab.i18n.fr.label) || tab.id) : escapeAttr(tab.id)}">
+        <span>${tab.icon || ''} ${escapeAttr(label)}</span>
+      </label>`;
+    }).join('');
+
+    const langOpts = [
+      ['fr','🇫🇷 Français'],['en','🇬🇧 English'],['it','🇮🇹 Italiano'],
+      ['pt','🇧🇷 Português'],['ar','🇸🇦 العربية'],['ja','🇯🇵 日本語']
+    ].map(([c,l]) => `<option value="${c}" ${c===currentLang?'selected':''}>${l}</option>`).join('');
+
+    return `
+      <div class="section-title">${ri('title')}</div>
+      <div class="section-sub">${ri('sub')}</div>
+      <div class="callout"><span>${ri('intro')}</span></div>
+
+      <div class="report-form" id="report-form">
+        <div class="report-field">
+          <label>${ri('tabsLabel')}</label>
+          <div class="report-tabs-grid" id="report-tabs">${checks}</div>
+        </div>
+
+        <div class="report-field">
+          <label>${ri('langLabel')}</label>
+          <select id="report-lang">${langOpts}</select>
+        </div>
+
+        <div class="report-field">
+          <label>${ri('contextLabel')}</label>
+          <textarea id="report-context" placeholder="${ri('contextPh')}"></textarea>
+        </div>
+
+        <div class="report-field">
+          <label>${ri('proposalLabel')}</label>
+          <textarea id="report-proposal" placeholder="${ri('proposalPh')}"></textarea>
+        </div>
+
+        <div class="report-field">
+          <label>${ri('reporterLabel')}</label>
+          <input type="text" id="report-reporter" maxlength="60" autocomplete="off">
+        </div>
+
+        <div class="report-honey" aria-hidden="true">
+          <label>Website</label>
+          <input type="text" id="report-website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="button" class="report-submit" id="report-submit">${ri('submit')}</button>
+        <div class="report-status" id="report-status"></div>
+      </div>
+    `;
+  }
+
+  function escapeAttr(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function bindReportForm(root) {
+    const form = root.querySelector('#report-form');
+    if (!form) return;
+
+    // état visuel des cases cochées
+    form.querySelectorAll('.report-check input').forEach(cb => {
+      cb.addEventListener('change', () => cb.closest('.report-check').classList.toggle('checked', cb.checked));
+    });
+
+    const btn = form.querySelector('#report-submit');
+    const statusEl = form.querySelector('#report-status');
+
+    btn.addEventListener('click', async () => {
+      statusEl.className = 'report-status';
+      statusEl.textContent = '';
+
+      // anti-spam : si le champ piège est rempli, on simule un succès sans rien envoyer
+      if (form.querySelector('#report-website').value.trim()) {
+        statusEl.className = 'report-status ok';
+        statusEl.textContent = ri('success');
+        return;
+      }
+
+      const checked = [...form.querySelectorAll('.report-check input:checked')];
+      const context = form.querySelector('#report-context').value.trim();
+      const proposal = form.querySelector('#report-proposal').value.trim();
+      const reporter = form.querySelector('#report-reporter').value.trim();
+      const lang = form.querySelector('#report-lang').value;
+
+      if (!checked.length) { statusEl.className = 'report-status err'; statusEl.textContent = ri('needTab'); return; }
+      if (!context) { statusEl.className = 'report-status err'; statusEl.textContent = ri('needContext'); return; }
+
+      const tabIds = checked.map(c => c.value);
+      const tabLabels = checked.map(c => c.dataset.label || c.value);
+
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = ri('sending');
+
+      try {
+        await addDoc(collection(db, 'reports'), {
+          tabs: tabIds,
+          tabLabels: tabLabels,
+          lang: lang,
+          context: context.slice(0, 4000),
+          proposal: proposal.slice(0, 4000),
+          reporter: reporter.slice(0, 60),
+          status: 'new',
+          createdAt: serverTimestamp()
+        });
+        statusEl.className = 'report-status ok';
+        statusEl.textContent = ri('success');
+        // réinitialise le formulaire
+        form.querySelectorAll('.report-check input:checked').forEach(cb => { cb.checked = false; cb.closest('.report-check').classList.remove('checked'); });
+        form.querySelector('#report-context').value = '';
+        form.querySelector('#report-proposal').value = '';
+        form.querySelector('#report-reporter').value = '';
+      } catch (e) {
+        console.error('Envoi du signalement échoué :', e);
+        statusEl.className = 'report-status err';
+        statusEl.textContent = ri('error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
     });
   }
 
