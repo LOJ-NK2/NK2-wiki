@@ -121,6 +121,15 @@
     .order-controls { display: flex; flex-direction: column; gap: 2px; }
     .order-controls button { padding: 2px 6px; font-size: 0.6rem; line-height: 1; }
 
+    .rt-toolbar { display: flex; align-items: center; gap: 4px; margin: 4px 0; flex-wrap: wrap; }
+    .rt-btn {
+      min-width: 28px; padding: 3px 8px; font-size: 0.8rem; line-height: 1;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 2px;
+    }
+    .rt-btn:hover { border-color: var(--accent); }
+    .rt-color { font-weight: 700; }
+    .rt-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
+
     table.hero-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; }
     table.hero-table th, table.hero-table td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; }
     table.hero-table th { background: var(--surface); font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 1px; color: var(--accent); }
@@ -261,6 +270,11 @@
       <div class="section-label">Liste des héros</div>
       <div id="heroes-list"></div>
       <button id="add-hero-btn" style="margin-top:12px;">+ Ajouter un héros</button>
+
+      <div class="section-label">Catalogue des ressources</div>
+      <div class="help-text">Même principe que les héros : un identifiant + un nom, l'image correspondante doit être placée dans <strong>images/ressources/&lt;id&gt;.jpg</strong>. Les ressources s'ajoutent ensuite en bandes d'images dans chaque carte d'un onglet « Héros ».</div>
+      <div id="resources-list"></div>
+      <button id="add-resource-btn" style="margin-top:12px;">+ Ajouter une ressource</button>
 
       <div class="section-label">Tableau comparatif</div>
       <div class="help-text">Cochez les capacités de chaque héros pour le tableau "Comparatif rapide". Ce tableau est global ; chaque onglet Héros choisit de l'afficher ou non.</div>
@@ -458,6 +472,7 @@
       heroNames: {},
       heroGroups: { gatherers: [], frontline: [], backline: [] },
       heroTable: {},
+      resourceNames: {},
       events: [],
       ui: { fr: {}, en: {}, it: {}, pt: {}, ar: {}, ja: {} }
     };
@@ -500,6 +515,7 @@
     const safe = (name, fn) => { try { fn(); } catch (e) { console.error('Erreur de rendu (' + name + ') :', e); } };
     safe('onglets', renderTabs);
     safe('héros', renderHeroes);
+    safe('ressources', renderResources);
     safe('tableau', renderHeroTable);
     safe('événements', renderEvents);
     safe('textes UI', renderUi);
@@ -793,12 +809,30 @@
     ];
   }
 
+  // Ordre par défaut des blocs (doit refléter CARD_LAYOUT_DEFAULT côté index.html)
+  const CARD_LAYOUT_DEFAULT = ['strips', 'resources', 'desc', 'stats', 'carousel'];
+  const CARD_BLOCK_LABELS = {
+    strips: 'Bandes de héros',
+    resources: 'Bandes de ressources',
+    desc: 'Description',
+    stats: 'Statistiques',
+    carousel: 'Carrousel'
+  };
+
   function ensureTroopsCards(tab) {
     if (!Array.isArray(tab.cards)) tab.cards = buildDefaultTroopsCards();
     tab.cards = tab.cards.filter(c => c && typeof c === 'object');
     tab.cards.forEach(c => {
       if (!c.carousel || typeof c.carousel !== 'object') c.carousel = { enabled: false, images: [] };
       if (!Array.isArray(c.carousel.images)) c.carousel.images = [];
+      if (!Array.isArray(c.strips)) c.strips = [];
+      if (!Array.isArray(c.resources)) c.resources = [];
+      if (!Array.isArray(c.stats)) c.stats = [];
+      // Ordre des blocs : on complète avec les blocs manquants, on retire les inconnus
+      let order = Array.isArray(c.layout) && c.layout.length ? c.layout.slice() : CARD_LAYOUT_DEFAULT.slice();
+      order = order.filter(k => CARD_LAYOUT_DEFAULT.includes(k));
+      CARD_LAYOUT_DEFAULT.forEach(k => { if (!order.includes(k)) order.push(k); });
+      c.layout = order;
     });
     if (typeof tab.showTable === 'undefined') tab.showTable = true;
   }
@@ -806,22 +840,24 @@
   function renderTroopsEditor(tab, uid) {
     ensureTroopsCards(tab);
     const heroKeys = Object.keys(DATA.heroNames || {}).sort();
+    const resKeys = Object.keys(DATA.resourceNames || {}).sort();
     return `
       <div class="section-label" style="margin-top:20px;">Section Héros — contenu de cet onglet</div>
       <div class="checkbox-row">
         <input type="checkbox" class="f-show-table" id="showtable-${tab.id}" ${tab.showTable !== false ? 'checked' : ''}/>
         <label for="showtable-${tab.id}">Afficher le tableau comparatif (matrice globale) sous les cartes</label>
       </div>
-      <div class="help-text">Chaque carte : une couleur, des textes par langue, des bandes d'images de héros et des lignes de stats. Tout est propre à cet onglet.</div>
+      <div class="help-text">Chaque carte : une couleur, des textes par langue, des bandes d'images (héros &amp; ressources), des lignes de stats, un carrousel, et un ordre d'affichage personnalisable. Tout est propre à cet onglet.</div>
       <div class="cards-editor">
-        ${tab.cards.map((c, cidx) => renderOneTroopCard(tab, uid, c, cidx, heroKeys)).join('')}
+        ${tab.cards.map((c, cidx) => renderOneTroopCard(tab, uid, c, cidx, heroKeys, resKeys)).join('')}
       </div>
       <button class="small add-troop-card" style="margin-top:8px;">+ Ajouter une carte</button>
     `;
   }
 
-  function renderOneTroopCard(tab, uid, c, cidx, heroKeys) {
+  function renderOneTroopCard(tab, uid, c, cidx, heroKeys, resKeys) {
     const cuid = uid + '-card-' + cidx;
+    const order = (Array.isArray(c.layout) && c.layout.length) ? c.layout : CARD_LAYOUT_DEFAULT;
     return `
       <div class="item-card troop-card" data-cidx="${cidx}" style="padding:12px 16px;">
         <div class="item-card-header" style="margin:0;">
@@ -843,6 +879,19 @@
             ${TIER_COLORS.map(tc => `<option value="${tc.value}" ${c.tier === tc.value ? 'selected' : ''}>${tc.label}</option>`).join('')}
           </select>
 
+          <div class="section-label" style="margin-top:14px;">Ordre d'affichage des blocs</div>
+          <div class="help-text">Le nom et l'étiquette de couleur restent en haut de la carte. Réorganisez le reste (description, bandes, stats, carrousel) avec les flèches.</div>
+          <div class="layout-list">
+            ${order.map((blk, bidx) => `
+              <div class="layout-row" data-bidx="${bidx}" style="display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); padding:6px 10px; margin-bottom:6px;">
+                <span class="item-card-meta" style="flex:1;">${bidx + 1}. ${CARD_BLOCK_LABELS[blk] || blk}</span>
+                <div class="order-controls">
+                  <button class="small layout-up" ${bidx === 0 ? 'disabled' : ''}>▲</button>
+                  <button class="small layout-down" ${bidx === order.length - 1 ? 'disabled' : ''}>▼</button>
+                </div>
+              </div>`).join('')}
+          </div>
+
           <div class="section-label" style="margin-top:14px;">Bandes d'images (héros)</div>
           <div class="strips-list">
             ${(c.strips || []).map((s, sidx) => `
@@ -861,6 +910,26 @@
               </div>`).join('')}
           </div>
           <button class="small strip-add">+ Ajouter une bande</button>
+
+          <div class="section-label" style="margin-top:14px;">Bandes d'images (ressources)</div>
+          ${resKeys.length ? '' : '<div class="help-text">Aucune ressource dans le catalogue. Ajoutez-en d\'abord dans l\'onglet « Héros » &rarr; « Catalogue des ressources ».</div>'}
+          <div class="res-list">
+            ${(c.resources || []).map((s, ridx) => `
+              <div class="res-row" data-ridx="${ridx}" style="border:1px solid var(--border); padding:8px 10px; margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span class="item-card-meta">Bande ${ridx + 1} — ressources affichées</span>
+                  <button class="small res-delete danger">Retirer</button>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">
+                  ${resKeys.map(k => `
+                    <label class="checkbox-row" style="background:var(--surface); border:1px solid var(--border); padding:2px 8px; border-radius:2px; font-size:0.7rem; margin:0;">
+                      <input type="checkbox" class="f-res-item" data-ridx="${ridx}" data-key="${k}" ${(s.items || []).includes(k) ? 'checked' : ''}/>
+                      ${DATA.resourceNames[k]}
+                    </label>`).join('')}
+                </div>
+              </div>`).join('')}
+          </div>
+          <button class="small res-add" ${resKeys.length ? '' : 'disabled'}>+ Ajouter une bande de ressources</button>
 
           <div class="section-label" style="margin-top:14px;">Statistiques</div>
           <div class="stats-list">
@@ -900,10 +969,25 @@
               <label>Nom de la carte (${l.code.toUpperCase()})</label>
               <input type="text" class="f-card-name" data-lang="${l.code}" value="${(c.name && c.name[l.code]) || ''}"/>
               <label>Description (${l.code.toUpperCase()})</label>
+              <div class="rt-toolbar">
+                <button type="button" class="rt-btn" data-fmt="b" title="Gras"><b>G</b></button>
+                <button type="button" class="rt-btn" data-fmt="i" title="Italique"><i>I</i></button>
+                <button type="button" class="rt-btn" data-fmt="u" title="Souligné"><u>S</u></button>
+                <span class="rt-sep"></span>
+                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="or"     title="Or"     style="color:var(--accent2)">A</button>
+                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="rouge"  title="Rouge"  style="color:var(--danger)">A</button>
+                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="vert"   title="Vert"   style="color:var(--green)">A</button>
+                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="bleu"   title="Bleu"   style="color:var(--blue)">A</button>
+                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="violet" title="Violet" style="color:var(--violet)">A</button>
+              </div>
               <textarea class="f-card-desc" data-lang="${l.code}">${(c.desc && c.desc[l.code]) || ''}</textarea>
               ${(c.strips || []).map((s, sidx) => `
-                <label>Libellé bande ${sidx + 1} (${l.code.toUpperCase()})</label>
+                <label>Libellé bande héros ${sidx + 1} (${l.code.toUpperCase()})</label>
                 <input type="text" class="f-strip-label" data-sidx="${sidx}" data-key="strip${sidx}" data-lang="${l.code}" value="${(s.label && s.label[l.code]) || ''}"/>
+              `).join('')}
+              ${(c.resources || []).map((s, ridx) => `
+                <label>Libellé bande ressources ${ridx + 1} (${l.code.toUpperCase()})</label>
+                <input type="text" class="f-res-label" data-ridx="${ridx}" data-key="res${ridx}" data-lang="${l.code}" value="${(s.label && s.label[l.code]) || ''}"/>
               `).join('')}
               ${(c.stats || []).map((st, stidx) => `
                 <label>Libellé stat ${stidx + 1} (${l.code.toUpperCase()})</label>
@@ -945,6 +1029,20 @@
         if (cidx < tab.cards.length - 1) { [tab.cards[cidx + 1], tab.cards[cidx]] = [tab.cards[cidx], tab.cards[cidx + 1]]; reexpand(); }
       });
 
+      // Ordre des blocs (layout)
+      if (!Array.isArray(c.layout) || !c.layout.length) c.layout = CARD_LAYOUT_DEFAULT.slice();
+      cc.querySelectorAll('.layout-row').forEach(lr => {
+        const bidx = parseInt(lr.dataset.bidx, 10);
+        const up = lr.querySelector('.layout-up');
+        const down = lr.querySelector('.layout-down');
+        if (up) up.addEventListener('click', () => {
+          if (bidx > 0) { [c.layout[bidx - 1], c.layout[bidx]] = [c.layout[bidx], c.layout[bidx - 1]]; reexpand(); }
+        });
+        if (down) down.addEventListener('click', () => {
+          if (bidx < c.layout.length - 1) { [c.layout[bidx + 1], c.layout[bidx]] = [c.layout[bidx], c.layout[bidx + 1]]; reexpand(); }
+        });
+      });
+
       // Bandes
       cc.querySelector('.strip-add').addEventListener('click', () => {
         c.strips = c.strips || []; c.strips.push({ label: {}, heroes: [] }); reexpand();
@@ -956,6 +1054,22 @@
           const k = e.target.dataset.key; const s = c.strips[sidx]; s.heroes = s.heroes || [];
           if (e.target.checked) { if (!s.heroes.includes(k)) s.heroes.push(k); }
           else s.heroes = s.heroes.filter(x => x !== k);
+        }));
+      });
+
+      // Bandes de ressources
+      c.resources = c.resources || [];
+      const resAdd = cc.querySelector('.res-add');
+      if (resAdd && !resAdd.disabled) resAdd.addEventListener('click', () => {
+        c.resources.push({ label: {}, items: [] }); reexpand();
+      });
+      cc.querySelectorAll('.res-row').forEach(rr => {
+        const ridx = parseInt(rr.dataset.ridx, 10);
+        rr.querySelector('.res-delete').addEventListener('click', () => { c.resources.splice(ridx, 1); reexpand(); });
+        rr.querySelectorAll('.f-res-item').forEach(cb => cb.addEventListener('change', e => {
+          const k = e.target.dataset.key; const s = c.resources[ridx]; s.items = s.items || [];
+          if (e.target.checked) { if (!s.items.includes(k)) s.items.push(k); }
+          else s.items = s.items.filter(x => x !== k);
         }));
       });
 
@@ -1008,6 +1122,29 @@
         const sidx = parseInt(inp.dataset.sidx, 10); const s = c.strips[sidx];
         s.label = s.label || {}; s.label[e.target.dataset.lang] = e.target.value;
       }));
+      cc.querySelectorAll('.f-res-label').forEach(inp => inp.addEventListener('input', e => {
+        const ridx = parseInt(inp.dataset.ridx, 10); const s = c.resources[ridx];
+        s.label = s.label || {}; s.label[e.target.dataset.lang] = e.target.value;
+      }));
+      // Barre de mise en forme des descriptions (gras/italique/souligné/couleur)
+      cc.querySelectorAll('.rt-toolbar').forEach(tb => {
+        const textarea = tb.nextElementSibling && tb.nextElementSibling.classList.contains('f-card-desc')
+          ? tb.nextElementSibling : tb.parentElement.querySelector('.f-card-desc');
+        tb.querySelectorAll('.rt-btn').forEach(btn => btn.addEventListener('click', () => {
+          if (!textarea) return;
+          const open = btn.dataset.fmt === 'c' ? `[c=${btn.dataset.color}]` : `[${btn.dataset.fmt}]`;
+          const close = btn.dataset.fmt === 'c' ? '[/c]' : `[/${btn.dataset.fmt}]`;
+          const start = textarea.selectionStart, end = textarea.selectionEnd;
+          const val = textarea.value;
+          const sel = val.slice(start, end) || 'texte';
+          textarea.value = val.slice(0, start) + open + sel + close + val.slice(end);
+          // place le curseur sur le texte inséré et notifie le modèle
+          textarea.focus();
+          textarea.selectionStart = start + open.length;
+          textarea.selectionEnd = start + open.length + sel.length;
+          textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        }));
+      });
       cc.querySelectorAll('.f-stat-label').forEach(inp => inp.addEventListener('input', e => {
         const stidx = parseInt(inp.dataset.stidx, 10); const st = c.stats[stidx];
         st.label = st.label || {}; st.label[e.target.dataset.lang] = e.target.value;
@@ -1020,7 +1157,7 @@
 
     const addCardBtn = card.querySelector('.add-troop-card');
     if (addCardBtn) addCardBtn.addEventListener('click', () => {
-      tab.cards.push({ tier: 'tier-1', tierLabel: {}, name: {}, desc: {}, strips: [], stats: [] });
+      tab.cards.push({ tier: 'tier-1', tierLabel: {}, name: {}, desc: {}, strips: [], resources: [], stats: [], carousel: { enabled: false, images: [] }, layout: CARD_LAYOUT_DEFAULT.slice() });
       reexpand();
     });
   }
@@ -1374,6 +1511,58 @@
     const name = prompt("Nom affiché du héros", cleanKey.charAt(0).toUpperCase() + cleanKey.slice(1)) || cleanKey;
     DATA.heroNames[cleanKey] = name;
     DATA.heroTable[cleanKey] = { solo: false, rally: false, rallyCage: false, rejoinCage: false };
+    renderAll();
+  });
+
+  // ───────────────────────────────────────────
+  // RESOURCES PANEL (catalogue, même principe que les héros)
+  // ───────────────────────────────────────────
+  function renderResources() {
+    const container = document.getElementById('resources-list');
+    if (!container) return;
+    if (!DATA.resourceNames || typeof DATA.resourceNames !== 'object') DATA.resourceNames = {};
+    const keys = Object.keys(DATA.resourceNames).sort();
+    container.innerHTML = keys.length ? keys.map(key => `
+      <div class="item-card" data-key="${key}" style="padding:10px 16px;">
+        <div class="item-card-header" style="margin:0;">
+          <div class="item-card-title" style="font-size:0.95rem;">
+            <span class="item-card-meta">${key}</span>
+            <input type="text" class="f-res-name" value="${DATA.resourceNames[key]}" style="width:160px; display:inline-block;" />
+          </div>
+          <div class="item-card-actions">
+            <button class="small delete-resource danger">Suppr.</button>
+          </div>
+        </div>
+      </div>
+    `).join('') : '<div class="help-text">Aucune ressource pour le moment.</div>';
+
+    container.querySelectorAll(':scope > .item-card').forEach(card => {
+      const key = card.dataset.key;
+      card.querySelector('.f-res-name').addEventListener('input', e => {
+        DATA.resourceNames[key] = e.target.value;
+      });
+      card.querySelector('.delete-resource').addEventListener('click', () => {
+        if (confirm(`Supprimer la ressource "${key}" ? (image: images/ressources/${key}.jpg à retirer manuellement)`)) {
+          delete DATA.resourceNames[key];
+          // Retire la ressource des bandes de toutes les cartes
+          (DATA.tabs || []).forEach(tb => (tb.cards || []).forEach(c => {
+            (c.resources || []).forEach(s => { if (Array.isArray(s.items)) s.items = s.items.filter(k => k !== key); });
+          }));
+          renderAll();
+        }
+      });
+    });
+  }
+
+  document.getElementById('add-resource-btn').addEventListener('click', () => {
+    const key = prompt("Identifiant ressource (en minuscules, sans espaces, ex: 'fer')\nL'image devra être placée dans images/ressources/<id>.jpg");
+    if (!key) return;
+    const cleanKey = key.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!cleanKey) return;
+    if (!DATA.resourceNames) DATA.resourceNames = {};
+    if (DATA.resourceNames[cleanKey]) { alert("Cette ressource existe déjà."); return; }
+    const name = prompt("Nom affiché de la ressource", cleanKey.charAt(0).toUpperCase() + cleanKey.slice(1)) || cleanKey;
+    DATA.resourceNames[cleanKey] = name;
     renderAll();
   });
 

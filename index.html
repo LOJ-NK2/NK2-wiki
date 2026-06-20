@@ -330,6 +330,26 @@
   const db = getFirestore(app);
 
   const IMAGES_BASE = "images/heros/";
+  const RES_BASE = "images/ressources/";
+
+  // Couleurs autorisées pour la mise en forme des descriptions (uniquement
+  // celles déjà utilisées ailleurs sur le site, cf. variables CSS :root).
+  const RICH_COLORS = { or: '--accent2', rouge: '--danger', vert: '--green', bleu: '--blue', violet: '--violet' };
+
+  // Convertit le balisage léger des descriptions en HTML sûr.
+  // Balises gérées : [b]gras[/b], [i]italique[/i], [u]souligné[/u],
+  // [c=or|rouge|vert|bleu|violet]texte coloré[/c].
+  function formatRich(raw) {
+    if (raw === null || raw === undefined) return '';
+    let s = String(raw)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    s = s.replace(/\[c=(or|rouge|vert|bleu|violet)\]([\s\S]*?)\[\/c\]/gi,
+      (m, col, inner) => `<span style="color:var(${RICH_COLORS[col.toLowerCase()]})">${inner}</span>`);
+    s = s.replace(/\[b\]([\s\S]*?)\[\/b\]/gi, '<strong>$1</strong>');
+    s = s.replace(/\[i\]([\s\S]*?)\[\/i\]/gi, '<em>$1</em>');
+    s = s.replace(/\[u\]([\s\S]*?)\[\/u\]/gi, '<u>$1</u>');
+    return s;
+  }
 
   let DATA = null;
   let currentLang = 'fr';
@@ -418,9 +438,17 @@
     return obj[lang] !== undefined ? obj[lang] : (obj['fr'] !== undefined ? obj['fr'] : (fallback || ''));
   }
 
+  // Les noms ne sont plus affichés sous les vignettes de héros sur l'index.
+  // Le paramètre `label` est conservé pour compatibilité mais ignoré ici.
   function heroThumb(key, label) {
     const name = (DATA.heroNames && DATA.heroNames[key]) || key;
-    return `<div class="hero-thumb"><img src="${IMAGES_BASE}${key}.jpg" alt="${key}">${label !== false ? `<span>${name}</span>` : ''}</div>`;
+    return `<div class="hero-thumb"><img src="${IMAGES_BASE}${key}.jpg" alt="${name}" title="${name}" loading="lazy"></div>`;
+  }
+
+  // Vignette de ressource (même principe que les héros, dossier dédié).
+  function resourceThumb(key) {
+    const name = (DATA.resourceNames && DATA.resourceNames[key]) || key;
+    return `<div class="hero-thumb"><img src="${RES_BASE}${key}.jpg" alt="${name}" title="${name}" loading="lazy"></div>`;
   }
 
   function renderNav() {
@@ -506,11 +534,16 @@
     `;
   }
 
+  // Ordre par défaut des blocs d'une carte (les ressources sont insérées
+  // juste après les bandes de héros ; sans contenu, elles n'affichent rien).
+  const CARD_LAYOUT_DEFAULT = ['strips', 'resources', 'desc', 'stats', 'carousel'];
+
   function heroCardHtml(c) {
     const tier = c.tier || 'tier-1';
     const tierLabel = t(c.tierLabel, currentLang);
     const name = t(c.name, currentLang);
     const desc = t(c.desc, currentLang);
+
     const stripsHtml = (c.strips || []).map(s => {
       const label = t(s.label, currentLang);
       const imgs = (s.heroes || []).map(k => heroThumb(k)).join('');
@@ -519,23 +552,44 @@
         ${imgs ? `<div class="hero-strip-imgs">${imgs}</div>` : ''}
       </div>`;
     }).join('');
+
+    const resourcesHtml = (c.resources || []).map(s => {
+      const label = t(s.label, currentLang);
+      const imgs = (s.items || []).map(k => resourceThumb(k)).join('');
+      return `<div class="hero-strip">
+        ${label ? `<span class="hero-strip-label">${label}</span>` : ''}
+        ${imgs ? `<div class="hero-strip-imgs">${imgs}</div>` : ''}
+      </div>`;
+    }).join('');
+
     const statsHtml = (c.stats || []).map(st => {
       const label = t(st.label, currentLang);
       const value = t(st.value, currentLang);
       const tone = st.tone ? (' ' + st.tone) : '';
       return `<div class="stat-row"><span class="stat-label">${label}</span><span class="stat-value${tone}">${value}</span></div>`;
     }).join('');
+
     const carouselImgs = (c.carousel && c.carousel.enabled && Array.isArray(c.carousel.images))
       ? c.carousel.images.filter(im => im && im.src) : [];
     const carouselHtml = carouselImgs.length ? heroCarouselHtml(carouselImgs) : '';
+
+    const blocks = {
+      strips: stripsHtml,
+      resources: resourcesHtml,
+      desc: desc ? `<div class="card-desc" style="margin-top:12px;">${formatRich(desc)}</div>` : '',
+      stats: statsHtml,
+      carousel: carouselHtml
+    };
+    let order = Array.isArray(c.layout) && c.layout.length ? c.layout.slice() : CARD_LAYOUT_DEFAULT.slice();
+    // sécurité : on ajoute les blocs manquants à la fin, on ignore les inconnus
+    CARD_LAYOUT_DEFAULT.forEach(k => { if (!order.includes(k)) order.push(k); });
+    const body = order.map(k => blocks[k] || '').join('');
+
     return `
       <div class="card">
         ${tierLabel ? `<div class="card-tier ${tier}">${tierLabel}</div>` : ''}
         ${name ? `<div class="card-name">${name}</div>` : ''}
-        ${stripsHtml}
-        ${desc ? `<div class="card-desc" style="margin-top:12px;">${desc}</div>` : ''}
-        ${statsHtml}
-        ${carouselHtml}
+        ${body}
       </div>
     `;
   }
