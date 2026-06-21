@@ -130,6 +130,18 @@
     .rt-color { font-weight: 700; }
     .rt-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
 
+    .res-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+    .res-gallery-item { background: var(--surface); border: 1px solid var(--border); padding: 6px; text-align: center; }
+    .res-gallery-item img { width: 100%; height: 60px; object-fit: contain; display: block; background: var(--bg); }
+    .res-gallery-item span { display: block; font-size: 0.62rem; color: var(--muted); margin-top: 4px; word-break: break-word; }
+
+    .res-pick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; }
+    .res-pick-item { position: relative; border: 2px solid var(--border); background: var(--bg); padding: 3px; cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+    .res-pick-item img { width: 100%; height: 50px; object-fit: contain; display: block; }
+    .res-pick-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .res-pick-item.selected { border-color: var(--green); box-shadow: 0 0 0 1px var(--green) inset; }
+    .res-pick-item.selected::after { content: '✓'; position: absolute; top: 1px; right: 3px; color: var(--green); font-size: 0.8rem; font-weight: 700; }
+
     table.hero-table { width: 100%; font-size: 0.8rem; border-collapse: collapse; }
     table.hero-table th, table.hero-table td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; }
     table.hero-table th { background: var(--surface); font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 1px; color: var(--accent); }
@@ -272,9 +284,9 @@
       <button id="add-hero-btn" style="margin-top:12px;">+ Ajouter un héros</button>
 
       <div class="section-label">Catalogue des ressources</div>
-      <div class="help-text">Même principe que les héros : un identifiant + un nom, l'image correspondante doit être placée dans <strong>images/ressources/&lt;id&gt;.jpg</strong>. Les ressources s'ajoutent ensuite en bandes d'images dans chaque carte d'un onglet « Héros ».</div>
+      <div class="help-text">Les images sont détectées automatiquement dans le dossier <strong>images/ressources/</strong> du dépôt (jpg, png, webp…). Il suffit d'y déposer vos fichiers : aucun ajout manuel ici. Pour les afficher, cochez-les directement dans une carte d'un onglet « Héros ».</div>
+      <div style="margin-bottom:12px;"><button id="reload-resources-btn" class="small">🔄 Recharger la liste</button></div>
       <div id="resources-list"></div>
-      <button id="add-resource-btn" style="margin-top:12px;">+ Ajouter une ressource</button>
 
       <div class="section-label">Tableau comparatif</div>
       <div class="help-text">Cochez les capacités de chaque héros pour le tableau "Comparatif rapide". Ce tableau est global ; chaque onglet Héros choisit de l'afficher ou non.</div>
@@ -415,8 +427,67 @@
   let DATA = null;
 
   // ───────────────────────────────────────────
-  // AUTH
+  // RESSOURCES — découverte automatique des images
   // ───────────────────────────────────────────
+  // Les images du dossier images/ressources/ sont listées automatiquement via
+  // l'API GitHub (dépôt public, sans authentification). Aucun ajout manuel.
+  const RES_BASE = "images/ressources/";
+  const GH_OWNER = "loj-nk2";
+  const GH_REPO  = "NK2-wiki";
+  const GH_RES_DIR = "images/ressources";
+  const GH_REF = ""; // branche : laisser vide pour la branche par défaut du dépôt
+  const RES_IMG_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
+
+  let RES_IMAGES = null;        // [{ file, name }]
+  let RES_LOAD_PROMISE = null;
+  let RES_LOAD_ERROR = '';
+
+  // Jolit un nom de fichier en libellé lisible (sans extension).
+  function prettyResName(file) {
+    return file.replace(RES_IMG_EXT, '').replace(/[_-]+/g, ' ').trim();
+  }
+
+  async function fetchResourceImagesFromGitHub() {
+    let url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_RES_DIR}`;
+    if (GH_REF) url += `?ref=${encodeURIComponent(GH_REF)}`;
+    const r = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+    if (!r.ok) {
+      if (r.status === 403) throw new Error("Limite de l'API GitHub atteinte (60 requêtes/h). Réessayez dans quelques minutes.");
+      if (r.status === 404) throw new Error("Dossier introuvable. Vérifiez le nom du dépôt/branche ou créez images/ressources/.");
+      throw new Error("API GitHub : HTTP " + r.status);
+    }
+    const arr = await r.json();
+    return (Array.isArray(arr) ? arr : [])
+      .filter(it => it && it.type === 'file' && RES_IMG_EXT.test(it.name))
+      .map(it => ({ file: it.name, name: prettyResName(it.name) }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async function getResourceImages(force) {
+    if (!force && RES_IMAGES) return RES_IMAGES;
+    if (!force && RES_LOAD_PROMISE) return RES_LOAD_PROMISE;
+    RES_LOAD_ERROR = '';
+    RES_LOAD_PROMISE = (async () => {
+      try {
+        // cache de session pour limiter les appels à l'API
+        if (!force) {
+          const cached = sessionStorage.getItem('nk2_res_images');
+          if (cached) { RES_IMAGES = JSON.parse(cached); return RES_IMAGES; }
+        }
+        const list = await fetchResourceImagesFromGitHub();
+        RES_IMAGES = list;
+        try { sessionStorage.setItem('nk2_res_images', JSON.stringify(list)); } catch (e) {}
+        return list;
+      } catch (e) {
+        RES_LOAD_ERROR = e.message || String(e);
+        RES_IMAGES = RES_IMAGES || [];
+        return RES_IMAGES;
+      } finally {
+        RES_LOAD_PROMISE = null;
+      }
+    })();
+    return RES_LOAD_PROMISE;
+  }
   document.getElementById('login-btn').addEventListener('click', async () => {
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-password').value;
@@ -840,7 +911,6 @@
   function renderTroopsEditor(tab, uid) {
     ensureTroopsCards(tab);
     const heroKeys = Object.keys(DATA.heroNames || {}).sort();
-    const resKeys = Object.keys(DATA.resourceNames || {}).sort();
     return `
       <div class="section-label" style="margin-top:20px;">Section Héros — contenu de cet onglet</div>
       <div class="checkbox-row">
@@ -849,13 +919,13 @@
       </div>
       <div class="help-text">Chaque carte : une couleur, des textes par langue, des bandes d'images (héros &amp; ressources), des lignes de stats, un carrousel, et un ordre d'affichage personnalisable. Tout est propre à cet onglet.</div>
       <div class="cards-editor">
-        ${tab.cards.map((c, cidx) => renderOneTroopCard(tab, uid, c, cidx, heroKeys, resKeys)).join('')}
+        ${tab.cards.map((c, cidx) => renderOneTroopCard(tab, uid, c, cidx, heroKeys)).join('')}
       </div>
       <button class="small add-troop-card" style="margin-top:8px;">+ Ajouter une carte</button>
     `;
   }
 
-  function renderOneTroopCard(tab, uid, c, cidx, heroKeys, resKeys) {
+  function renderOneTroopCard(tab, uid, c, cidx, heroKeys) {
     const cuid = uid + '-card-' + cidx;
     const order = (Array.isArray(c.layout) && c.layout.length) ? c.layout : CARD_LAYOUT_DEFAULT;
     return `
@@ -912,7 +982,7 @@
           <button class="small strip-add">+ Ajouter une bande</button>
 
           <div class="section-label" style="margin-top:14px;">Bandes d'images (ressources)</div>
-          ${resKeys.length ? '' : '<div class="help-text">Aucune ressource dans le catalogue. Ajoutez-en d\'abord dans l\'onglet « Héros » &rarr; « Catalogue des ressources ».</div>'}
+          <div class="help-text">Cliquez sur les images du dossier <strong>images/ressources/</strong> pour les afficher dans la bande. La liste est détectée automatiquement.</div>
           <div class="res-list">
             ${(c.resources || []).map((s, ridx) => `
               <div class="res-row" data-ridx="${ridx}" style="border:1px solid var(--border); padding:8px 10px; margin-bottom:8px;">
@@ -920,16 +990,12 @@
                   <span class="item-card-meta">Bande ${ridx + 1} — ressources affichées</span>
                   <button class="small res-delete danger">Retirer</button>
                 </div>
-                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">
-                  ${resKeys.map(k => `
-                    <label class="checkbox-row" style="background:var(--surface); border:1px solid var(--border); padding:2px 8px; border-radius:2px; font-size:0.7rem; margin:0;">
-                      <input type="checkbox" class="f-res-item" data-ridx="${ridx}" data-key="${k}" ${(s.items || []).includes(k) ? 'checked' : ''}/>
-                      ${DATA.resourceNames[k]}
-                    </label>`).join('')}
+                <div class="res-pick" data-ridx="${ridx}" style="margin-top:6px;">
+                  <span class="item-card-meta">Chargement des images…</span>
                 </div>
               </div>`).join('')}
           </div>
-          <button class="small res-add" ${resKeys.length ? '' : 'disabled'}>+ Ajouter une bande de ressources</button>
+          <button class="small res-add">+ Ajouter une bande de ressources</button>
 
           <div class="section-label" style="margin-top:14px;">Statistiques</div>
           <div class="stats-list">
@@ -1060,18 +1126,46 @@
       // Bandes de ressources
       c.resources = c.resources || [];
       const resAdd = cc.querySelector('.res-add');
-      if (resAdd && !resAdd.disabled) resAdd.addEventListener('click', () => {
+      if (resAdd) resAdd.addEventListener('click', () => {
         c.resources.push({ label: {}, items: [] }); reexpand();
       });
       cc.querySelectorAll('.res-row').forEach(rr => {
         const ridx = parseInt(rr.dataset.ridx, 10);
         rr.querySelector('.res-delete').addEventListener('click', () => { c.resources.splice(ridx, 1); reexpand(); });
-        rr.querySelectorAll('.f-res-item').forEach(cb => cb.addEventListener('change', e => {
-          const k = e.target.dataset.key; const s = c.resources[ridx]; s.items = s.items || [];
-          if (e.target.checked) { if (!s.items.includes(k)) s.items.push(k); }
-          else s.items = s.items.filter(x => x !== k);
-        }));
       });
+      // Remplissage asynchrone des sélecteurs d'images
+      const pickers = cc.querySelectorAll('.res-pick');
+      if (pickers.length) {
+        getResourceImages().then(list => {
+          pickers.forEach(pick => {
+            const ridx = parseInt(pick.dataset.ridx, 10);
+            const s = c.resources[ridx];
+            if (!s) return;
+            s.items = s.items || [];
+            if (RES_LOAD_ERROR && !list.length) {
+              pick.innerHTML = `<span class="item-card-meta" style="color:var(--danger)">⚠ ${RES_LOAD_ERROR} — voir l'onglet « Héros ».</span>`;
+              return;
+            }
+            if (!list.length) {
+              pick.innerHTML = '<span class="item-card-meta">Aucune image dans images/ressources/.</span>';
+              return;
+            }
+            pick.innerHTML = `<div class="res-pick-grid">
+              ${list.map(im => `
+                <div class="res-pick-item ${s.items.includes(im.file) ? 'selected' : ''}" data-file="${im.file}" title="${im.file}">
+                  <img src="${RES_BASE}${im.file}" alt="${im.name}" loading="lazy"/>
+                </div>`).join('')}
+            </div>`;
+            pick.querySelectorAll('.res-pick-item').forEach(it => {
+              it.addEventListener('click', () => {
+                const f = it.dataset.file;
+                if (s.items.includes(f)) { s.items = s.items.filter(x => x !== f); it.classList.remove('selected'); }
+                else { s.items.push(f); it.classList.add('selected'); }
+              });
+            });
+          });
+        });
+      }
 
       // Stats
       cc.querySelector('.stat-add').addEventListener('click', () => {
@@ -1515,55 +1609,52 @@
   });
 
   // ───────────────────────────────────────────
-  // RESOURCES PANEL (catalogue, même principe que les héros)
+  // RESOURCES PANEL (galerie auto-détectée depuis le dossier)
   // ───────────────────────────────────────────
-  function renderResources() {
+  async function renderResources(force) {
     const container = document.getElementById('resources-list');
     if (!container) return;
-    if (!DATA.resourceNames || typeof DATA.resourceNames !== 'object') DATA.resourceNames = {};
-    const keys = Object.keys(DATA.resourceNames).sort();
-    container.innerHTML = keys.length ? keys.map(key => `
-      <div class="item-card" data-key="${key}" style="padding:10px 16px;">
-        <div class="item-card-header" style="margin:0;">
-          <div class="item-card-title" style="font-size:0.95rem;">
-            <span class="item-card-meta">${key}</span>
-            <input type="text" class="f-res-name" value="${DATA.resourceNames[key]}" style="width:160px; display:inline-block;" />
-          </div>
-          <div class="item-card-actions">
-            <button class="small delete-resource danger">Suppr.</button>
-          </div>
-        </div>
-      </div>
-    `).join('') : '<div class="help-text">Aucune ressource pour le moment.</div>';
-
-    container.querySelectorAll(':scope > .item-card').forEach(card => {
-      const key = card.dataset.key;
-      card.querySelector('.f-res-name').addEventListener('input', e => {
-        DATA.resourceNames[key] = e.target.value;
+    container.innerHTML = '<div class="help-text">Chargement des images…</div>';
+    const list = await getResourceImages(force);
+    if (RES_LOAD_ERROR) {
+      container.innerHTML = `<div class="help-text" style="color:var(--danger)">⚠ ${RES_LOAD_ERROR}</div>
+        <div class="help-text">Vous pouvez quand même saisir un nom de fichier manuellement&nbsp;:</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" id="res-manual-add" placeholder="ex : fer.png" style="max-width:240px;"/>
+          <button class="small" id="res-manual-btn">+ Ajouter à la liste</button>
+        </div>`;
+      const btn = container.querySelector('#res-manual-btn');
+      if (btn) btn.addEventListener('click', () => {
+        const inp = container.querySelector('#res-manual-add');
+        const f = (inp.value || '').trim();
+        if (!f) return;
+        RES_IMAGES = RES_IMAGES || [];
+        if (!RES_IMAGES.some(x => x.file === f)) RES_IMAGES.push({ file: f, name: prettyResName(f) });
+        RES_LOAD_ERROR = '';
+        renderResources();
+        renderTabs(); // rafraîchit les sélecteurs des cartes
       });
-      card.querySelector('.delete-resource').addEventListener('click', () => {
-        if (confirm(`Supprimer la ressource "${key}" ? (image: images/ressources/${key}.jpg à retirer manuellement)`)) {
-          delete DATA.resourceNames[key];
-          // Retire la ressource des bandes de toutes les cartes
-          (DATA.tabs || []).forEach(tb => (tb.cards || []).forEach(c => {
-            (c.resources || []).forEach(s => { if (Array.isArray(s.items)) s.items = s.items.filter(k => k !== key); });
-          }));
-          renderAll();
-        }
-      });
-    });
+      return;
+    }
+    if (!list.length) {
+      container.innerHTML = '<div class="help-text">Aucune image trouvée dans le dossier images/ressources/.</div>';
+      return;
+    }
+    container.innerHTML = `<div class="res-gallery">
+      ${list.map(im => `
+        <div class="res-gallery-item" title="${im.file}">
+          <img src="${RES_BASE}${im.file}" alt="${im.name}" loading="lazy"/>
+          <span>${im.name}</span>
+        </div>`).join('')}
+    </div>
+    <div class="help-text" style="margin-top:8px;">${list.length} image(s) détectée(s).</div>`;
   }
 
-  document.getElementById('add-resource-btn').addEventListener('click', () => {
-    const key = prompt("Identifiant ressource (en minuscules, sans espaces, ex: 'fer')\nL'image devra être placée dans images/ressources/<id>.jpg");
-    if (!key) return;
-    const cleanKey = key.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (!cleanKey) return;
-    if (!DATA.resourceNames) DATA.resourceNames = {};
-    if (DATA.resourceNames[cleanKey]) { alert("Cette ressource existe déjà."); return; }
-    const name = prompt("Nom affiché de la ressource", cleanKey.charAt(0).toUpperCase() + cleanKey.slice(1)) || cleanKey;
-    DATA.resourceNames[cleanKey] = name;
-    renderAll();
+  const reloadResBtn = document.getElementById('reload-resources-btn');
+  if (reloadResBtn) reloadResBtn.addEventListener('click', () => {
+    try { sessionStorage.removeItem('nk2_res_images'); } catch (e) {}
+    renderResources(true);
+    renderTabs(); // recharge aussi les sélecteurs d'images des cartes
   });
 
   // ───────────────────────────────────────────

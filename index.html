@@ -446,9 +446,12 @@
   }
 
   // Vignette de ressource (même principe que les héros, dossier dédié).
-  function resourceThumb(key) {
-    const name = (DATA.resourceNames && DATA.resourceNames[key]) || key;
-    return `<div class="hero-thumb"><img src="${RES_BASE}${key}.jpg" alt="${name}" title="${name}" loading="lazy"></div>`;
+  // `item` est le nom de fichier complet (ex: "fer.png"). Pour compatibilité,
+  // un identifiant sans extension reçoit ".jpg" par défaut.
+  function resourceThumb(item) {
+    const file = /\.[a-z0-9]+$/i.test(item) ? item : (item + '.jpg');
+    const name = (DATA.resourceNames && DATA.resourceNames[item]) || file.replace(/\.[a-z0-9]+$/i, '');
+    return `<div class="hero-thumb"><img src="${RES_BASE}${file}" alt="${name}" title="${name}" loading="lazy"></div>`;
   }
 
   function renderNav() {
