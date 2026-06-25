@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NK2 Wiki — Land of Jail</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -312,12 +313,12 @@
 <div class="lang-bar">
   <div class="lang-inner">
     <span class="lang-label">LANG</span>
-    <button class="lang-btn active" data-lang="fr">🇫🇷</button>
-    <button class="lang-btn" data-lang="en">🇬🇧</button>
-    <button class="lang-btn" data-lang="it">🇮🇹</button>
-    <button class="lang-btn" data-lang="pt">🇧🇷</button>
-    <button class="lang-btn" data-lang="ar">🇸🇦</button>
-    <button class="lang-btn" data-lang="ja">🇯🇵</button>
+    <button class="lang-btn active" data-lang="fr" aria-label="Français" title="Français">🇫🇷</button>
+    <button class="lang-btn" data-lang="en" aria-label="English" title="English">🇬🇧</button>
+    <button class="lang-btn" data-lang="it" aria-label="Italiano" title="Italiano">🇮🇹</button>
+    <button class="lang-btn" data-lang="pt" aria-label="Português" title="Português">🇧🇷</button>
+    <button class="lang-btn" data-lang="ar" aria-label="العربية" title="العربية">🇸🇦</button>
+    <button class="lang-btn" data-lang="ja" aria-label="日本語" title="日本語">🇯🇵</button>
   </div>
 </div>
 
@@ -427,6 +428,9 @@
 
   let DATA = null;
   let currentLang = 'fr';
+  // Onglet actif courant, conservé entre les re-rendus (changement de langue,
+  // réconciliation Firestore) et reflété dans l'URL pour des liens partageables.
+  let currentTab = null;
   // Permet de supprimer le défilement vers le haut lors d'un re-rendu silencieux
   // (réconciliation Firestore en arrière-plan), pour ne pas déplacer l'utilisateur.
   let SUPPRESS_SCROLL = false;
@@ -506,12 +510,9 @@
         const differs = !shown || JSON.stringify(remote) !== JSON.stringify(DATA);
         if (differs) {
           const savedY = window.scrollY;
-          const activeBtn = document.querySelector('.nav-btn.active');
-          const activeTab = activeBtn ? activeBtn.dataset.tab : null;
           SUPPRESS_SCROLL = true;
           DATA = remote;
-          render();
-          if (activeTab && document.getElementById('section-' + activeTab)) showSection(activeTab);
+          render();   // pickActiveTab() conserve l'onglet courant (ou l'ancre d'URL)
           SUPPRESS_SCROLL = false;
           window.scrollTo(0, savedY);
         }
@@ -545,7 +546,7 @@
   function heroThumb(key, label) {
     const file = (DATA.heroFiles && DATA.heroFiles[key]) || (key + '.jpg');
     const name = (DATA.heroNames && DATA.heroNames[key]) || key;
-    return `<div class="hero-thumb" data-hero="${escapeAttr(key)}" tabindex="0"><img src="${IMAGES_BASE}${file}" alt="${name}" title="${name}" loading="lazy"></div>`;
+    return `<div class="hero-thumb" data-hero="${escapeAttr(key)}" tabindex="0"><img src="${IMAGES_BASE}${file}" alt="${name}" title="${name}" width="56" height="56" loading="lazy" decoding="async"></div>`;
   }
 
   // Vignette de ressource (même principe que les héros, dossier dédié).
@@ -554,24 +555,36 @@
   function resourceThumb(item) {
     const file = /\.[a-z0-9]+$/i.test(item) ? item : (item + '.jpg');
     const name = (DATA.resourceNames && DATA.resourceNames[item]) || file.replace(/\.[a-z0-9]+$/i, '');
-    return `<div class="hero-thumb"><img src="${RES_BASE}${file}" alt="${name}" title="${name}" loading="lazy"></div>`;
+    return `<div class="hero-thumb"><img src="${RES_BASE}${file}" alt="${name}" title="${name}" width="56" height="56" loading="lazy" decoding="async"></div>`;
   }
 
   function renderNav() {
     const navInner = document.getElementById('nav-inner');
     const tabs = (DATA.tabs || []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
-    navInner.innerHTML = tabs.map((tab, i) => {
+    navInner.innerHTML = tabs.map((tab) => {
       const langData = (tab.i18n && (tab.i18n[currentLang] || tab.i18n.fr)) || {};
       const label = langData.label || tab.id;
-      return `<button class="nav-btn ${i === 0 ? 'active' : ''}" data-tab="${tab.id}">${tab.icon || ''} <span>${label}</span></button>`;
+      return `<button class="nav-btn" data-tab="${tab.id}">${tab.icon || ''} <span>${label}</span></button>`;
     }).join('')
       + `<button class="nav-btn" data-tab="${REPORT_TAB_ID}">📝 <span>${ri('navLabel')}</span></button>`;
 
     navInner.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => showSection(btn.dataset.tab));
     });
+    // L'onglet actif est choisi de façon centralisée dans render() (cf. pickActiveTab).
+  }
 
-    if (tabs.length) showSection(tabs[0].id);
+  // Détermine l'onglet à afficher : on conserve l'onglet courant s'il existe encore
+  // (changement de langue, réconciliation Firestore), sinon on honore l'ancre d'URL
+  // (#onglet, lien partageable / rafraîchissement), sinon le premier onglet.
+  function pickActiveTab() {
+    const tabs = (DATA && DATA.tabs ? DATA.tabs : []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
+    const valid = id => id === REPORT_TAB_ID || tabs.some(t => t.id === id);
+    if (currentTab && valid(currentTab)) return currentTab;
+    let fromHash = '';
+    try { fromHash = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
+    if (fromHash && valid(fromHash)) return fromHash;
+    return tabs.length ? tabs[0].id : null;
   }
 
   function renderHomeSection(tab) {
@@ -704,7 +717,7 @@
     const multi = images.length > 1;
     return `<div class="hero-carousel">
       <div class="hc-track">
-        ${images.map((im, idx) => `<div class="hc-slide ${idx === 0 ? 'active' : ''}"><img src="${im.src}" alt="" loading="lazy"></div>`).join('')}
+        ${images.map((im, idx) => `<div class="hc-slide ${idx === 0 ? 'active' : ''}"><img src="${im.src}" alt="" loading="lazy" decoding="async"></div>`).join('')}
       </div>
       ${multi ? `<button class="hc-prev" type="button" aria-label="Précédent">‹</button>
       <button class="hc-next" type="button" aria-label="Suivant">›</button>
@@ -919,7 +932,7 @@
     const itemsHtml = images.map(img => {
       const caption = t(img.caption, currentLang);
       return `<div class="gallery-item">
-        <img src="${img.src || ''}" alt="${caption || ''}" loading="lazy">
+        <img src="${img.src || ''}" alt="${caption || ''}" loading="lazy" decoding="async">
         ${caption ? `<div class="caption">${caption}</div>` : ''}
       </div>`;
     }).join('');
@@ -970,8 +983,8 @@
   function renderMain() {
     const main = document.getElementById('main');
     const tabs = (DATA.tabs || []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
-    main.innerHTML = tabs.map((tab, i) => `
-      <div id="section-${tab.id}" class="section ${i === 0 ? 'active' : ''}">
+    main.innerHTML = tabs.map((tab) => `
+      <div id="section-${tab.id}" class="section">
         ${renderSectionContent(tab)}
       </div>
     `).join('')
@@ -1128,6 +1141,13 @@
     if (sec) sec.classList.add('active');
     const btn = document.querySelector(`.nav-btn[data-tab="${id}"]`);
     if (btn) btn.classList.add('active');
+    currentTab = id;
+    // Reflète l'onglet dans l'URL sans polluer l'historique ni provoquer de saut natif
+    // (les ancres réelles sont "section-<id>", jamais "<id>").
+    try {
+      const target = id ? '#' + encodeURIComponent(id) : (location.pathname + location.search);
+      if (location.hash !== ('#' + encodeURIComponent(id))) history.replaceState(null, '', target);
+    } catch (e) {}
     if (!SUPPRESS_SCROLL) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1164,16 +1184,50 @@
     renderFooter();
     initCarousels();
     document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = currentLang;
+    const target = pickActiveTab();
+    if (target) showSection(target);
   }
 
-  // language switching
+  function setActiveLangButton() {
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+  }
+
+  // Langue initiale : préférence mémorisée, sinon langue du navigateur si gérée, sinon FR.
+  function initLang() {
+    const supported = ['fr', 'en', 'it', 'pt', 'ar', 'ja'];
+    let lang = '';
+    try { lang = localStorage.getItem('nk2_lang') || ''; } catch (e) {}
+    if (!supported.includes(lang)) {
+      const nav = (navigator.language || 'fr').slice(0, 2).toLowerCase();
+      lang = supported.includes(nav) ? nav : 'fr';
+    }
+    currentLang = lang;
+    setActiveLangButton();
+  }
+
+  // Changement de langue : on reste sur l'onglet courant et à la même position,
+  // et on mémorise la préférence pour les prochaines visites.
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (btn.dataset.lang === currentLang) return;
       currentLang = btn.dataset.lang;
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      render();
+      try { localStorage.setItem('nk2_lang', currentLang); } catch (e) {}
+      setActiveLangButton();
+      const savedY = window.scrollY;
+      SUPPRESS_SCROLL = true;
+      render();                 // pickActiveTab() conserve currentTab
+      SUPPRESS_SCROLL = false;
+      window.scrollTo(0, savedY);
     });
+  });
+
+  // Liens partageables / navigation par ancre : honore #onglet si modifié.
+  window.addEventListener('hashchange', () => {
+    let id = '';
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
+    if (!id || id === currentTab) return;
+    if (document.getElementById('section-' + id)) showSection(id);
   });
 
   // ── Suivi de fréquentation (anonyme, sans inscription ni connexion) ──
@@ -1347,6 +1401,7 @@
     window.addEventListener('resize', hide);
   }
 
+  initLang();
   loadData();
   initHeroTooltips();
 
