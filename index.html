@@ -178,6 +178,25 @@
     .hero-thumb img { width: 56px; height: 56px; object-fit: cover; object-position: top; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); transition: border-color 0.2s, transform 0.2s; }
     .hero-thumb img:hover { border-color: var(--accent); transform: scale(1.2); }
     .hero-thumb span { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--muted); letter-spacing: 0.5px; text-align: center; }
+    .hero-thumb[data-hero] { cursor: pointer; }
+    .hero-thumb[data-hero]:focus { outline: none; }
+    .hero-thumb[data-hero]:focus img { border-color: var(--accent); }
+
+    /* ── INFOBULLE DES CAPACITÉS (survol des héros) ── */
+    .hero-tip {
+      position: fixed; z-index: 2000; min-width: 168px; max-width: 240px;
+      background: var(--card); border: 1px solid var(--accent);
+      padding: 10px 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+      opacity: 0; visibility: hidden; transform: translateY(4px);
+      transition: opacity 0.12s ease, transform 0.12s ease; pointer-events: none;
+    }
+    .hero-tip.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .hero-tip .ht-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; letter-spacing: 1.5px; color: #fff; margin-bottom: 8px; }
+    .hero-tip .ht-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .hero-tip .ht-row:last-child { border-bottom: none; }
+    .hero-tip .ht-label { font-family: 'Share Tech Mono', monospace; font-size: 0.64rem; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+    .hero-tip .ht-val { font-size: 0.85rem; }
+    html[dir="rtl"] .hero-tip .ht-row { flex-direction: row-reverse; }
 
     /* ── CARROUSEL DE CARTE ── */
     .hero-carousel { position: relative; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; }
@@ -439,10 +458,11 @@
   }
 
   // Les noms ne sont plus affichés sous les vignettes de héros sur l'index.
-  // Le paramètre `label` est conservé pour compatibilité mais ignoré ici.
+  // data-hero permet d'afficher l'infobulle des capacités (tableau comparatif).
   function heroThumb(key, label) {
+    const file = (DATA.heroFiles && DATA.heroFiles[key]) || (key + '.jpg');
     const name = (DATA.heroNames && DATA.heroNames[key]) || key;
-    return `<div class="hero-thumb"><img src="${IMAGES_BASE}${key}.jpg" alt="${name}" title="${name}" loading="lazy"></div>`;
+    return `<div class="hero-thumb" data-hero="${escapeAttr(key)}" tabindex="0"><img src="${IMAGES_BASE}${file}" alt="${name}" title="${name}" loading="lazy"></div>`;
   }
 
   // Vignette de ressource (même principe que les héros, dossier dédié).
@@ -1172,8 +1192,79 @@
     }
   }
 
+  // ── Infobulle des capacités au survol d'un héros ──
+  function heroTipHtml(key) {
+    const ui = (DATA.ui && (DATA.ui[currentLang] || DATA.ui.fr)) || {};
+    const row = (DATA.heroTable && DATA.heroTable[key]) || {};
+    const name = (DATA.heroNames && DATA.heroNames[key]) || key;
+    const mark = v => v ? '✔️' : '❌';
+    const rows = [
+      [ui.troop3_name || 'Solo', row.solo],
+      [ui.troop4_name || 'Rally', row.rally],
+      [ui.col_rally || 'Rally Cage', row.rallyCage],
+      [ui.col_rejoin || 'Rejoin Cage', row.rejoinCage]
+    ];
+    return `<div class="ht-name">${escapeAttr(name)}</div>` +
+      rows.map(([l, v]) => `<div class="ht-row"><span class="ht-label">${escapeAttr(l)}</span><span class="ht-val">${mark(v)}</span></div>`).join('');
+  }
+
+  function initHeroTooltips() {
+    const tip = document.createElement('div');
+    tip.className = 'hero-tip';
+    document.body.appendChild(tip);
+    let currentEl = null;
+
+    function position(el) {
+      const r = el.getBoundingClientRect();
+      const tr = tip.getBoundingClientRect();
+      let left = r.left + r.width / 2 - tr.width / 2;
+      let top = r.top - tr.height - 8;
+      if (top < 8) top = r.bottom + 8; // bascule en dessous si pas de place au-dessus
+      left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    }
+    function show(el) {
+      const key = el.dataset.hero;
+      if (!key) return;
+      currentEl = el;
+      tip.innerHTML = heroTipHtml(key);
+      tip.classList.add('show');
+      position(el);
+    }
+    function hide() { currentEl = null; tip.classList.remove('show'); }
+
+    document.addEventListener('mouseover', e => {
+      const el = e.target.closest('.hero-thumb[data-hero]');
+      if (el) show(el);
+    });
+    document.addEventListener('mouseout', e => {
+      const el = e.target.closest('.hero-thumb[data-hero]');
+      if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) hide();
+    });
+    // Accessibilité clavier
+    document.addEventListener('focusin', e => {
+      const el = e.target.closest('.hero-thumb[data-hero]');
+      if (el) show(el);
+    });
+    document.addEventListener('focusout', e => {
+      if (e.target.closest('.hero-thumb[data-hero]')) hide();
+    });
+    // Tactile : appui pour afficher/masquer
+    document.addEventListener('click', e => {
+      const el = e.target.closest('.hero-thumb[data-hero]');
+      if (!el) { hide(); return; }
+      if (currentEl === el && tip.classList.contains('show')) hide();
+      else show(el);
+    });
+    // Évite une infobulle figée lors du défilement
+    window.addEventListener('scroll', hide, true);
+    window.addEventListener('resize', hide);
+  }
+
   loadData();
   trackVisit();
+  initHeroTooltips();
 </script>
 </body>
 </html>

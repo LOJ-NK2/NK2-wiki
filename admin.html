@@ -260,7 +260,7 @@
 
     <div class="admin-tabs">
       <button class="admin-tab active" data-panel="tabs">Onglets</button>
-      <button class="admin-tab" data-panel="heroes">Héros</button>
+      <button class="admin-tab" data-panel="heroes">Héros &amp; ressources</button>
       <button class="admin-tab" data-panel="events">Événements</button>
       <button class="admin-tab" data-panel="ui">Textes UI</button>
       <button class="admin-tab" data-panel="reports">Signalements <span id="reports-badge" class="reports-badge hidden">0</span></button>
@@ -277,14 +277,16 @@
 
     <!-- HEROS -->
     <div class="admin-panel" id="panel-heroes">
-      <div class="help-text">Catalogue global des héros (nom + image) et matrice du tableau comparatif. Le regroupement des héros en bandes d'images se fait désormais carte par carte, dans chaque onglet de type « Héros ».</div>
+      <div class="help-text">Catalogues d'images du wiki (héros et ressources), détectés automatiquement depuis le dépôt, et matrice du tableau comparatif. Le regroupement des images en bandes se fait carte par carte, dans chaque onglet de type « Héros ».</div>
 
-      <div class="section-label">Liste des héros</div>
+      <div class="section-label">Catalogue des héros</div>
+      <div class="help-text">Les images sont détectées automatiquement dans le dossier <strong>images/heros/</strong> du dépôt (jpg, png, webp…). Déposez-y vos fichiers, puis donnez un nom à chaque héros (utilisé dans le tableau comparatif et au survol). Pour les afficher, cliquez-les directement dans une carte d'un onglet « Héros ».</div>
+      <div style="margin-bottom:12px;"><button id="reload-heroes-btn" class="small">🔄 Recharger la liste</button></div>
       <div id="heroes-list"></div>
-      <button id="add-hero-btn" style="margin-top:12px;">+ Ajouter un héros</button>
+      <button id="add-hero-btn" style="margin-top:12px; display:none;">+ Ajouter un héros manuellement</button>
 
       <div class="section-label">Catalogue des ressources</div>
-      <div class="help-text">Les images sont détectées automatiquement dans le dossier <strong>images/ressources/</strong> du dépôt (jpg, png, webp…). Il suffit d'y déposer vos fichiers : aucun ajout manuel ici. Pour les afficher, cochez-les directement dans une carte d'un onglet « Héros ».</div>
+      <div class="help-text">Les images sont détectées automatiquement dans le dossier <strong>images/ressources/</strong> du dépôt (jpg, png, webp…). Il suffit d'y déposer vos fichiers : aucun ajout manuel ici. Pour les afficher, cliquez-les directement dans une carte d'un onglet « Héros ».</div>
       <div style="margin-bottom:12px;"><button id="reload-resources-btn" class="small">🔄 Recharger la liste</button></div>
       <div id="resources-list"></div>
 
@@ -427,66 +429,117 @@
   let DATA = null;
 
   // ───────────────────────────────────────────
-  // RESSOURCES — découverte automatique des images
+  // IMAGES — découverte automatique depuis les dossiers du dépôt
   // ───────────────────────────────────────────
-  // Les images du dossier images/ressources/ sont listées automatiquement via
-  // l'API GitHub (dépôt public, sans authentification). Aucun ajout manuel.
-  const RES_BASE = "images/ressources/";
+  // Les images des dossiers images/heros/ et images/ressources/ sont listées
+  // automatiquement via l'API GitHub (dépôt public, sans authentification).
+  const HERO_BASE = "images/heros/";
+  const RES_BASE  = "images/ressources/";
   const GH_OWNER = "loj-nk2";
   const GH_REPO  = "NK2-wiki";
-  const GH_RES_DIR = "images/ressources";
+  const GH_HERO_DIR = "images/heros";
+  const GH_RES_DIR  = "images/ressources";
   const GH_REF = ""; // branche : laisser vide pour la branche par défaut du dépôt
-  const RES_IMG_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
+  const IMG_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
 
-  let RES_IMAGES = null;        // [{ file, name }]
-  let RES_LOAD_PROMISE = null;
-  let RES_LOAD_ERROR = '';
-
-  // Jolit un nom de fichier en libellé lisible (sans extension).
-  function prettyResName(file) {
-    return file.replace(RES_IMG_EXT, '').replace(/[_-]+/g, ' ').trim();
+  function prettyName(file) {
+    return file.replace(IMG_EXT, '').replace(/[_-]+/g, ' ').trim();
+  }
+  function baseName(file) {
+    return file.replace(IMG_EXT, '');
   }
 
-  async function fetchResourceImagesFromGitHub() {
-    let url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_RES_DIR}`;
+  // Récupère la liste des fichiers images d'un dossier du dépôt.
+  async function fetchDirImages(dir) {
+    let url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${dir}`;
     if (GH_REF) url += `?ref=${encodeURIComponent(GH_REF)}`;
     const r = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
     if (!r.ok) {
       if (r.status === 403) throw new Error("Limite de l'API GitHub atteinte (60 requêtes/h). Réessayez dans quelques minutes.");
-      if (r.status === 404) throw new Error("Dossier introuvable. Vérifiez le nom du dépôt/branche ou créez images/ressources/.");
+      if (r.status === 404) throw new Error("Dossier introuvable. Vérifiez le dépôt/branche ou créez le dossier " + dir + "/.");
       throw new Error("API GitHub : HTTP " + r.status);
     }
     const arr = await r.json();
     return (Array.isArray(arr) ? arr : [])
-      .filter(it => it && it.type === 'file' && RES_IMG_EXT.test(it.name))
-      .map(it => ({ file: it.name, name: prettyResName(it.name) }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .filter(it => it && it.type === 'file' && IMG_EXT.test(it.name))
+      .map(it => it.name)
+      .sort((a, b) => a.localeCompare(b));
   }
 
-  async function getResourceImages(force) {
-    if (!force && RES_IMAGES) return RES_IMAGES;
-    if (!force && RES_LOAD_PROMISE) return RES_LOAD_PROMISE;
-    RES_LOAD_ERROR = '';
-    RES_LOAD_PROMISE = (async () => {
-      try {
-        // cache de session pour limiter les appels à l'API
-        if (!force) {
-          const cached = sessionStorage.getItem('nk2_res_images');
-          if (cached) { RES_IMAGES = JSON.parse(cached); return RES_IMAGES; }
+  // Fabrique un chargeur mis en cache (mémoire + session) pour un dossier donné.
+  function makeImageLoader(dir, cacheKey) {
+    const state = { images: null, promise: null, error: '' };
+    state.load = async function (force) {
+      if (!force && state.images) return state.images;
+      if (!force && state.promise) return state.promise;
+      state.error = '';
+      state.promise = (async () => {
+        try {
+          if (!force) {
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) { state.images = JSON.parse(cached); return state.images; }
+          }
+          const files = await fetchDirImages(dir);
+          state.images = files;
+          try { sessionStorage.setItem(cacheKey, JSON.stringify(files)); } catch (e) {}
+          return files;
+        } catch (e) {
+          state.error = e.message || String(e);
+          state.images = state.images || [];
+          return state.images;
+        } finally {
+          state.promise = null;
         }
-        const list = await fetchResourceImagesFromGitHub();
-        RES_IMAGES = list;
-        try { sessionStorage.setItem('nk2_res_images', JSON.stringify(list)); } catch (e) {}
-        return list;
-      } catch (e) {
-        RES_LOAD_ERROR = e.message || String(e);
-        RES_IMAGES = RES_IMAGES || [];
-        return RES_IMAGES;
-      } finally {
-        RES_LOAD_PROMISE = null;
-      }
-    })();
-    return RES_LOAD_PROMISE;
+      })();
+      return state.promise;
+    };
+    return state;
+  }
+
+  const HERO_LOADER = makeImageLoader(GH_HERO_DIR, 'nk2_hero_images');
+  const RES_LOADER  = makeImageLoader(GH_RES_DIR,  'nk2_res_images');
+
+  // Vignette cliquable générique pour les sélecteurs d'images des cartes.
+  // `images` : [{ key, src, name }] ; `selected` : tableau muté en place.
+  function fillPicker(pickEl, images, selected, loadError) {
+    selected = selected || [];
+    if (loadError && !images.length) {
+      pickEl.innerHTML = `<span class="item-card-meta" style="color:var(--danger)">⚠ ${loadError}</span>`;
+      return;
+    }
+    if (!images.length) {
+      pickEl.innerHTML = '<span class="item-card-meta">Aucune image disponible.</span>';
+      return;
+    }
+    pickEl.innerHTML = `<div class="res-pick-grid">
+      ${images.map(im => `
+        <div class="res-pick-item ${selected.includes(im.key) ? 'selected' : ''}" data-key="${im.key}" title="${im.name}">
+          <img src="${im.src}" alt="${im.name}" loading="lazy"/>
+        </div>`).join('')}
+    </div>`;
+    pickEl.querySelectorAll('.res-pick-item').forEach(it => {
+      it.addEventListener('click', () => {
+        const k = it.dataset.key;
+        const i = selected.indexOf(k);
+        if (i >= 0) { selected.splice(i, 1); it.classList.remove('selected'); }
+        else { selected.push(k); it.classList.add('selected'); }
+      });
+    });
+  }
+
+  // Synchronise les métadonnées des héros avec les images détectées :
+  // crée un nom par défaut + une ligne de tableau pour chaque nouvelle image,
+  // et mémorise le nom de fichier (pour gérer les extensions ≠ .jpg).
+  function syncHeroesFromImages(files) {
+    DATA.heroNames = DATA.heroNames || {};
+    DATA.heroTable = DATA.heroTable || {};
+    DATA.heroFiles = DATA.heroFiles || {};
+    files.forEach(file => {
+      const base = baseName(file);
+      DATA.heroFiles[base] = file;
+      if (!(base in DATA.heroNames)) DATA.heroNames[base] = prettyName(file);
+      if (!DATA.heroTable[base]) DATA.heroTable[base] = { solo: false, rally: false, rallyCage: false, rejoinCage: false };
+    });
   }
   document.getElementById('login-btn').addEventListener('click', async () => {
     const email = document.getElementById('login-email').value.trim();
@@ -543,6 +596,7 @@
       heroNames: {},
       heroGroups: { gatherers: [], frontline: [], backline: [] },
       heroTable: {},
+      heroFiles: {},
       resourceNames: {},
       events: [],
       ui: { fr: {}, en: {}, it: {}, pt: {}, ar: {}, ja: {} }
@@ -910,7 +964,6 @@
 
   function renderTroopsEditor(tab, uid) {
     ensureTroopsCards(tab);
-    const heroKeys = Object.keys(DATA.heroNames || {}).sort();
     return `
       <div class="section-label" style="margin-top:20px;">Section Héros — contenu de cet onglet</div>
       <div class="checkbox-row">
@@ -919,13 +972,13 @@
       </div>
       <div class="help-text">Chaque carte : une couleur, des textes par langue, des bandes d'images (héros &amp; ressources), des lignes de stats, un carrousel, et un ordre d'affichage personnalisable. Tout est propre à cet onglet.</div>
       <div class="cards-editor">
-        ${tab.cards.map((c, cidx) => renderOneTroopCard(tab, uid, c, cidx, heroKeys)).join('')}
+        ${tab.cards.map((c, cidx) => renderOneTroopCard(tab, uid, c, cidx)).join('')}
       </div>
       <button class="small add-troop-card" style="margin-top:8px;">+ Ajouter une carte</button>
     `;
   }
 
-  function renderOneTroopCard(tab, uid, c, cidx, heroKeys) {
+  function renderOneTroopCard(tab, uid, c, cidx) {
     const cuid = uid + '-card-' + cidx;
     const order = (Array.isArray(c.layout) && c.layout.length) ? c.layout : CARD_LAYOUT_DEFAULT;
     return `
@@ -963,6 +1016,7 @@
           </div>
 
           <div class="section-label" style="margin-top:14px;">Bandes d'images (héros)</div>
+          <div class="help-text">Cliquez sur les héros du dossier <strong>images/heros/</strong> pour les afficher dans la bande. La liste est détectée automatiquement.</div>
           <div class="strips-list">
             ${(c.strips || []).map((s, sidx) => `
               <div class="strip-row" data-sidx="${sidx}" style="border:1px solid var(--border); padding:8px 10px; margin-bottom:8px;">
@@ -970,12 +1024,8 @@
                   <span class="item-card-meta">Bande ${sidx + 1} — héros affichés</span>
                   <button class="small strip-delete danger">Retirer</button>
                 </div>
-                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">
-                  ${heroKeys.map(k => `
-                    <label class="checkbox-row" style="background:var(--surface); border:1px solid var(--border); padding:2px 8px; border-radius:2px; font-size:0.7rem; margin:0;">
-                      <input type="checkbox" class="f-strip-hero" data-sidx="${sidx}" data-key="${k}" ${(s.heroes || []).includes(k) ? 'checked' : ''}/>
-                      ${DATA.heroNames[k]}
-                    </label>`).join('')}
+                <div class="hero-pick" data-sidx="${sidx}" style="margin-top:6px;">
+                  <span class="item-card-meta">Chargement des images…</span>
                 </div>
               </div>`).join('')}
           </div>
@@ -1116,12 +1166,21 @@
       cc.querySelectorAll('.strip-row').forEach(sr => {
         const sidx = parseInt(sr.dataset.sidx, 10);
         sr.querySelector('.strip-delete').addEventListener('click', () => { c.strips.splice(sidx, 1); reexpand(); });
-        sr.querySelectorAll('.f-strip-hero').forEach(cb => cb.addEventListener('change', e => {
-          const k = e.target.dataset.key; const s = c.strips[sidx]; s.heroes = s.heroes || [];
-          if (e.target.checked) { if (!s.heroes.includes(k)) s.heroes.push(k); }
-          else s.heroes = s.heroes.filter(x => x !== k);
-        }));
       });
+      // Remplissage asynchrone des sélecteurs d'images de héros (stocke l'identifiant = nom de fichier sans extension)
+      const heroPickers = cc.querySelectorAll('.hero-pick');
+      if (heroPickers.length) {
+        HERO_LOADER.load().then(files => {
+          const imgs = files.map(f => ({ key: baseName(f), src: HERO_BASE + f, name: (DATA.heroNames && DATA.heroNames[baseName(f)]) || prettyName(f) }));
+          heroPickers.forEach(pick => {
+            const sidx = parseInt(pick.dataset.sidx, 10);
+            const s = c.strips[sidx];
+            if (!s) return;
+            s.heroes = s.heroes || [];
+            fillPicker(pick, imgs, s.heroes, HERO_LOADER.error);
+          });
+        });
+      }
 
       // Bandes de ressources
       c.resources = c.resources || [];
@@ -1133,36 +1192,17 @@
         const ridx = parseInt(rr.dataset.ridx, 10);
         rr.querySelector('.res-delete').addEventListener('click', () => { c.resources.splice(ridx, 1); reexpand(); });
       });
-      // Remplissage asynchrone des sélecteurs d'images
-      const pickers = cc.querySelectorAll('.res-pick');
-      if (pickers.length) {
-        getResourceImages().then(list => {
-          pickers.forEach(pick => {
+      // Remplissage asynchrone des sélecteurs d'images de ressources
+      const resPickers = cc.querySelectorAll('.res-pick');
+      if (resPickers.length) {
+        RES_LOADER.load().then(files => {
+          const imgs = files.map(f => ({ key: f, src: RES_BASE + f, name: prettyName(f) }));
+          resPickers.forEach(pick => {
             const ridx = parseInt(pick.dataset.ridx, 10);
             const s = c.resources[ridx];
             if (!s) return;
             s.items = s.items || [];
-            if (RES_LOAD_ERROR && !list.length) {
-              pick.innerHTML = `<span class="item-card-meta" style="color:var(--danger)">⚠ ${RES_LOAD_ERROR} — voir l'onglet « Héros ».</span>`;
-              return;
-            }
-            if (!list.length) {
-              pick.innerHTML = '<span class="item-card-meta">Aucune image dans images/ressources/.</span>';
-              return;
-            }
-            pick.innerHTML = `<div class="res-pick-grid">
-              ${list.map(im => `
-                <div class="res-pick-item ${s.items.includes(im.file) ? 'selected' : ''}" data-file="${im.file}" title="${im.file}">
-                  <img src="${RES_BASE}${im.file}" alt="${im.name}" loading="lazy"/>
-                </div>`).join('')}
-            </div>`;
-            pick.querySelectorAll('.res-pick-item').forEach(it => {
-              it.addEventListener('click', () => {
-                const f = it.dataset.file;
-                if (s.items.includes(f)) { s.items = s.items.filter(x => x !== f); it.classList.remove('selected'); }
-                else { s.items.push(f); it.classList.add('selected'); }
-              });
-            });
+            fillPicker(pick, imgs, s.items, RES_LOADER.error);
           });
         });
       }
@@ -1561,15 +1601,60 @@
   // ───────────────────────────────────────────
   // HEROES PANEL
   // ───────────────────────────────────────────
-  function renderHeroes() {
+  async function renderHeroes(force) {
     const container = document.getElementById('heroes-list');
-    const keys = Object.keys(DATA.heroNames || {}).sort();
-    container.innerHTML = keys.map(key => `
+    if (!container) return;
+    const addBtn = document.getElementById('add-hero-btn');
+    container.innerHTML = '<div class="help-text">Chargement des images…</div>';
+    const files = await HERO_LOADER.load(force);
+
+    // Repli si l'API est indisponible : édition à partir des héros déjà connus.
+    if (HERO_LOADER.error && !files.length) {
+      if (addBtn) addBtn.style.display = '';
+      const keys = Object.keys(DATA.heroNames || {}).sort();
+      container.innerHTML = `<div class="help-text" style="color:var(--danger)">⚠ ${HERO_LOADER.error}</div>`
+        + (keys.length ? renderHeroNameCards(keys) : '<div class="help-text">Aucun héros connu. Utilisez « + Ajouter un héros manuellement ».</div>');
+      bindHeroNameCards(container);
+      return;
+    }
+    if (addBtn) addBtn.style.display = 'none';
+
+    syncHeroesFromImages(files);
+    renderHeroTable(); // le tableau reflète les héros détectés
+
+    if (!files.length) {
+      container.innerHTML = '<div class="help-text">Aucune image trouvée dans le dossier images/heros/.</div>';
+      return;
+    }
+
+    container.innerHTML = `<div class="res-gallery">
+      ${files.map(file => {
+        const base = baseName(file);
+        return `
+        <div class="res-gallery-item hero-edit" data-key="${base}" title="${file}">
+          <img src="${HERO_BASE}${file}" alt="${base}" loading="lazy"/>
+          <input type="text" class="f-hero-name" value="${(DATA.heroNames[base] || '').replace(/"/g,'&quot;')}" placeholder="Nom du héros" style="width:100%; font-size:0.72rem; padding:3px 5px; margin-top:4px;"/>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="help-text" style="margin-top:8px;">${files.length} héros détecté(s).</div>`;
+
+    container.querySelectorAll('.hero-edit').forEach(item => {
+      const key = item.dataset.key;
+      item.querySelector('.f-hero-name').addEventListener('input', e => {
+        DATA.heroNames[key] = e.target.value;
+      });
+    });
+  }
+
+  // Repli : cartes d'édition de nom (mode hors-ligne / API indisponible).
+  function renderHeroNameCards(keys) {
+    return keys.map(key => `
       <div class="item-card" data-key="${key}" style="padding:10px 16px;">
         <div class="item-card-header" style="margin:0;">
           <div class="item-card-title" style="font-size:0.95rem;">
             <span class="item-card-meta">${key}</span>
-            <input type="text" class="f-hero-name" value="${DATA.heroNames[key]}" style="width:160px; display:inline-block;" />
+            <input type="text" class="f-hero-name" value="${(DATA.heroNames[key] || '').replace(/"/g,'&quot;')}" style="width:160px; display:inline-block;" />
           </div>
           <div class="item-card-actions">
             <button class="small delete-hero danger">Suppr.</button>
@@ -1577,24 +1662,28 @@
         </div>
       </div>
     `).join('');
-
-    container.querySelectorAll('.item-card').forEach(card => {
+  }
+  function bindHeroNameCards(container) {
+    container.querySelectorAll(':scope > .item-card').forEach(card => {
       const key = card.dataset.key;
-      card.querySelector('.f-hero-name').addEventListener('input', e => {
-        DATA.heroNames[key] = e.target.value;
-      });
+      card.querySelector('.f-hero-name').addEventListener('input', e => { DATA.heroNames[key] = e.target.value; });
       card.querySelector('.delete-hero').addEventListener('click', () => {
-        if (confirm(`Supprimer le héros "${key}" ? (image: images/heros/${key}.jpg à retirer manuellement)`)) {
+        if (confirm(`Supprimer le héros "${key}" ?`)) {
           delete DATA.heroNames[key];
           delete DATA.heroTable[key];
-          Object.keys(DATA.heroGroups).forEach(g => {
-            DATA.heroGroups[g] = DATA.heroGroups[g].filter(k => k !== key);
-          });
+          if (DATA.heroFiles) delete DATA.heroFiles[key];
           renderAll();
         }
       });
     });
   }
+
+  const reloadHeroesBtn = document.getElementById('reload-heroes-btn');
+  if (reloadHeroesBtn) reloadHeroesBtn.addEventListener('click', () => {
+    try { sessionStorage.removeItem('nk2_hero_images'); } catch (e) {}
+    renderHeroes(true);
+    renderTabs(); // recharge aussi les sélecteurs d'images des cartes
+  });
 
   document.getElementById('add-hero-btn').addEventListener('click', () => {
     const key = prompt("Identifiant héros (en minuscules, sans espaces, ex: 'newhero')\nL'image devra être placée dans images/heros/<id>.jpg");
@@ -1615,9 +1704,9 @@
     const container = document.getElementById('resources-list');
     if (!container) return;
     container.innerHTML = '<div class="help-text">Chargement des images…</div>';
-    const list = await getResourceImages(force);
-    if (RES_LOAD_ERROR) {
-      container.innerHTML = `<div class="help-text" style="color:var(--danger)">⚠ ${RES_LOAD_ERROR}</div>
+    const list = await RES_LOADER.load(force);
+    if (RES_LOADER.error) {
+      container.innerHTML = `<div class="help-text" style="color:var(--danger)">⚠ ${RES_LOADER.error}</div>
         <div class="help-text">Vous pouvez quand même saisir un nom de fichier manuellement&nbsp;:</div>
         <div style="display:flex; gap:8px; align-items:center;">
           <input type="text" id="res-manual-add" placeholder="ex : fer.png" style="max-width:240px;"/>
@@ -1628,9 +1717,9 @@
         const inp = container.querySelector('#res-manual-add');
         const f = (inp.value || '').trim();
         if (!f) return;
-        RES_IMAGES = RES_IMAGES || [];
-        if (!RES_IMAGES.some(x => x.file === f)) RES_IMAGES.push({ file: f, name: prettyResName(f) });
-        RES_LOAD_ERROR = '';
+        RES_LOADER.images = RES_LOADER.images || [];
+        if (!RES_LOADER.images.includes(f)) RES_LOADER.images.push(f);
+        RES_LOADER.error = '';
         renderResources();
         renderTabs(); // rafraîchit les sélecteurs des cartes
       });
@@ -1641,10 +1730,10 @@
       return;
     }
     container.innerHTML = `<div class="res-gallery">
-      ${list.map(im => `
-        <div class="res-gallery-item" title="${im.file}">
-          <img src="${RES_BASE}${im.file}" alt="${im.name}" loading="lazy"/>
-          <span>${im.name}</span>
+      ${list.map(file => `
+        <div class="res-gallery-item" title="${file}">
+          <img src="${RES_BASE}${file}" alt="${prettyName(file)}" loading="lazy"/>
+          <span>${prettyName(file)}</span>
         </div>`).join('')}
     </div>
     <div class="help-text" style="margin-top:8px;">${list.length} image(s) détectée(s).</div>`;
