@@ -333,12 +333,9 @@
 
 <!-- Firebase -->
 <script type="module">
-  // ── Firebase ──
-  // Le SDK Firestore (lourd) n'est PLUS chargé au démarrage.
-  // • Lecture du contenu  → API REST Firestore en fetch() pur (aucun SDK).
-  // • Écritures (visites, signalements) → SDK chargé à la demande, en arrière-plan,
-  //   donc hors du chemin critique de rendu. Le comportement des écritures
-  //   (serverTimestamp, règles de sécurité) reste strictement identique.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
   const firebaseConfig = {
     apiKey: "AIzaSyCWADXq-C8yTrc3XeO7GI44bYQo8inatQk",
     authDomain: "nk2-wiki.firebaseapp.com",
@@ -348,60 +345,8 @@
     appId: "1:93044027032:web:9daf883017bef141466aed"
   };
 
-  // Base REST Firestore pour la lecture du document de contenu.
-  const FS_REST_BASE = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents`;
-
-  // Décodage du format typé de l'API REST Firestore vers un objet JS simple,
-  // identique à ce que renvoyait snap.data() du SDK.
-  function fsDecodeValue(v) {
-    if (v == null || typeof v !== 'object') return null;
-    if ('stringValue'    in v) return v.stringValue;
-    if ('booleanValue'   in v) return v.booleanValue;
-    if ('integerValue'   in v) return Number(v.integerValue);
-    if ('doubleValue'    in v) return v.doubleValue;
-    if ('nullValue'      in v) return null;
-    if ('timestampValue' in v) return v.timestampValue;   // chaîne ISO (non utilisée au rendu)
-    if ('mapValue'       in v) return fsDecodeFields((v.mapValue && v.mapValue.fields) || {});
-    if ('arrayValue'     in v) return ((v.arrayValue && v.arrayValue.values) || []).map(fsDecodeValue);
-    if ('geoPointValue'  in v) return v.geoPointValue;
-    if ('referenceValue' in v) return v.referenceValue;
-    if ('bytesValue'     in v) return v.bytesValue;
-    return null;
-  }
-  function fsDecodeFields(fields) {
-    const out = {};
-    for (const k in fields) out[k] = fsDecodeValue(fields[k]);
-    return out;
-  }
-
-  // Lecture du document site/content via REST. Renvoie l'objet décodé,
-  // ou null si le document n'existe pas (404).
-  async function fetchContentREST() {
-    const url = `${FS_REST_BASE}/site/content?key=${encodeURIComponent(firebaseConfig.apiKey)}`;
-    const r = await fetch(url, { cache: 'no-store' });
-    if (r.status === 404) return null;
-    if (!r.ok) throw new Error('Firestore REST ' + r.status);
-    const j = await r.json();
-    return j && j.fields ? fsDecodeFields(j.fields) : null;
-  }
-
-  // Chargement paresseux du SDK Firebase, uniquement pour les écritures.
-  // Mutualisé (un seul import / une seule initialisation).
-  let _fbReady = null;
-  function ensureFirebase() {
-    if (!_fbReady) {
-      _fbReady = (async () => {
-        const [appMod, fs] = await Promise.all([
-          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
-          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")
-        ]);
-        const app = appMod.initializeApp(firebaseConfig);
-        const db = fs.getFirestore(app);
-        return { db, collection: fs.collection, addDoc: fs.addDoc, serverTimestamp: fs.serverTimestamp };
-      })();
-    }
-    return _fbReady;
-  }
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
   const IMAGES_BASE = "images/heros/";
   const RES_BASE = "images/ressources/";
@@ -427,9 +372,6 @@
 
   let DATA = null;
   let currentLang = 'fr';
-  // Permet de supprimer le défilement vers le haut lors d'un re-rendu silencieux
-  // (réconciliation Firestore en arrière-plan), pour ne pas déplacer l'utilisateur.
-  let SUPPRESS_SCROLL = false;
 
   // ── Traductions du formulaire de signalement (intégrées, indépendantes de DATA) ──
   const REPORT_I18N = {
@@ -481,51 +423,26 @@
 
   async function loadData() {
     const loadingEl = document.getElementById('loading');
-    let shown = false;
-
-    // 1) Rendu IMMÉDIAT depuis le seed local (même CDN que la page → très rapide).
-    //    Le wiki s'affiche sans attendre Firestore ni aucun SDK.
     try {
-      const seed = await loadFallback();
-      if (seed && (seed.tabs || []).length) {
-        DATA = seed;
-        render();
-        loadingEl.style.display = 'none';
-        shown = true;
+      const snap = await getDoc(doc(db, "site", "content"));
+      if (snap.exists() && snap.data() && (snap.data().tabs || []).length) {
+        DATA = snap.data();
+      } else {
+        // Firestore vide → bascule sur les données par défaut du repo
+        DATA = await loadFallback();
       }
     } catch (e) {
-      // seed indisponible : on s'appuiera uniquement sur Firestore (étape 2)
-    }
-
-    // 2) Contenu autoritatif depuis Firestore (REST, sans SDK).
-    //    Si plus récent/différent du seed, on remplace en préservant l'onglet,
-    //    la langue et la position de défilement de l'utilisateur (zéro saut visible).
-    try {
-      const remote = await fetchContentREST();
-      if (remote && (remote.tabs || []).length) {
-        const differs = !shown || JSON.stringify(remote) !== JSON.stringify(DATA);
-        if (differs) {
-          const savedY = window.scrollY;
-          const activeBtn = document.querySelector('.nav-btn.active');
-          const activeTab = activeBtn ? activeBtn.dataset.tab : null;
-          SUPPRESS_SCROLL = true;
-          DATA = remote;
-          render();
-          if (activeTab && document.getElementById('section-' + activeTab)) showSection(activeTab);
-          SUPPRESS_SCROLL = false;
-          window.scrollTo(0, savedY);
-        }
-        loadingEl.style.display = 'none';
-        shown = true;
+      // Erreur de lecture (réseau, règles...) → tente le fallback local
+      console.error("Firestore indisponible :", e);
+      try {
+        DATA = await loadFallback();
+      } catch (e2) {
+        loadingEl.innerHTML = "ERREUR DE CHARGEMENT<br><span style='font-size:0.7rem'>Vérifiez la connexion ou chargez les données via admin.html</span>";
+        return;
       }
-    } catch (e) {
-      console.error('Firestore (REST) indisponible :', e);
     }
-
-    // 3) Ni seed ni Firestore exploitables.
-    if (!shown) {
-      loadingEl.innerHTML = "ERREUR DE CHARGEMENT<br><span style='font-size:0.7rem'>Vérifiez la connexion ou chargez les données via admin.html</span>";
-    }
+    render();
+    loadingEl.style.display = 'none';
   }
 
   async function loadFallback() {
@@ -1087,8 +1004,7 @@
       btn.textContent = ri('sending');
 
       try {
-        const fb = await ensureFirebase();
-        await fb.addDoc(fb.collection(fb.db, 'reports'), {
+        await addDoc(collection(db, 'reports'), {
           tabs: tabIds,
           tabLabels: tabLabels,
           lang: lang,
@@ -1096,7 +1012,7 @@
           proposal: proposal.slice(0, 4000),
           reporter: reporter.slice(0, 60),
           status: 'new',
-          createdAt: fb.serverTimestamp()
+          createdAt: serverTimestamp()
         });
         statusEl.className = 'report-status ok';
         statusEl.textContent = ri('success');
@@ -1128,7 +1044,7 @@
     if (sec) sec.classList.add('active');
     const btn = document.querySelector(`.nav-btn[data-tab="${id}"]`);
     if (btn) btn.classList.add('active');
-    if (!SUPPRESS_SCROLL) window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   let carouselTimers = [];
@@ -1256,10 +1172,9 @@
       } catch (e) {}
       if (!ref) ref = '(direct)';
 
-      const fb = await ensureFirebase();
-      await fb.addDoc(fb.collection(fb.db, 'visits'), {
+      await addDoc(collection(db, 'visits'), {
         ts: Date.now(),
-        createdAt: fb.serverTimestamp(),
+        createdAt: serverTimestamp(),
         vid: String(vid).slice(0, 40),
         returning: returning,
         bl: (navigator.language || '').slice(0, 12),
@@ -1348,15 +1263,8 @@
   }
 
   loadData();
+  trackVisit();
   initHeroTooltips();
-
-  // Le suivi de visite charge le SDK Firebase à la demande : on le déclenche
-  // après le rendu, en temps mort, pour ne jamais retarder l'affichage du wiki.
-  (function deferTrackVisit() {
-    const run = () => trackVisit();
-    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 });
-    else setTimeout(run, 1200);
-  })();
 </script>
 </body>
 </html>
