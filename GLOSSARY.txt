@@ -1,0 +1,4 @@
+fr : "Vague de colère" en : "Turmoil surge"
+fr : "déflecteur" en : "Shieldbearer"
+fr : "Renseignements" en : "Intelligence"
+fr : "Alliance"

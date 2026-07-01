@@ -1,0 +1,11 @@
+name = "nk2-translate-claude"
+main = "translate-worker.js"
+compatibility_date = "2024-01-01"
+
+# Optionnel : restreindre le CORS au domaine du wiki au lieu de "*".
+# [vars]
+# ALLOWED_ORIGIN = "https://ton-domaine.example"
+
+# La clé API ne va PAS ici (elle serait versionnée en clair).
+# Une fois le worker créé, configure-la avec :
+#   wrangler secret put ANTHROPIC_API_KEY
