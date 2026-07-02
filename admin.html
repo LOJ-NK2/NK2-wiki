@@ -379,6 +379,10 @@
       <div class="help-text">Télécharger une copie JSON de toutes les données actuelles (sauvegarde).</div>
       <button id="export-btn">⬇ Exporter le JSON</button>
 
+      <div class="section-label">Miroir seed-data.json</div>
+      <div class="help-text">Le fichier <strong>seed-data.json</strong> du dépôt sert au premier affichage du site (avant Firestore). Après chaque enregistrement, téléchargez-le ici puis remplacez-le dans le dépôt (git push) pour qu'il reste fidèle au contenu en ligne — sinon les liens partagés vers les nouveaux onglets et le premier rendu seront périmés.</div>
+      <button id="seed-download-btn">🌱 Télécharger seed-data.json</button>
+
       <div class="section-label">Importer</div>
       <div class="help-text">Coller un JSON complet pour remplacer toutes les données (attention : action destructive, pensez à exporter avant).</div>
       <textarea id="import-textarea" style="min-height:200px; font-family:'Share Tech Mono',monospace; font-size:0.75rem;" placeholder="Collez le JSON ici..."></textarea>
@@ -401,7 +405,7 @@
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import {
     getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, deleteDoc,
-    query, orderBy, limit
+    query, orderBy, limit, where, getCountFromServer
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -427,6 +431,8 @@
   ];
 
   let DATA = null;
+  // État tel que chargé/enregistré, pour détecter les modifications non sauvées.
+  let SAVED_SNAPSHOT = '';
 
   // ───────────────────────────────────────────
   // IMAGES — découverte automatique depuis les dossiers du dépôt
@@ -513,8 +519,8 @@
     }
     pickEl.innerHTML = `<div class="res-pick-grid">
       ${images.map(im => `
-        <div class="res-pick-item ${selected.includes(im.key) ? 'selected' : ''}" data-key="${im.key}" title="${im.name}">
-          <img src="${im.src}" alt="${im.name}" loading="lazy"/>
+        <div class="res-pick-item ${selected.includes(im.key) ? 'selected' : ''}" data-key="${escapeHtml(im.key)}" title="${escapeHtml(im.name)}">
+          <img src="${escapeHtml(im.src)}" alt="${escapeHtml(im.name)}" loading="lazy"/>
         </div>`).join('')}
     </div>`;
     pickEl.querySelectorAll('.res-pick-item').forEach(it => {
@@ -549,7 +555,15 @@
     try {
       await signInWithEmailAndPassword(auth, email, pass);
     } catch (e) {
-      errEl.textContent = "Échec de connexion : " + e.message;
+      const LOGIN_ERRORS = {
+        'auth/invalid-credential': 'Email ou mot de passe incorrect.',
+        'auth/user-not-found': 'Email ou mot de passe incorrect.',
+        'auth/wrong-password': 'Email ou mot de passe incorrect.',
+        'auth/invalid-email': 'Adresse email invalide.',
+        'auth/too-many-requests': 'Trop de tentatives : réessayez dans quelques minutes.',
+        'auth/network-request-failed': 'Connexion impossible : vérifiez votre accès internet.'
+      };
+      errEl.textContent = LOGIN_ERRORS[e && e.code] || ('Échec de connexion : ' + e.message);
     }
   });
 
@@ -578,6 +592,9 @@
     }
     migrateData();
     renderAll();
+    // Instantané pris après le rendu : les normalisations du rendu
+    // (ensureTroopsCards, etc.) font partie de l'état « propre ».
+    SAVED_SNAPSHOT = JSON.stringify(DATA);
     loadReports();
   }
 
@@ -588,6 +605,27 @@
       }
       if (!ev.date) ev.date = {};
     });
+  }
+
+  // Garde-fou : un JSON sans la structure minimale casserait le site public
+  // (index.html exige des onglets et les textes UI). Renvoie la liste des
+  // problèmes bloquants, vide si les données sont utilisables.
+  function validateData(d) {
+    const errs = [];
+    if (!d || typeof d !== 'object' || Array.isArray(d)) {
+      errs.push('la racine doit être un objet JSON');
+      return errs;
+    }
+    if (!Array.isArray(d.tabs) || !d.tabs.length) {
+      errs.push('« tabs » doit être une liste non vide d\'onglets');
+    } else {
+      if (d.tabs.some(t => !t || typeof t.id !== 'string' || !t.id)) errs.push('chaque onglet doit avoir un identifiant « id »');
+      if (!d.tabs.some(t => t && t.enabled)) errs.push('au moins un onglet doit être activé');
+    }
+    if (!d.ui || typeof d.ui !== 'object' || Array.isArray(d.ui)) {
+      errs.push('« ui » (textes d\'interface) est manquant');
+    }
+    return errs;
   }
 
   function emptyData() {
@@ -604,9 +642,15 @@
   }
 
   async function saveData() {
+    const errs = validateData(DATA);
+    if (errs.length) {
+      showToast("Enregistrement refusé : " + errs[0], true, 6000);
+      return;
+    }
     try {
       await setDoc(doc(db, "site", "content"), DATA);
-      showToast("Données enregistrées ✔");
+      SAVED_SNAPSHOT = JSON.stringify(DATA);
+      showToast("Données enregistrées ✔ — pensez à mettre à jour seed-data.json (onglet Import / Export)", false, 6000);
     } catch (e) {
       showToast("Erreur d'enregistrement : " + e.message, true);
     }
@@ -614,11 +658,20 @@
 
   document.getElementById('save-btn').addEventListener('click', saveData);
 
-  function showToast(msg, isError) {
+  // Prévient la fermeture de la page avec des modifications non enregistrées
+  // (comparaison à l'état chargé/enregistré : aucun marquage manuel à maintenir).
+  window.addEventListener('beforeunload', (e) => {
+    if (!DATA || !auth.currentUser) return;
+    if (JSON.stringify(DATA) === SAVED_SNAPSHOT) return;
+    e.preventDefault();
+    e.returnValue = '';
+  });
+
+  function showToast(msg, isError, ms) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.classList.remove('show'), 3000);
+    setTimeout(() => t.classList.remove('show'), ms || 3000);
   }
 
   // ───────────────────────────────────────────
@@ -728,9 +781,9 @@
         <div class="item-card" data-id="${tab.id}">
           <div class="item-card-header">
             <div class="item-card-title">
-              <span>${tab.icon || '❔'}</span>
-              <span>${label}</span>
-              <span class="item-card-meta">(${tab.id} · ${tab.type})</span>
+              <span>${escapeHtml(tab.icon || '❔')}</span>
+              <span>${escapeHtml(label)}</span>
+              <span class="item-card-meta">(${escapeHtml(tab.id)} · ${tab.type})</span>
               ${!tab.enabled ? '<span class="item-card-meta" style="color:var(--danger)">DÉSACTIVÉ</span>' : ''}
             </div>
             <div class="item-card-actions">
@@ -746,7 +799,7 @@
             <div class="grid-3">
               <div>
                 <label>Icône (emoji)</label>
-                <input type="text" class="f-icon" value="${tab.icon || ''}" />
+                <input type="text" class="f-icon" value="${escapeHtml(tab.icon || '')}" />
               </div>
               <div>
                 <label>Type de section</label>
@@ -772,8 +825,8 @@
                 ${fields.map(f => `
                   <label>${f.label} (${l.code.toUpperCase()})</label>
                   ${f.textarea
-                    ? `<textarea class="f-i18n" data-key="${f.key}" data-lang="${l.code}">${(tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || ''}</textarea>`
-                    : `<input type="text" class="f-i18n" data-key="${f.key}" data-lang="${l.code}" value="${(tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || ''}" />`
+                    ? `<textarea class="f-i18n" data-key="${f.key}" data-lang="${l.code}">${escapeHtml((tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || '')}</textarea>`
+                    : `<input type="text" class="f-i18n" data-key="${f.key}" data-lang="${l.code}" value="${escapeHtml((tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || '')}" />`
                   }
                 `).join('')}
               </div>
@@ -989,13 +1042,14 @@
         <div class="item-card-header" style="margin:0;">
           <div class="item-card-title" style="font-size:0.95rem;">
             <span class="item-card-meta">Carte ${cidx + 1}</span>
-            <span>${(c.name && c.name.fr) || (c.tierLabel && c.tierLabel.fr) || ''}</span>
+            <span>${escapeHtml((c.name && c.name.fr) || (c.tierLabel && c.tierLabel.fr) || '')}</span>
           </div>
           <div class="item-card-actions">
             <div class="order-controls">
               <button class="small card-up" ${cidx === 0 ? 'disabled' : ''}>▲</button>
               <button class="small card-down" ${cidx === tab.cards.length - 1 ? 'disabled' : ''}>▼</button>
             </div>
+            <button class="small card-clone" title="Dupliquer cette carte (avec tous ses textes et images)">Dupl.</button>
             <button class="small card-delete danger">Suppr.</button>
           </div>
         </div>
@@ -1073,7 +1127,7 @@
             <div class="help-text">URL ou chemin d'image (ex : images/carrousel/photo1.jpg). Les images défilent en bas de la carte.</div>
             ${((c.carousel && c.carousel.images) || []).map((im, imidx) => `
               <div class="carousel-row" data-imidx="${imidx}" style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                <input type="text" class="f-carousel-src" data-imidx="${imidx}" value="${(im && im.src) || ''}" placeholder="images/carrousel/...jpg ou https://..."/>
+                <input type="text" class="f-carousel-src" data-imidx="${imidx}" value="${escapeHtml((im && im.src) || '')}" placeholder="images/carrousel/...jpg ou https://..."/>
                 <button class="small carousel-del danger">Retirer</button>
               </div>`).join('')}
             <button class="small carousel-add">+ Ajouter une image</button>
@@ -1084,9 +1138,9 @@
           ${LANGS.map((l, i) => `
             <div class="lang-fields ${i === 0 ? 'active' : ''}" data-uid="${cuid}" data-lang="${l.code}">
               <label>Étiquette de couleur (${l.code.toUpperCase()})</label>
-              <input type="text" class="f-card-tierlabel" data-lang="${l.code}" value="${(c.tierLabel && c.tierLabel[l.code]) || ''}"/>
+              <input type="text" class="f-card-tierlabel" data-lang="${l.code}" value="${escapeHtml((c.tierLabel && c.tierLabel[l.code]) || '')}"/>
               <label>Nom de la carte (${l.code.toUpperCase()})</label>
-              <input type="text" class="f-card-name" data-lang="${l.code}" value="${(c.name && c.name[l.code]) || ''}"/>
+              <input type="text" class="f-card-name" data-lang="${l.code}" value="${escapeHtml((c.name && c.name[l.code]) || '')}"/>
               <label>Description (${l.code.toUpperCase()})</label>
               <div class="rt-toolbar">
                 <button type="button" class="rt-btn" data-fmt="b" title="Gras"><b>G</b></button>
@@ -1099,20 +1153,20 @@
                 <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="bleu"   title="Bleu"   style="color:var(--blue)">A</button>
                 <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="violet" title="Violet" style="color:var(--violet)">A</button>
               </div>
-              <textarea class="f-card-desc" data-lang="${l.code}">${(c.desc && c.desc[l.code]) || ''}</textarea>
+              <textarea class="f-card-desc" data-lang="${l.code}">${escapeHtml((c.desc && c.desc[l.code]) || '')}</textarea>
               ${(c.strips || []).map((s, sidx) => `
                 <label>Libellé bande héros ${sidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-strip-label" data-sidx="${sidx}" data-key="strip${sidx}" data-lang="${l.code}" value="${(s.label && s.label[l.code]) || ''}"/>
+                <input type="text" class="f-strip-label" data-sidx="${sidx}" data-key="strip${sidx}" data-lang="${l.code}" value="${escapeHtml((s.label && s.label[l.code]) || '')}"/>
               `).join('')}
               ${(c.resources || []).map((s, ridx) => `
                 <label>Libellé bande ressources ${ridx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-res-label" data-ridx="${ridx}" data-key="res${ridx}" data-lang="${l.code}" value="${(s.label && s.label[l.code]) || ''}"/>
+                <input type="text" class="f-res-label" data-ridx="${ridx}" data-key="res${ridx}" data-lang="${l.code}" value="${escapeHtml((s.label && s.label[l.code]) || '')}"/>
               `).join('')}
               ${(c.stats || []).map((st, stidx) => `
                 <label>Libellé stat ${stidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-stat-label" data-stidx="${stidx}" data-key="statl${stidx}" data-lang="${l.code}" value="${(st.label && st.label[l.code]) || ''}"/>
+                <input type="text" class="f-stat-label" data-stidx="${stidx}" data-key="statl${stidx}" data-lang="${l.code}" value="${escapeHtml((st.label && st.label[l.code]) || '')}"/>
                 <label>Valeur stat ${stidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-stat-value" data-stidx="${stidx}" data-key="statv${stidx}" data-lang="${l.code}" value="${(st.value && st.value[l.code]) || ''}"/>
+                <input type="text" class="f-stat-value" data-stidx="${stidx}" data-key="statv${stidx}" data-lang="${l.code}" value="${escapeHtml((st.value && st.value[l.code]) || '')}"/>
               `).join('')}
             </div>
           `).join('')}
@@ -1138,6 +1192,12 @@
       const c = tab.cards[cidx];
 
       cc.querySelector('.f-card-tier').addEventListener('change', e => { c.tier = e.target.value; });
+      cc.querySelector('.card-clone').addEventListener('click', () => {
+        // copie profonde : la carte dupliquée doit être indépendante de l'originale
+        // (textes i18n, bandes, stats, carrousel imbriqués)
+        tab.cards.splice(cidx + 1, 0, JSON.parse(JSON.stringify(c)));
+        reexpand();
+      });
       cc.querySelector('.card-delete').addEventListener('click', () => {
         if (confirm('Supprimer cette carte ?')) { tab.cards.splice(cidx, 1); reexpand(); }
       });
@@ -1312,7 +1372,7 @@
             <div class="item-card-header" style="margin:0;">
               <div class="item-card-title" style="font-size:0.95rem;">
                 <span class="item-card-meta">Bloc ${bidx + 1}</span>
-                <span>${(b.title && b.title.fr) || ''}</span>
+                <span>${escapeHtml((b.title && b.title.fr) || '')}</span>
               </div>
               <div class="item-card-actions">
                 <div class="order-controls">
@@ -1328,9 +1388,9 @@
               ${LANGS.map((l, i) => `
                 <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-block-${bidx}" data-lang="${l.code}">
                   <label>Titre (${l.code.toUpperCase()})</label>
-                  <input type="text" class="f-block-title" data-lang="${l.code}" value="${(b.title && b.title[l.code]) || ''}" />
+                  <input type="text" class="f-block-title" data-lang="${l.code}" value="${escapeHtml((b.title && b.title[l.code]) || '')}" />
                   <label>Texte (${l.code.toUpperCase()})</label>
-                  <textarea class="f-block-text" data-lang="${l.code}">${(b.text && b.text[l.code]) || ''}</textarea>
+                  <textarea class="f-block-text" data-lang="${l.code}">${escapeHtml((b.text && b.text[l.code]) || '')}</textarea>
                 </div>
               `).join('')}
             </div>
@@ -1411,7 +1471,7 @@
             <div class="item-card-header" style="margin:0;">
               <div class="item-card-title" style="font-size:0.95rem; flex:1;">
                 <span class="item-card-meta">Image ${iidx + 1}</span>
-                <input type="text" class="f-img-src" placeholder="images/galerie/fichier.jpg" value="${img.src || ''}" style="flex:1; max-width:320px;" />
+                <input type="text" class="f-img-src" placeholder="images/galerie/fichier.jpg" value="${escapeHtml(img.src || '')}" style="flex:1; max-width:320px;" />
               </div>
               <div class="item-card-actions">
                 <div class="order-controls">
@@ -1426,7 +1486,7 @@
               ${LANGS.map((l, i) => `
                 <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-img-${iidx}" data-lang="${l.code}">
                   <label>Légende (${l.code.toUpperCase()})</label>
-                  <input type="text" class="f-img-caption" data-lang="${l.code}" value="${(img.caption && img.caption[l.code]) || ''}" />
+                  <input type="text" class="f-img-caption" data-lang="${l.code}" value="${escapeHtml((img.caption && img.caption[l.code]) || '')}" />
                 </div>
               `).join('')}
             </div>
@@ -1497,7 +1557,7 @@
             <div class="item-card-header" style="margin:0;">
               <div class="item-card-title" style="font-size:0.95rem;">
                 <span class="item-card-meta">Lien ${lidx + 1}</span>
-                <span>${(lk.title && lk.title.fr) || ''}</span>
+                <span>${escapeHtml((lk.title && lk.title.fr) || '')}</span>
               </div>
               <div class="item-card-actions">
                 <div class="order-controls">
@@ -1511,20 +1571,20 @@
               <div class="grid-2">
                 <div>
                   <label>Icône (emoji)</label>
-                  <input type="text" class="f-link-icon" value="${lk.icon || ''}" />
+                  <input type="text" class="f-link-icon" value="${escapeHtml(lk.icon || '')}" />
                 </div>
                 <div>
                   <label>URL</label>
-                  <input type="text" class="f-link-url" value="${lk.url || ''}" placeholder="https://..." />
+                  <input type="text" class="f-link-url" value="${escapeHtml(lk.url || '')}" placeholder="https://..." />
                 </div>
               </div>
               ${langTabsHtml(uid + '-link-' + lidx)}
               ${LANGS.map((l, i) => `
                 <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}-link-${lidx}" data-lang="${l.code}">
                   <label>Titre (${l.code.toUpperCase()})</label>
-                  <input type="text" class="f-link-title" data-lang="${l.code}" value="${(lk.title && lk.title[l.code]) || ''}" />
+                  <input type="text" class="f-link-title" data-lang="${l.code}" value="${escapeHtml((lk.title && lk.title[l.code]) || '')}" />
                   <label>Sous-texte (${l.code.toUpperCase()})</label>
-                  <input type="text" class="f-link-sub" data-lang="${l.code}" value="${(lk.sub && lk.sub[l.code]) || ''}" />
+                  <input type="text" class="f-link-sub" data-lang="${l.code}" value="${escapeHtml((lk.sub && lk.sub[l.code]) || '')}" />
                 </div>
               `).join('')}
             </div>
@@ -1590,8 +1650,12 @@
   }
 
   document.getElementById('add-tab-btn').addEventListener('click', () => {
-    const id = prompt("Identifiant unique de l'onglet (sans espaces, ex: 'shop')");
-    if (!id) return;
+    const raw = prompt("Identifiant unique de l'onglet (sans espaces, ex: 'shop')");
+    if (!raw) return;
+    // L'id sert d'ancre d'URL (#onglet) et de clé interne : on normalise
+    // (espaces → tirets, ponctuation retirée) au lieu de compter sur la consigne.
+    const id = raw.trim().replace(/\s+/g, '-').replace(/[^\p{L}\p{N}_-]/gu, '');
+    if (!id) { alert("Identifiant invalide : utilisez des lettres, chiffres, tirets."); return; }
     if (DATA.tabs.find(t => t.id === id)) { alert("Cet identifiant existe déjà."); return; }
     const maxOrder = DATA.tabs.reduce((m, t) => Math.max(m, t.order), -1);
     DATA.tabs.push({
@@ -1636,7 +1700,7 @@
         return `
         <div class="res-gallery-item hero-edit" data-key="${base}" title="${file}">
           <img src="${HERO_BASE}${file}" alt="${base}" loading="lazy"/>
-          <input type="text" class="f-hero-name" value="${(DATA.heroNames[base] || '').replace(/"/g,'&quot;')}" placeholder="Nom du héros" style="width:100%; font-size:0.72rem; padding:3px 5px; margin-top:4px;"/>
+          <input type="text" class="f-hero-name" value="${escapeHtml(DATA.heroNames[base] || '')}" placeholder="Nom du héros" style="width:100%; font-size:0.72rem; padding:3px 5px; margin-top:4px;"/>
         </div>`;
       }).join('')}
     </div>
@@ -1657,7 +1721,7 @@
         <div class="item-card-header" style="margin:0;">
           <div class="item-card-title" style="font-size:0.95rem;">
             <span class="item-card-meta">${key}</span>
-            <input type="text" class="f-hero-name" value="${(DATA.heroNames[key] || '').replace(/"/g,'&quot;')}" style="width:160px; display:inline-block;" />
+            <input type="text" class="f-hero-name" value="${escapeHtml(DATA.heroNames[key] || '')}" style="width:160px; display:inline-block;" />
           </div>
           <div class="item-card-actions">
             <button class="small delete-hero danger">Suppr.</button>
@@ -1858,9 +1922,13 @@
           <div class="item-card-header">
             <div class="item-card-title">
               <span class="item-card-meta">[${ev.type}]</span>
-              <span>${nameFr}</span>
+              <span>${escapeHtml(nameFr)}</span>
             </div>
             <div class="item-card-actions">
+              <div class="order-controls">
+                <button class="small ev-up" ${idx===0?'disabled':''}>▲</button>
+                <button class="small ev-down" ${idx===events.length-1?'disabled':''}>▼</button>
+              </div>
               <button class="small toggle-expand">Éditer</button>
               <button class="small delete-event danger">Suppr.</button>
             </div>
@@ -1879,13 +1947,13 @@
             ${LANGS.map((l, i) => `
               <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
                 <label>Date / fréquence (${l.code.toUpperCase()}) — texte libre, affiché tel quel</label>
-                <input type="text" class="f-ev-date" data-lang="${l.code}" value="${(typeof ev.date === 'object' ? (ev.date && ev.date[l.code]) : (l.code === 'fr' ? (ev.date || '') : '')) || ''}" />
+                <input type="text" class="f-ev-date" data-lang="${l.code}" value="${escapeHtml((typeof ev.date === 'object' ? (ev.date && ev.date[l.code]) : (l.code === 'fr' ? (ev.date || '') : '')) || '')}" />
                 <label>Tag (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-ev-tag" data-lang="${l.code}" value="${(ev.tag && ev.tag[l.code]) || ''}" />
+                <input type="text" class="f-ev-tag" data-lang="${l.code}" value="${escapeHtml((ev.tag && ev.tag[l.code]) || '')}" />
                 <label>Nom (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-ev-name" data-lang="${l.code}" value="${(ev.name && ev.name[l.code]) || ''}" />
+                <input type="text" class="f-ev-name" data-lang="${l.code}" value="${escapeHtml((ev.name && ev.name[l.code]) || '')}" />
                 <label>Description (${l.code.toUpperCase()})</label>
-                <textarea class="f-ev-desc" data-lang="${l.code}">${(ev.desc && ev.desc[l.code]) || ''}</textarea>
+                <textarea class="f-ev-desc" data-lang="${l.code}">${escapeHtml((ev.desc && ev.desc[l.code]) || '')}</textarea>
               </div>
             `).join('')}
           </div>
@@ -1905,6 +1973,17 @@
           DATA.events = DATA.events.filter(e => e.id !== id);
           renderEvents();
         }
+      });
+
+      // L'ordre du tableau DATA.events est l'ordre d'affichage sur le site :
+      // l'indice est recalculé au clic (il change après chaque re-rendu).
+      card.querySelector('.ev-up').addEventListener('click', () => {
+        const i = DATA.events.findIndex(e => e.id === id);
+        if (i > 0) { [DATA.events[i-1], DATA.events[i]] = [DATA.events[i], DATA.events[i-1]]; renderEvents(); }
+      });
+      card.querySelector('.ev-down').addEventListener('click', () => {
+        const i = DATA.events.findIndex(e => e.id === id);
+        if (i >= 0 && i < DATA.events.length - 1) { [DATA.events[i+1], DATA.events[i]] = [DATA.events[i], DATA.events[i+1]]; renderEvents(); }
       });
 
       card.querySelector('.f-ev-type').addEventListener('change', e => { ev.type = e.target.value; renderEvents(); });
@@ -1993,8 +2072,8 @@
           ${UI_FIELDS.map(f => `
             <label>${f.label}</label>
             ${f.textarea
-              ? `<textarea class="f-ui" data-key="${f.key}" data-lang="${l.code}">${(DATA.ui[l.code] && DATA.ui[l.code][f.key]) || ''}</textarea>`
-              : `<input type="text" class="f-ui" data-key="${f.key}" data-lang="${l.code}" value="${(DATA.ui[l.code] && DATA.ui[l.code][f.key]) || ''}" />`
+              ? `<textarea class="f-ui" data-key="${f.key}" data-lang="${l.code}">${escapeHtml((DATA.ui[l.code] && DATA.ui[l.code][f.key]) || '')}</textarea>`
+              : `<input type="text" class="f-ui" data-key="${f.key}" data-lang="${l.code}" value="${escapeHtml((DATA.ui[l.code] && DATA.ui[l.code][f.key]) || '')}" />`
             }
           `).join('')}
         </div>
@@ -2026,11 +2105,26 @@
     URL.revokeObjectURL(url);
   });
 
+  document.getElementById('seed-download-btn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(DATA, null, 2) + '\n'], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'seed-data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
   document.getElementById('import-btn').addEventListener('click', () => {
     const raw = document.getElementById('import-textarea').value.trim();
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw);
+      const errs = validateData(parsed);
+      if (errs.length) {
+        showToast("Import refusé : " + errs[0], true, 6000);
+        return;
+      }
       if (!confirm("Ceci va remplacer TOUTES les données actuelles. Continuer ?")) return;
       DATA = parsed;
       migrateData();
@@ -2178,6 +2272,10 @@
   // ───────────────────────────────────────────
   let VISITS = [];
   let statsLoaded = false;
+  // Fenêtre réellement téléchargée ('90d' ou 'all') et total global (agrégation
+  // serveur), pour ne pas payer la lecture de tout l'historique à chaque visite.
+  let STATS_WINDOW = 'all';
+  let TOTAL_VISITS = 0;
 
   function visitTime(v) {
     if (v && typeof v.ts === 'number') return v.ts;
@@ -2214,15 +2312,29 @@
   async function loadStats() {
     const cards = document.getElementById('stats-cards');
     if (cards) cards.innerHTML = '<div class="stats-empty">Chargement…</div>';
+    const periodSel = document.getElementById('stats-period');
+    const wantAll = periodSel ? parseInt(periodSel.value, 10) === 0 : false;
     try {
       let snap;
       try {
-        snap = await getDocs(query(collection(db, 'visits'), orderBy('ts', 'desc'), limit(5000)));
+        // Lecture bornée aux 90 derniers jours : les périodes 7/30/90 j n'ont
+        // pas besoin de plus, on évite de télécharger (et payer) tout
+        // l'historique. La période « Tout » recharge l'intégralité à la demande.
+        snap = wantAll
+          ? await getDocs(query(collection(db, 'visits'), orderBy('ts', 'desc'), limit(5000)))
+          : await getDocs(query(collection(db, 'visits'), where('ts', '>=', Date.now() - 90 * 86400000), orderBy('ts', 'desc'), limit(5000)));
+        STATS_WINDOW = wantAll ? 'all' : '90d';
       } catch (e) {
         snap = await getDocs(collection(db, 'visits'));
+        STATS_WINDOW = 'all';
       }
       VISITS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       VISITS.sort((a, b) => visitTime(b) - visitTime(a));
+      TOTAL_VISITS = VISITS.length;
+      if (STATS_WINDOW !== 'all') {
+        // Total global sans télécharger les documents (une seule lecture d'index).
+        try { TOTAL_VISITS = (await getCountFromServer(collection(db, 'visits'))).data().count; } catch (e) {}
+      }
       statsLoaded = true;
       renderStats();
     } catch (e) {
@@ -2278,7 +2390,7 @@
     const d7 = now - 7 * 86400000;
     const d30 = now - 30 * 86400000;
 
-    const total = all.length;
+    const total = TOTAL_VISITS || all.length;
     const uniqAll = new Set(all.map(v => v.vid).filter(Boolean)).size;
     const todayN = all.filter(v => visitTime(v) >= t0).length;
     const n7 = all.filter(v => visitTime(v) >= d7).length;
@@ -2292,7 +2404,7 @@
       ['7 derniers jours', n7],
       ['30 derniers jours', n30],
       ['Visites totales', total],
-      ['Visiteurs uniques', uniqAll],
+      [STATS_WINDOW === 'all' ? 'Visiteurs uniques' : 'Uniques (90 j)', uniqAll],
       ['Uniques (7 j)', uniq7],
       ['Récurrents', returnRate + '%']
     ].map(([label, val]) =>
@@ -2361,7 +2473,13 @@
   }
 
   document.getElementById('stats-refresh').addEventListener('click', loadStats);
-  document.getElementById('stats-period').addEventListener('change', () => { if (statsLoaded) renderStats(); });
+  document.getElementById('stats-period').addEventListener('change', () => {
+    if (!statsLoaded) return;
+    const days = parseInt(document.getElementById('stats-period').value, 10);
+    // « Tout » exige l'historique complet ; seule la fenêtre 90 j est chargée.
+    if (days === 0 && STATS_WINDOW !== 'all') loadStats();
+    else renderStats();
+  });
   document.querySelector('.admin-tab[data-panel="stats"]').addEventListener('click', () => { if (!statsLoaded) loadStats(); });
 
   // ───────────────────────────────────────────
