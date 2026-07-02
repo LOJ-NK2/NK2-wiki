@@ -43,4 +43,4 @@ Langues : **fr, en, it, pt, ar, ja** (fr = repli ; champs au format `i18n: { fr:
 - Préserve les optimisations perf en place (chargement Firebase paresseux, `SUPPRESS_SCROLL`,
   attributs `width`/`height`/`decoding` anti-CLS, langue et onglet persistés).
 - Concis et précis. Aucune invention : si une info manque, dis-le au lieu de supposer.
-- Toutes tes réflexions/commentaires/réponses sont en français.
+- Toutes tes réflexions/commentaires/questions/réponses sont en français.
