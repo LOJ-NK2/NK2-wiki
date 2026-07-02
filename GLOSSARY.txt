@@ -1,4 +1,4 @@
-fr : "Vague de colère" en : "Turmoil surge"
-fr : "déflecteur" en : "Shieldbearer"
-fr : "Renseignements" en : "Intelligence"
-fr : "Alliance"
+fr : "Vague de colère" en : "Turmoil surge" it : "Regno del Caos"
+fr : "déflecteur" en : "Shieldbearer" it :"Portascudi"
+fr : "Renseignements" en : "Intelligence" it : Intelligenza
+fr : "Alliance" it : "Alleanza"
