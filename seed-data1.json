@@ -1,0 +1,2624 @@
+{
+  "heroTable": {
+    "lofili": {
+      "solo": true,
+      "rally": true,
+      "rallyCage": true,
+      "rejoinCage": true
+    },
+    "aiksen": {
+      "solo": false,
+      "rallyCage": false,
+      "rejoinCage": false,
+      "rally": false
+    },
+    "inata": {
+      "rallyCage": false,
+      "rejoinCage": false,
+      "rally": false,
+      "solo": true
+    },
+    "gerd": {
+      "solo": false,
+      "rally": false,
+      "rallyCage": false,
+      "rejoinCage": false
+    },
+    "cesar": {
+      "rally": true,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "solo": true
+    },
+    "whisper": {
+      "rejoinCage": false,
+      "rallyCage": true,
+      "rally": false,
+      "solo": true
+    },
+    "mireya": {
+      "rally": true,
+      "rallyCage": true,
+      "rejoinCage": false,
+      "solo": true
+    },
+    "flamme": {
+      "solo": false,
+      "rallyCage": false,
+      "rejoinCage": true,
+      "rally": false
+    },
+    "drake": {
+      "rally": false,
+      "rejoinCage": false,
+      "rallyCage": true,
+      "solo": true
+    },
+    "vesaryon": {
+      "solo": false,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "rally": false
+    },
+    "devilian": {
+      "rally": true,
+      "rallyCage": false,
+      "rejoinCage": true,
+      "solo": true
+    },
+    "lee": {
+      "rallyCage": false,
+      "rejoinCage": false,
+      "rally": true,
+      "solo": true
+    },
+    "ekko": {
+      "solo": false,
+      "rally": false,
+      "rallyCage": false,
+      "rejoinCage": true
+    },
+    "sumo": {
+      "rally": false,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "solo": false
+    },
+    "phenix": {
+      "solo": true,
+      "rally": false,
+      "rallyCage": true,
+      "rejoinCage": true
+    },
+    "platos": {
+      "rally": false,
+      "rallyCage": false,
+      "rejoinCage": false,
+      "solo": false
+    },
+    "gimes": {
+      "rejoinCage": false,
+      "rallyCage": false,
+      "rally": false,
+      "solo": false
+    },
+    "xuanming": {
+      "rally": true,
+      "rallyCage": true,
+      "rejoinCage": true,
+      "solo": true
+    },
+    "mia": {
+      "rally": false,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "solo": false
+    },
+    "terry": {
+      "rally": true,
+      "rejoinCage": true,
+      "rallyCage": true,
+      "solo": true
+    },
+    "sawyer": {
+      "rejoinCage": false,
+      "rallyCage": true,
+      "rally": true,
+      "solo": true
+    },
+    "ada": {
+      "rallyCage": false,
+      "rejoinCage": false,
+      "rally": true,
+      "solo": true
+    },
+    "lanchester": {
+      "rally": true,
+      "rallyCage": false,
+      "rejoinCage": false,
+      "solo": true
+    },
+    "koschevoi": {
+      "rallyCage": true,
+      "rejoinCage": true,
+      "rally": false,
+      "solo": true
+    },
+    "marcus": {
+      "solo": true,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "rally": false
+    },
+    "ito": {
+      "rally": false,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "solo": true
+    },
+    "tyronn": {
+      "solo": true,
+      "rally": true,
+      "rejoinCage": true,
+      "rallyCage": true
+    },
+    "edwin": {
+      "solo": true,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "rally": true
+    },
+    "pasino": {
+      "rejoinCage": false,
+      "rallyCage": false,
+      "rally": false,
+      "solo": false
+    },
+    "vivian": {
+      "rallyCage": false,
+      "rejoinCage": false,
+      "rally": true,
+      "solo": true
+    },
+    "zoltan": {
+      "rejoinCage": false,
+      "rallyCage": false,
+      "rally": false,
+      "solo": true
+    },
+    "alph": {
+      "solo": true,
+      "rally": false,
+      "rejoinCage": false,
+      "rallyCage": true
+    },
+    "flora": {
+      "rally": false,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "solo": false
+    },
+    "lunarl": {
+      "solo": true,
+      "rallyCage": true,
+      "rejoinCage": true,
+      "rally": true
+    },
+    "durga": {
+      "rally": false,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "solo": false
+    },
+    "veronica": {
+      "solo": true,
+      "rejoinCage": true,
+      "rallyCage": true,
+      "rally": false
+    },
+    "tormund": {
+      "rally": false,
+      "rejoinCage": false,
+      "rallyCage": false,
+      "solo": true
+    },
+    "harton": {
+      "solo": false,
+      "rally": false,
+      "rallyCage": false,
+      "rejoinCage": false
+    },
+    "samir": {
+      "solo": false,
+      "rally": false,
+      "rejoinCage": true,
+      "rallyCage": false
+    }
+  },
+  "events": [
+    {
+      "tag": {
+        "ja": "SVS",
+        "en": "SVS",
+        "fr": "GUERRE ",
+        "it": "SVS",
+        "pt": "SVS",
+        "ar": "SVS"
+      },
+      "desc": {
+        "ja": "サーバー間戦争は2つのフェーズで行われます：\n-月曜日から金曜日までの準備フェーズ。 最大ポイントを獲得するには、2つのSVSの間で最大限の開発リソースを維持することが非常に重要です。\n-土曜日の戦争フェーズでは、24時間シールドを設置することを忘れないでください。 戦争に参加したい人は、その機会にSVS同盟に参加することができます。",
+        "ar": "تجري الحرب بين الخوادم على مرحلتين:\n- مرحلة التحضير من الاثنين إلى الجمعة. من المهم جدًا الحفاظ على الحد الأقصى من موارد التطوير بين 2 SVS من أجل الحصول على الحد الأقصى من النقاط.\n- مرحلة الحرب أيام السبت، لا تنس وضع درع 24 ساعة. أولئك الذين يرغبون في المشاركة في الحرب يمكنك الانضمام إلى تحالف SVS لهذه المناسبة.",
+        "pt": "A guerra entre servidores ocorre em 2 fases:\n- Fase de preparação de segunda a sexta-feira. É muito importante manter um máximo de recursos de desenvolvimento entre 2 SVSs para adquirir um máximo de pontos.\n- Fase de guerra aos sábados, não se esqueça de colocar um escudo de 24 horas. Aqueles que desejam participar da guerra podem se juntar à aliança SVS para a ocasião.",
+        "it": "Guerra inter-server che si svolge in 2 fasi:\n- Fase di preparazione dal lunedì al venerdì. È molto importante mantenere il massimo delle risorse di sviluppo tra 2 SVS per ottenere il massimo dei punti.\n- Fase di guerra il sabato, non dimenticare di mettere uno scudo di 24 ore. Chi volesse partecipare alla guerra può aderire all'alleanza SVS per l'occasione.",
+        "fr": "Guerre inter-serveur se déroulant en 2 phase :\n- Phase de préparation du lundi au vendredi. Il est très important de conserver un maximum de ressources de développement entre 2 SVS afin d'acquérir un maximum de points.\n- Phase de guerre le samedi, ne surtout pas oublier de mettre un bouclier de 24h. Ceux qui souhaitent participer à la guerre vous pouvez rejoindre l'alliance SVS pour l'occasion.",
+        "en": "Inter-server warfare taking place in 2 phases:\n- Preparation phase from Monday to Friday. It is very important to keep a maximum of development resources between 2 SVSs in order to acquire a maximum of points.\n- War phase on Saturdays, do not forget to put a 24-hour shield. Those who wish to participate in the war you can join the SVS alliance for the occasion."
+      },
+      "id": "event_1781306739049",
+      "date": {
+        "ja": "月に1週間",
+        "ar": "أسبوع واحد في الشهر",
+        "en": "Week per month",
+        "fr": "1 semaine par mois",
+        "it": "1 settimana al mese",
+        "pt": "1 semana por mês"
+      },
+      "name": {
+        "ja": "戦争",
+        "it": "War",
+        "pt": "Guerra.",
+        "fr": "SVS",
+        "en": "War",
+        "ar": "الحرب"
+      },
+      "type": "war"
+    },
+    {
+      "name": {
+        "it": "GABBIA",
+        "pt": "GAIOLA",
+        "fr": "CAGE",
+        "en": "CAGE",
+        "ar": "قفص",
+        "ja": "かご，おり"
+      },
+      "id": "event_1781307855289",
+      "date": {
+        "ja": "毎日",
+        "pt": "Todos os dias",
+        "it": "Ogni due o tre giorni",
+        "en": "Every 2 days",
+        "fr": "Tous les 2 jours",
+        "ar": "كلّ يومين"
+      },
+      "tag": {
+        "pt": "ALIANÇA",
+        "it": "ALLEANZA",
+        "en": "ALLIANCE",
+        "fr": "ALLIANCE ",
+        "ar": "التحالف",
+        "ja": "同盟"
+      },
+      "desc": {
+        "ja": "このイベントの目的は、連携したラリーを通じて最大のダメージを生成することです。",
+        "pt": "O objetivo deste evento é gerar o máximo de danos através de comícios coordenados.",
+        "it": "Lo scopo di questo evento è quello di generare il massimo danno attraverso raduni coordinati.",
+        "en": "The purpose of this event is to generate maximum damage through coordinated rallies.",
+        "fr": "Le but de cet événement est de générer le maximum de dégât par des ralliements coordonnées.",
+        "ar": "الغرض من هذا الحدث هو توليد أقصى قدر من الضرر من خلال المسيرات المنسقة."
+      },
+      "type": "alliance"
+    },
+    {
+      "desc": {
+        "ja": "20の攻撃の波から砲塔と手足を守ります。",
+        "pt": "Defenda torres e membros de 20 ondas de ataques.",
+        "it": "Difendere le torrette e gli arti di fronte alle 20 ondate di attacchi.",
+        "fr": "Défendre les tourelles et les membres faces aux 20 vagues d'attaques.",
+        "en": "Defend turrets and limbs from 20 waves of attacks.",
+        "ar": "دافع عن الأبراج والأطراف من 20 موجة من الهجمات."
+      },
+      "tag": {
+        "ja": "同盟",
+        "pt": "ALIANÇA",
+        "it": "ALLEANZA",
+        "fr": "ALLIANCE ",
+        "en": "ALLIANCE",
+        "ar": "التحالف"
+      },
+      "date": {
+        "ar": "الأربعاء والخميس",
+        "fr": "Mercredi et jeudi",
+        "en": "Wednesday - Thursday",
+        "pt": "Quarta-feira e quinta-feira",
+        "it": "Mercoledí e giovedí",
+        "ja": "水曜日と木曜日"
+      },
+      "id": "event_1781720327587",
+      "name": {
+        "ja": "怒りの波",
+        "en": "Turmoil Surge",
+        "fr": "Vague de colère",
+        "it": "Ondata di rabbia",
+        "pt": "Onda de raiva",
+        "ar": "موجة غضب"
+      },
+      "type": "alliance"
+    }
+  ],
+  "ui": {
+    "ja": {
+      "req_yes": "✔ はい",
+      "troops_tir": "シューター",
+      "troop3_desc": "ダメージや致死性ボーナスを持つヒーローを優先し、ソロ攻撃専用の装備を使用してください。",
+      "col_req": "必須",
+      "col_type": "種類",
+      "stat_role": "役割",
+      "col_name": "名前",
+      "troop3_name": "ソロ",
+      "second_line": "後衛",
+      "stat_rec": "推奨",
+      "col_day": "曜日",
+      "role_farm": "採集",
+      "troop1_name": "採集者",
+      "tier1": "採集者",
+      "robots": "ロボット",
+      "home_ql_troops": "戦略",
+      "troop1_desc": "資源収集専用。",
+      "tier2": "アリーナ/逮捕/...",
+      "footer": "アライアンスウィキ—刑務所の土地// Schnereux23によって更新",
+      "troops_bomber": "爆撃機",
+      "troop4_desc": "全ての味方に影響するボーナスを持つヒーローを優先し、集団攻撃専用の装備を使用してください。",
+      "req_opt": "任意",
+      "troop2_desc2": "逮捕スキルのみを考慮してください。",
+      "home_ql_events": "ガイド",
+      "troops_table_title": "クイック比較",
+      "col_event": "イベント",
+      "req_rec": "推奨",
+      "troops_def": "盾の持ち主",
+      "col_rally": "ラリーケージ",
+      "tier4": "攻撃",
+      "col_rejoin": "参加ケージ",
+      "events_table_title": "要約",
+      "col_tier": "ヒーロー",
+      "tier3": "攻撃",
+      "heroes_label": "ヒーロー",
+      "rec_no": "戦闘不可",
+      "troop4_name": "ラリー",
+      "first_line": "前衛",
+      "troop2_desc1": "5人のヒーローと2体のロボットを配置する必要があるすべてのバトルに適用されます（アリーナ、逮捕、KOFレジェンド、同盟バトルなど…）"
+    },
+    "it": {
+      "heroes_label": "EROI",
+      "tier3": "Attacchi",
+      "troop2_desc1": "Riguarda tutti i combattimenti in cui bisogna schierare 5 eroi e 2 robot (Arena, Arresto, Leggenda KOF, Battaglia dell'Alleanza...)",
+      "first_line": "Prima linea",
+      "troop4_name": "RADUNI",
+      "rec_no": "NESSUN COMBATTIMENTO",
+      "col_rejoin": "UNISCITI CAGE",
+      "col_tier": "EROI",
+      "events_table_title": "RIEPILOGO",
+      "troops_def": "Porta scudo",
+      "req_rec": "Consigliato",
+      "col_event": "EVENTO",
+      "tier4": "Attacchi",
+      "col_rally": "RALLY CAGE",
+      "home_ql_events": "Guide",
+      "troops_table_title": "CONFRONTO RAPIDO",
+      "troop4_desc": "Preferisci eroi con bonus che influenzano tutti gli alleati, con equipaggiamento esclusivo per attacchi di gruppo.",
+      "troops_bomber": "Bomber",
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // AGGIORNATO DA Schnereux23",
+      "tier2": "Arena/Arresto/...",
+      "troop2_desc2": "Considera solo le abilità legate all'arresto.",
+      "req_opt": "Facoltativo",
+      "troop1_name": "Raccoglitori",
+      "troop1_desc": "Ideale solo per raccogliere risorse.",
+      "home_ql_troops": "Strategie",
+      "robots": "Robot",
+      "tier1": "Raccoglitori",
+      "second_line": "Seconda linea",
+      "troop3_name": "SOLO",
+      "col_name": "NOME",
+      "stat_role": "RUOLO",
+      "col_day": "GIORNO",
+      "role_farm": "Raccolta",
+      "stat_rec": "RACCOMANDAZIONE",
+      "troops_tir": "Tiratore",
+      "req_yes": "✔ Sì",
+      "col_type": "TIPO",
+      "col_req": "RICHIESTO",
+      "troop3_desc": "Preferisci eroi con bonus ai danni o alla letalità, con equipaggiamento esclusivo per attacchi singoli."
+    },
+    "pt": {
+      "col_day": "DIA",
+      "role_farm": "Coleta",
+      "stat_rec": "RECOMENDAÇÃO",
+      "troop3_name": "SOLO",
+      "second_line": "Linha de trás",
+      "stat_role": "FUNÇÃO",
+      "col_name": "NOME",
+      "troop3_desc": "Prefira heróis com bônus de dano ou letalidade, com equipamento exclusivo para ataques solo.",
+      "col_type": "TIPO",
+      "col_req": "OBRIGATÓRIO",
+      "troops_tir": "Atirador",
+      "req_yes": "✔ Sim",
+      "troop2_desc2": "Considere apenas as habilidades de prisão.",
+      "req_opt": "Opcional",
+      "troop4_desc": "Prefira heróis com bônus que afetam todos os aliados, com equipamento exclusivo para ataques em grupo.",
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // ATUALIZADO POR Schnereux23",
+      "tier2": "Arena/Prisão/...",
+      "troops_bomber": "Bombardier",
+      "home_ql_troops": "Estratégias",
+      "troop1_desc": "Ideal apenas para coletar recursos.",
+      "tier1": "Coletores",
+      "robots": "Robôs",
+      "troop1_name": "Coletores",
+      "tier4": "Ataques",
+      "col_rally": "RALLY CAGE",
+      "req_rec": "Recomendado",
+      "troops_def": "Porta Escudo",
+      "col_event": "EVENTO",
+      "troops_table_title": "COMPARATIVO RÁPIDO",
+      "home_ql_events": "Guias",
+      "troop2_desc1": "Aplica-se a todas as batalhas em que é preciso posicionar 5 heróis e 2 robôs (Arena, Prisão, Lenda do KOF, Batalha da Aliança...)",
+      "troop4_name": "RALLIES",
+      "rec_no": "SEM COMBATE",
+      "first_line": "Linha de frente",
+      "tier3": "Ataques",
+      "heroes_label": "HERÓIS",
+      "events_table_title": "RECAPITULANDO",
+      "col_tier": "HERÓIS",
+      "col_rejoin": "ENTRAR CAGE"
+    },
+    "en": {
+      "tier3": "Attacks",
+      "heroes_label": "HEROES",
+      "troop2_desc1": "Applies to all battles where you have to field 5 heroes and 2 robots (Arena, Arrest, KOF Legend, Alliance Battle, etc.)",
+      "rec_no": "NO COMBAT",
+      "troop4_name": "RALLIES",
+      "first_line": "Front line",
+      "col_rejoin": "JOIN CAGE",
+      "events_table_title": "Recap",
+      "col_tier": "HEROES",
+      "req_rec": "Recommended",
+      "troops_def": "Shield bearer",
+      "col_event": "EVENT",
+      "tier4": "Attacks",
+      "col_rally": "RALLY CAGE",
+      "home_ql_events": "Guides",
+      "troops_table_title": "QUICK COMPARISON",
+      "troop4_desc": "Prefer heroes with bonuses affecting all allies, along with exclusive equipment for group attacks.",
+      "footer": "ALLIANCE WIKI — LAND OF JAIL // UPDATED BY Schnereux23",
+      "tier2": "Arena/Arrest/...",
+      "troops_bomber": "Bombardier",
+      "troop2_desc2": "Only consider arrest-related skills.",
+      "req_opt": "Optional",
+      "troop1_name": "Gatherers",
+      "home_ql_troops": "Strategies",
+      "troop1_desc": "Ideal for resource collection only.",
+      "tier1": "Gatherers",
+      "robots": "Robots",
+      "troop3_name": "SOLO",
+      "second_line": "Back line",
+      "stat_role": "ROLE",
+      "col_name": "NAME",
+      "role_farm": "Gathering",
+      "col_day": "DAY",
+      "stat_rec": "RECOMMENDATION",
+      "troops_tir": "Shooter",
+      "req_yes": "✔ Yes",
+      "troop3_desc": "Prefer heroes with damage or lethality bonuses, along with exclusive equipment for solo attacks.",
+      "col_type": "TYPE",
+      "col_req": "REQUIRED"
+    },
+    "fr": {
+      "home_ql_events": "Guides",
+      "troops_table_title": "COMPARATIF RAPIDE",
+      "col_event": "ÉVÉNEMENT",
+      "troops_def": "Déflecteur",
+      "req_rec": "Recommandé",
+      "col_rally": "RALLY CAGE",
+      "tier4": "Attaques",
+      "col_rejoin": "REJOINDRE CAGE",
+      "events_table_title": "RÉCAPITULATIF",
+      "col_tier": "HÉROS",
+      "heroes_label": "HÉROS",
+      "tier3": "Attaques",
+      "first_line": "Première ligne",
+      "rec_no": "PAS DE COMBAT",
+      "troop4_name": "RALLIEMENTS",
+      "troop2_desc1": "Concerne tous les combats où l'on doit placer 5 héros et 2 robots (Arène, arrestation, légende KOF, bataille de l'alliance...)",
+      "req_yes": "✔ Oui",
+      "troops_tir": "Tirreur",
+      "col_req": "REQUIS",
+      "col_type": "TYPE",
+      "troop3_desc": "Privilégier des héros ayant des bonus de dégats ou de létalités, ainsi qu'un equipement exclusif pour les attaques en solo.",
+      "col_name": "NOM",
+      "stat_role": "RÔLE",
+      "second_line": "Seconde ligne",
+      "troop3_name": "SOLO",
+      "stat_rec": "RECOMMANDATION",
+      "col_day": "JOUR",
+      "role_farm": "Collecte",
+      "troop1_name": "Récolteurs",
+      "robots": "Robots",
+      "tier1": "Récoltes",
+      "troop1_desc": "Idéal pour collecter des ressources uniquement.",
+      "home_ql_troops": "Stratégies",
+      "troops_bomber": "Bombardier",
+      "tier2": "Arène/Arrestation/...",
+      "footer": "NK2 WIKI — LAND OF JAIL // MISE À JOUR PAR Schnereux23",
+      "troop4_desc": "Privilégier des héros ayant des bonus affectant tout les alliés, ainsi qu'un equipement exclusif pour les attaques groupées.",
+      "req_opt": "Optionnel",
+      "troop2_desc2": "Prendre en compte uniquement les compétences d'arrestation."
+    },
+    "ar": {
+      "stat_role": "الدور",
+      "col_name": "الاسم",
+      "troop3_name": "فردي",
+      "second_line": "الصف الخلفي",
+      "stat_rec": "التوصية",
+      "col_day": "اليوم",
+      "role_farm": "جمع الموارد",
+      "req_yes": "✔ نعم",
+      "troops_tir": "مطلق النار",
+      "troop3_desc": "فضّل الأبطال ذوي مكافآت الضرر أو الإماتة، مع معدات حصرية للهجمات الفردية.",
+      "col_req": "مطلوب",
+      "col_type": "النوع",
+      "tier2": "الحلبة/الاعتقال/...",
+      "footer": "ALLIANCE WIKI — أرض السجن // تم التحديث بواسطة Schnereux23",
+      "troops_bomber": "بومباردييه",
+      "troop4_desc": "فضّل الأبطال ذوي المكافآت التي تؤثر على جميع الحلفاء، مع معدات حصرية للهجمات الجماعية.",
+      "req_opt": "اختياري",
+      "troop2_desc2": "أخذ مهارات الاعتقال بعين الاعتبار فقط.",
+      "troop1_name": "الجامعون",
+      "tier1": "الجامعون",
+      "robots": "الروبوتات",
+      "home_ql_troops": "الاستراتيجيات",
+      "troop1_desc": "مثالي فقط لجمع الموارد.",
+      "col_event": "الحدث",
+      "req_rec": "موصى به",
+      "troops_def": "حامل الدرع",
+      "col_rally": "تجمع السجن",
+      "tier4": "الهجمات",
+      "home_ql_events": "الأدلة",
+      "troops_table_title": "مقارنة سريعة",
+      "tier3": "الهجمات",
+      "heroes_label": "الأبطال",
+      "rec_no": "لا قتال",
+      "troop4_name": "التجمعات",
+      "first_line": "الصف الأمامي",
+      "troop2_desc1": "ينطبق هذا على جميع المعارك التي يتعين فيها وضع 5 أبطال و2 روبوتات (الساحة، الاعتقال، أسطورة KOF، معركة التحالف...)",
+      "col_rejoin": "الانضمام",
+      "events_table_title": "الملخص",
+      "col_tier": "الأبطال"
+    }
+  },
+  "resourceNames": {},
+  "tabs": [
+    {
+      "i18n": {
+        "ja": {
+          "desc": "このWikiはアライアンスの公式フィールドマニュアルです。ヒーローガイドと戦略情報をここで確認できます。",
+          "label": "ホーム",
+          "title": "ようこそ",
+          "noticeTitle": "📢 お知らせ：",
+          "noticeText": " ご提案はSchnereux23にご連絡ください。"
+        },
+        "ar": {
+          "noticeTitle": "📢 ملاحظة:",
+          "noticeText": " لأي اقتراح، تواصل مع Schnereux23.",
+          "label": "الرئيسية",
+          "title": "مرحباً",
+          "desc": "هذا الويكي هو الدليل الرسمي للتحالف. ستجد هنا أدلة الأبطال وجميع المعلومات الاستراتيجية."
+        },
+        "pt": {
+          "desc": "Este wiki é o manual de campo oficial da nossa aliança. Encontre guias de heróis e todas as informações estratégicas.",
+          "noticeText": " Para qualquer sugestão, contate Schnereux23.",
+          "noticeTitle": "📢 NOTA:",
+          "label": "Início",
+          "title": "BEM-VINDO"
+        },
+        "it": {
+          "desc": "Questo wiki è il manuale ufficiale della nostra alleanza. Trova guide agli eroi e tutte le informazioni strategiche.",
+          "label": "Home",
+          "title": "BENVENUTO",
+          "noticeTitle": "📢 NOTA:",
+          "noticeText": " Per qualsiasi suggerimento, contatta Schnereux23."
+        },
+        "fr": {
+          "desc": "Ce wiki est le manuel de terrain officiel de notre alliance. Retrouvez ici les guides de troupes et toutes les informations stratégiques.",
+          "noticeText": " Pour toute suggestion, contactez Schnereux23.",
+          "noticeTitle": "📢 NOTE :",
+          "label": "Accueil",
+          "title": "BIENVENUE"
+        },
+        "en": {
+          "label": "Home",
+          "title": "WELCOME",
+          "noticeText": " For any suggestion, contact Schnereux23.",
+          "noticeTitle": "📢 NOTE:",
+          "desc": "This wiki is the official field manual of our alliance. Find hero guides and all strategic information here."
+        }
+      },
+      "enabled": true,
+      "type": "home",
+      "icon": "🏠",
+      "order": 0,
+      "id": "home"
+    },
+    {
+      "enabled": true,
+      "showTable": true,
+      "i18n": {
+        "it": {
+          "tipTitle": "💡 CONSIGLIO:",
+          "tipText": " Non usare MAI MIA in combattimento.",
+          "label": "Eroi",
+          "title": "GUIDA AGLI EROI",
+          "sub": "// CONSIGLI SUGLI EROI"
+        },
+        "pt": {
+          "sub": "// RECOMENDAÇÕES DE HERÓIS",
+          "tipText": " NUNCA use MIA em combate.",
+          "tipTitle": "💡 DICA:",
+          "title": "GUIA DE HERÓIS",
+          "label": "Heróis"
+        },
+        "en": {
+          "sub": "// HERO RECOMMENDATIONS",
+          "tipText": " NEVER use MIA in combat.",
+          "tipTitle": "💡 TIP:",
+          "label": "Heroes",
+          "title": "HERO GUIDE"
+        },
+        "fr": {
+          "title": "GUIDE DES HEROS",
+          "label": "Héros",
+          "tipTitle": "💡 CONSEIL :",
+          "tipText": " N'utilisez JAMAIS MIA ni les Récolteurs pour les combats.",
+          "sub": "// RECOMMANDATIONS DES HEROS"
+        },
+        "ar": {
+          "title": "دليل الأبطال",
+          "label": "الأبطال",
+          "tipText": " لا تستخدم MIA أبداً في القتال.",
+          "tipTitle": "💡 نصيحة:",
+          "sub": "// توصيات الأبطال"
+        },
+        "ja": {
+          "tipText": " MIAを戦闘で絶対に使わないでください。",
+          "tipTitle": "💡 ヒント：",
+          "label": "ヒーロー",
+          "title": "ヒーローガイド",
+          "sub": "// ヒーロー推奨事項"
+        }
+      },
+      "type": "troops",
+      "id": "troops",
+      "order": 2,
+      "icon": "⚔️",
+      "cards": [
+        {
+          "resources": [
+            {
+              "items": [],
+              "label": {}
+            }
+          ],
+          "tierLabel": {
+            "ja": "採集者",
+            "pt": "Coletores",
+            "it": "Raccoglitori",
+            "fr": "Récoltes",
+            "en": "Gatherers",
+            "ar": "الجامعون"
+          },
+          "desc": {
+            "fr": "Idéal pour collecter des ressources uniquement.",
+            "en": "Ideal for resource collection only.",
+            "pt": "Ideal apenas para coletar recursos.",
+            "it": "Ideale solo per raccogliere risorse.",
+            "ar": "مثالي فقط لجمع الموارد.",
+            "ja": "資源収集専用。"
+          },
+          "layout": [
+            "desc",
+            "strips",
+            "resources",
+            "stats",
+            "carousel"
+          ],
+          "stats": [
+            {
+              "tone": "warn",
+              "label": {
+                "fr": "RÔLE",
+                "en": "ROLE",
+                "it": "RUOLO",
+                "pt": "FUNÇÃO",
+                "ar": "الدور",
+                "ja": "役割"
+              },
+              "value": {
+                "ja": "採集",
+                "ar": "جمع الموارد",
+                "pt": "Coleta",
+                "it": "Raccolta",
+                "en": "Gathering",
+                "fr": "Collecte"
+              }
+            },
+            {
+              "tone": "bad",
+              "label": {
+                "fr": "RECOMMANDATION",
+                "en": "RECOMMENDATION",
+                "pt": "RECOMENDAÇÃO",
+                "it": "RACCOMANDAZIONE",
+                "ar": "التوصية",
+                "ja": "推奨"
+              },
+              "value": {
+                "ja": "戦闘不可",
+                "en": "NO COMBAT",
+                "fr": "PAS DE COMBAT",
+                "pt": "SEM COMBATE",
+                "it": "NESSUN COMBATTIMENTO",
+                "ar": "لا قتال"
+              }
+            }
+          ],
+          "name": {
+            "ja": "採集者",
+            "ar": "الجامعون",
+            "en": "Gatherers",
+            "fr": "Récolteurs",
+            "pt": "Coletores",
+            "it": "Raccoglitori"
+          },
+          "tier": "tier-1",
+          "carousel": {
+            "images": [],
+            "enabled": false
+          },
+          "strips": [
+            {
+              "label": {
+                "ja": "ヒーロー",
+                "it": "EROI",
+                "pt": "HERÓIS",
+                "fr": "HÉROS",
+                "en": "HEROES",
+                "ar": "الأبطال"
+              },
+              "heroes": [
+                "aiksen",
+                "durga",
+                "harton",
+                "pasino"
+              ]
+            }
+          ]
+        },
+        {
+          "tierLabel": {
+            "ja": "アリーナ/逮捕/...",
+            "pt": "Arena/Prisão/...",
+            "it": "Arena/Arresto/...",
+            "fr": "Arène/Arrestation/...",
+            "en": "Arena/Arrest/...",
+            "ar": "الحلبة/الاعتقال/..."
+          },
+          "resources": [],
+          "name": {},
+          "tier": "tier-2",
+          "desc": {
+            "ar": "يتعلق بكل المعارك التي تتطلب 5 أبطال و2 روبوت (الحلبة، الاعتقال، أسطورة KOF، معركة التحالف...)\nأخذ مهارات الاعتقال بعين الاعتبار فقط.",
+            "fr": "Concerne tous les combats où l'on doit placer 5 héros et 2 robots (Arène, arrestation, légende KOF, bataille de l'alliance...)\nPrendre en compte uniquement les compétences d'arrestation.",
+            "en": "Concerns all battles requiring 5 heroes and 2 robots (Arena, arrest, KOF legend, alliance battle...)\nOnly consider arrest-related skills.",
+            "pt": "Refere-se a todas as batalhas com 5 heróis e 2 robôs (Arena, prisão, lenda KOF, batalha de aliança...)\nConsidere apenas as habilidades de prisão.",
+            "it": "Riguarda tutti i combattimenti con 5 eroi e 2 robot (Arena, arresto, leggenda KOF, battaglia di alleanza...)\nConsidera solo le abilità legate all'arresto.",
+            "ja": "5人のヒーローと2台のロボットを配置する全ての戦闘に関連します（アリーナ、逮捕、KOFレジェンド、アライアンス戦...）\n逮捕スキルのみを考慮してください。"
+          },
+          "layout": [
+            "desc",
+            "strips",
+            "resources",
+            "stats",
+            "carousel"
+          ],
+          "stats": [],
+          "strips": [
+            {
+              "heroes": [
+                "marcus",
+                "tyronn",
+                "phenix",
+                "koschevoi",
+                "tormund",
+                "xuanming",
+                "cesar",
+                "ito",
+                "lanchester",
+                "zoltan",
+                "whisper",
+                "vivian",
+                "gerd"
+              ],
+              "label": {
+                "ja": "前衛",
+                "fr": "Première ligne",
+                "en": "Front line",
+                "it": "Prima linea",
+                "pt": "Linha de frente",
+                "ar": "الصف الأمامي"
+              }
+            },
+            {
+              "label": {
+                "en": "Robots",
+                "fr": "Robots",
+                "it": "Robot",
+                "pt": "Robôs",
+                "ar": "الروبوتات",
+                "ja": "ロボット"
+              },
+              "heroes": []
+            },
+            {
+              "label": {
+                "fr": "Seconde ligne",
+                "en": "Back line",
+                "pt": "Linha de trás",
+                "it": "Seconda linea",
+                "ar": "الصف الخلفي",
+                "ja": "後衛"
+              },
+              "heroes": [
+                "drake",
+                "mireya",
+                "sawyer",
+                "inata",
+                "ito",
+                "koschevoi",
+                "vivian",
+                "veronica",
+                "lee",
+                "ada",
+                "edwin",
+                "devilian"
+              ]
+            }
+          ],
+          "carousel": {
+            "enabled": false,
+            "images": []
+          }
+        },
+        {
+          "strips": [],
+          "carousel": {
+            "enabled": false,
+            "images": []
+          },
+          "resources": [],
+          "tierLabel": {
+            "ar": "الهجمات",
+            "pt": "Ataques",
+            "it": "Attacchi",
+            "fr": "Attaques",
+            "en": "Attacks",
+            "ja": "攻撃"
+          },
+          "desc": {
+            "it": "Preferisci eroi con bonus ai danni o alla letalità, con equipaggiamento esclusivo per attacchi singoli.",
+            "pt": "Prefira heróis com bônus de dano ou letalidade, com equipamento exclusivo para ataques solo.",
+            "fr": "Privilégier des héros ayant des bonus de dégats ou de létalités, ainsi qu'un equipement exclusif pour les attaques en solo.",
+            "en": "Prefer heroes with damage or lethality bonuses, along with exclusive equipment for solo attacks.",
+            "ar": "فضّل الأبطال ذوي مكافآت الضرر أو الإماتة، مع معدات حصرية للهجمات الفردية.",
+            "ja": "ダメージや致死性ボーナスを持つヒーローを優先し、ソロ攻撃専用の装備を使用してください。"
+          },
+          "stats": [
+            {
+              "tone": "",
+              "label": {
+                "ja": "盾の持ち主",
+                "ar": "حامل الدرع",
+                "it": "Porta scudo",
+                "pt": "Porta Escudo",
+                "en": "Shield bearer",
+                "fr": "Déflecteur"
+              },
+              "value": {
+                "fr": "40%"
+              }
+            },
+            {
+              "tone": "",
+              "value": {
+                "fr": "10%"
+              },
+              "label": {
+                "ja": "爆撃機",
+                "ar": "بومباردييه",
+                "fr": "Bombardier",
+                "en": "Bombardier",
+                "pt": "Bombardier",
+                "it": "Bomber"
+              }
+            },
+            {
+              "label": {
+                "ar": "مطلق النار",
+                "pt": "Atirador",
+                "it": "Tiratore",
+                "en": "Shooter",
+                "fr": "Tirreur",
+                "ja": "シューター"
+              },
+              "value": {
+                "fr": "50%"
+              },
+              "tone": ""
+            }
+          ],
+          "layout": [
+            "desc",
+            "strips",
+            "resources",
+            "stats",
+            "carousel"
+          ],
+          "tier": "tier-3",
+          "name": {
+            "ar": "فردي",
+            "it": "SOLO",
+            "pt": "SOLO",
+            "fr": "SOLO",
+            "en": "SOLO",
+            "ja": "ソロ"
+          }
+        },
+        {
+          "desc": {
+            "ja": "全ての味方に影響するボーナスを持つヒーローを優先し、集団攻撃専用の装備を使用してください。",
+            "it": "Preferisci eroi con bonus che influenzano tutti gli alleati, con equipaggiamento esclusivo per attacchi di gruppo.",
+            "pt": "Prefira heróis com bônus que afetam todos os aliados, com equipamento exclusivo para ataques em grupo.",
+            "en": "Prefer heroes with bonuses affecting all allies, along with exclusive equipment for group attacks.",
+            "fr": "Privilégier des héros ayant des bonus affectant tout les alliés, ainsi qu'un equipement exclusif pour les attaques groupées.",
+            "ar": "فضّل الأبطال ذوي المكافآت التي تؤثر على جميع الحلفاء، مع معدات حصرية للهجمات الجماعية."
+          },
+          "layout": [
+            "desc",
+            "strips",
+            "resources",
+            "stats",
+            "carousel"
+          ],
+          "stats": [
+            {
+              "label": {
+                "ja": "盾の持ち主",
+                "ar": "حامل الدرع",
+                "pt": "Porta Escudo",
+                "it": "Porta scudo",
+                "fr": "Déflecteur",
+                "en": "Shield bearer"
+              },
+              "value": {
+                "fr": "40%"
+              },
+              "tone": ""
+            },
+            {
+              "value": {
+                "fr": "10%"
+              },
+              "label": {
+                "ar": "بومباردييه",
+                "pt": "Bombardier",
+                "it": "Bomber",
+                "fr": "Bombardier",
+                "en": "Bombardier",
+                "ja": "爆撃機"
+              },
+              "tone": ""
+            },
+            {
+              "value": {
+                "fr": "50%"
+              },
+              "label": {
+                "ja": "シューター",
+                "en": "Shooter",
+                "fr": "Tirreur",
+                "it": "Tiratore",
+                "pt": "Atirador",
+                "ar": "مطلق النار"
+              },
+              "tone": ""
+            }
+          ],
+          "tier": "tier-4",
+          "name": {
+            "ar": "التجمعات",
+            "fr": "RALLIEMENTS",
+            "en": "RALLIES",
+            "it": "RADUNI",
+            "pt": "RALLIES",
+            "ja": "ラリー"
+          },
+          "resources": [],
+          "tierLabel": {
+            "ja": "攻撃",
+            "pt": "Ataques",
+            "it": "Attacchi",
+            "fr": "Attaques",
+            "en": "Attacks",
+            "ar": "الهجمات"
+          },
+          "strips": [],
+          "carousel": {
+            "enabled": false,
+            "images": []
+          }
+        }
+      ]
+    },
+    {
+      "type": "events",
+      "enabled": true,
+      "i18n": {
+        "ja": {
+          "warningText": "SVS準備フェーズのために開発リソースを保管することが重要です",
+          "title": "イベント",
+          "label": "イベント",
+          "sub": "//同盟イベント",
+          "warningTitle": "⚠️ SVS最優先："
+        },
+        "en": {
+          "sub": "//ALLIANCE EVENTS",
+          "warningTitle": "⚠️ SVS  PRIORITY:",
+          "warningText": "It is important to keep your development resources for the SVS preparation phase",
+          "label": "Events",
+          "title": "EVENTS"
+        },
+        "fr": {
+          "warningTitle": "⚠️ PRIORITÉ SVS :",
+          "sub": "//ÉVÉNEMENTS DE L'ALLIANCE",
+          "warningText": "Il est important de conserver vos ressources de développement pour la phase de préparation SVS ",
+          "label": "Événements",
+          "title": "ÉVÉNEMENTS"
+        },
+        "it": {
+          "sub": "//EVENTI DELL'ALLEANZA",
+          "warningTitle": "⚠️ PRIORITÀ SVS:",
+          "title": "EVENTI",
+          "label": "Eventi",
+          "warningText": "È importante conservare le risorse di sviluppo per la fase di preparazione SVS"
+        },
+        "pt": {
+          "warningText": "É importante manter seus recursos de desenvolvimento para a fase de preparação do SVS",
+          "title": "EVENTOS",
+          "label": "Eventos",
+          "sub": "//EVENTOS DA ALIANÇA",
+          "warningTitle": "⚠️ PRIORIDADE SVS:"
+        },
+        "ar": {
+          "warningTitle": "⚠️ أولوية SVS:",
+          "sub": "// فعاليات التحالف",
+          "title": "الأحداث",
+          "label": "الأحداث",
+          "warningText": "من المهم الحفاظ على موارد التطوير الخاصة بك لمرحلة إعداد SVS"
+        }
+      },
+      "id": "events",
+      "order": 6,
+      "icon": "📅"
+    },
+    {
+      "images": [],
+      "showTable": false,
+      "i18n": {
+        "ja": {
+          "label": "かご，おり",
+          "title": "かご，おり",
+          "tipText": "時間をかけて自分の編成を登録しましょう\n「サソリの囚人」を解放 - 部隊の攻撃力ボーナス",
+          "tipTitle": "重要：",
+          "sub": "最適な参加方法"
+        },
+        "fr": {
+          "sub": "Comment participer de façon optimale ",
+          "desc": "Prenez votre temps pour vous préparer, ne foncer pas tête baisser.\nAfin de faire un maximum de dégât, il faut que chacun choisissent leurs héros ainsi que le bon ration de troupe.",
+          "label": "CAGE",
+          "title": "CAGE",
+          "tipText": "Prenez le temps d'enregistrer vos compositions\nSortez le prisonnier scorpion - Bonus d'attaque des troupes",
+          "tipTitle": "IMPORTANT"
+        },
+        "en": {
+          "title": "CAGE",
+          "label": "CAGE",
+          "tipTitle": "IMPORTANT",
+          "tipText": "Take the time to save your compositions\nFree the Scorpion Prisoner – Troop attack bonus",
+          "sub": "How to participate optimally"
+        },
+        "pt": {
+          "tipTitle": "IMPORTANTE",
+          "tipText": "Reserve um tempo para registrar suas composições\nLiberte o prisioneiro escorpião — Bônus de ataque das tropas",
+          "title": "GAIOLA",
+          "label": "GAIOLA",
+          "sub": "Como participar de forma ideal"
+        },
+        "it": {
+          "sub": "Come partecipare in modo ottimale",
+          "title": "GABBIA",
+          "label": "GABBIA",
+          "tipTitle": "IMPORTANTE",
+          "tipText": "Prenditi il tempo necessario per salvare le tue composizioni\nLibera il prigioniero scorpione - Bonus di attacco delle truppe"
+        },
+        "ar": {
+          "tipText": "خذ وقتك في تسجيل تكويناتك\nأطلق سراح السجين العقرب - مكافأة هجوم القوات",
+          "tipTitle": "هام",
+          "title": "قفص",
+          "label": "قفص",
+          "sub": "كيفية المشاركة على النحو الأمثل"
+        }
+      },
+      "type": "troops",
+      "order": 3,
+      "icon": "⚙️",
+      "id": "CAGE",
+      "links": [],
+      "cards": [
+        {
+          "strips": [
+            {
+              "label": {
+                "fr": "Héros conseillés",
+                "en": "Recommended Heroes",
+                "pt": "Heróis recomendados",
+                "it": "Eroi consigliati",
+                "ar": "الأبطال الموصى بهم",
+                "ja": "おすすめのヒーロー"
+              },
+              "heroes": [
+                "alph",
+                "koschevoi",
+                "lunarl",
+                "lofili",
+                "mireya",
+                "phenix",
+                "sawyer",
+                "tyronn",
+                "xuanming",
+                "whisper",
+                "veronica"
+              ]
+            }
+          ],
+          "carousel": {
+            "images": [],
+            "enabled": false
+          },
+          "tier": "tier-3",
+          "name": {},
+          "stats": [],
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "desc": {
+            "ar": "لا تبدأ جميع السباقات في نفس الوقت",
+            "pt": "Não inicie todas as provas de rally ao mesmo tempo",
+            "it": "Non avviare tutte le gare contemporaneamente",
+            "fr": "Ne pas lancer tous les rallye en même temps",
+            "en": "Do not start all the rallies at the same time",
+            "ja": "すべてのラリーを同時に開始しないこと"
+          },
+          "tierLabel": {
+            "it": "Crea un rally",
+            "pt": "Criar Rally",
+            "fr": "Créer un ralliement",
+            "en": "Create Rally",
+            "ar": "إنشاء رالي",
+            "ja": "ラリーを作成"
+          },
+          "resources": []
+        },
+        {
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "stats": [],
+          "desc": {
+            "ja": "[c=rouge]このリストの中で最も優秀な英雄を1番目の位置に配置してください[/c]。残りの2人には、このリストに含まれていない英雄を使用してください。\n\nできるだけ多くのプレイヤーがラリーに参加できるように、[c=rouge]最大75,000部隊まで[/c]送ってください（シールド禁止！）。主に[c=vert]シューター[/c]、そして少数の[c=vert]ボンバー[/c]を送ってください。例：シューター60,000、ボンバー15,000、またはシューター70,000、ボンバー5,000。\n\n全軍を送るプレイヤーはラリーから追放してください⚠️",
+            "ar": "ضع [c=rouge]أفضل بطل من هذه القائمة في المركز الأول[/c]، وبالنسبة للبطلين الآخرين استخدم أبطالاً غير موجودين في هذه القائمة.\n\nللسماح لأكبر عدد ممكن من اللاعبين بالانضمام إلى التجمعات، أرسل [c=rouge]بحد أقصى 75,000 جندي[/c] (بدون درع!) معظمهم من [c=vert]الرماة[/c] مع عدد قليل من [c=vert]القاذفات[/c]. مثال: 60,000 رامٍ و15,000 قاذف، أو 70,000 رامٍ و5,000 قاذفات.\n\nيجب طرد اللاعبين الذين يرسلون جميع قواتهم من التجمع ⚠️",
+            "pt": "Coloque [c=rouge]o melhor herói desta lista na 1ª posição[/c]; para os outros 2 heróis, utilize heróis que não façam parte desta lista.\n\nPara permitir que o maior número possível de jogadores participe dos rallies, envie [c=rouge]NO MÁXIMO 75.000 TROPAS[/c] (Sem escudo!) Principalmente [c=vert]atiradores[/c] e alguns [c=vert]bombardeiros[/c]. Exemplo: 60.000 atiradores, 15.000 bombardeiros ou 70.000 atiradores, 5.000 bombardeiros.\n\nOs jogadores que enviarem todas as suas tropas devem ser expulsos do rally ⚠️",
+            "it": "Metti [c=rouge]il miglior eroe di questa lista in 1ª posizione[/c]; per gli altri 2 eroi, utilizza eroi che non fanno parte di questa lista.\n\nPer consentire al maggior numero possibile di giocatori di partecipare ai rally, invia [c=rouge]UN MASSIMO DI 75.000 TRUPPE[/c] (Niente scudo!) Principalmente [c=vert]tiratori[/c] e alcuni [c=vert]bombardieri[/c]. Esempio: 60.000 tiratori, 15.000 bombardieri oppure 70.000 tiratori, 5.000 bombardieri.\n\nI giocatori che inviano tutte le loro truppe devono essere espulsi dal rally ⚠️",
+            "fr": "Mettre [c=rouge]le meilleur héros de cette liste en 1ere position[/c], pour les 2 autres héros mettre des héros ne faisant pas partie de cette liste.\n\nAfin de permettre à un maximum de joueurs de rejoindre les ralliements, envoyez [c=rouge]MAXIMUM 75000 troupes[/c] (Pas de bouclier !) Majoritairement [c=vert]tireurs[/c] et un peu de [c=vert]bombardiers[/c]. Exemple : 60 000 tireurs, 15 000 bombardiers ou 70 000 tireurs, 5 000 bombardiers.\n\nLes joueurs qui envoient full troupes doivent être expulsés du rallye⚠️",
+            "en": "Put [c=rouge]the best hero from this list in 1st position[/c]; for the other 2 heroes, use heroes that are not part of this list.\n\nTo allow as many players as possible to join the rallies, send [c=rouge]A MAXIMUM OF 75,000 TROOPS[/c] (No shield!) Mainly [c=vert]shooters[/c] and a few [c=vert]bombers[/c]. Example: 60,000 shooters, 15,000 bombers or 70,000 shooters, 5,000 bombers.\n\nPlayers who send full troops must be removed from the rally ⚠️"
+          },
+          "tier": "tier-2",
+          "name": {},
+          "resources": [],
+          "tierLabel": {
+            "ja": "ラリーに参加",
+            "ar": "انضم إلى الرالي",
+            "pt": "Participar do rally",
+            "it": "Unisciti a Rally",
+            "en": "Join rally",
+            "fr": "Rejoindre ralliement"
+          },
+          "carousel": {
+            "enabled": true,
+            "images": [
+              {
+                "src": "images/caroussel/joinrally.png"
+              },
+              {
+                "src": "images/caroussel/joinrally2.png"
+              }
+            ]
+          },
+          "strips": [
+            {
+              "heroes": [
+                "lofili",
+                "lunarl",
+                "samir",
+                "tyronn",
+                "phenix",
+                "koschevoi",
+                "devilian",
+                "flamme",
+                "ekko",
+                "xuanming",
+                "veronica"
+              ],
+              "label": {
+                "pt": "⚠️Heróis a serem colocados na 1ª posição⚠️",
+                "it": "⚠️Eroe da posizionare in prima posizione⚠️",
+                "en": "⚠️Hero to be placed in first position⚠️",
+                "fr": "⚠️Héros à placer en 1ere position⚠️",
+                "ar": "⚠️أبطال يجب وضعهم في المركز الأول⚠️",
+                "ja": "⚠️1番目に配置すべきヒーロー⚠️"
+              }
+            }
+          ]
+        }
+      ],
+      "enabled": true,
+      "blocks": [
+        {
+          "style": "callout",
+          "text": {},
+          "title": {}
+        },
+        {
+          "text": {},
+          "style": "callout",
+          "title": {}
+        }
+      ]
+    },
+    {
+      "type": "troops",
+      "i18n": {
+        "ja": {
+          "label": "怒りの波",
+          "title": "怒りの波"
+        },
+        "ar": {
+          "label": "موجة غضب",
+          "title": "موجة غضب"
+        },
+        "fr": {
+          "title": "VAGUE DE COLERE",
+          "label": "Vague de colère",
+          "sub": "",
+          "desc": ""
+        },
+        "en": {
+          "title": "TURMOIL SURGE",
+          "label": "Turmoil Surge"
+        },
+        "it": {
+          "title": "ONDATA DI RABBIA",
+          "label": "Ondata di rabbia"
+        },
+        "pt": {
+          "title": "ONDA DE RAIVA",
+          "label": "Onda de raiva"
+        }
+      },
+      "enabled": true,
+      "showTable": false,
+      "cards": [
+        {
+          "tierLabel": {
+            "en": "Preparing",
+            "fr": "Préparation",
+            "pt": "Preparação",
+            "it": "Preparazione",
+            "ar": "التحضير",
+            "ja": "準備"
+          },
+          "resources": [],
+          "name": {},
+          "tier": "tier-1",
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "stats": [],
+          "desc": {
+            "fr": "- Sortir le prisonnier \"[c=vert]Etincelle[/c]\" (boost DEF) avant d'envoyer vos troupes.\n- Cocher la case \"[c=vert]Les troupes en prison ne défendent pas[/c]\".\n- Ratio pour défendre les membre : \n[c=vert]50%[/c] [b]boucliers[/b], [c=vert]20%[/c] [b]bombardiers[/b], [c=vert]30%[/c] [b]tireurs[/b]\n- Envoyer les meilleurs héros défendre les tours (Ne pas envoyer Mia ni les héros bleu).\n- [c=rouge]Une seule personne[/c] par défense sauf s'il y a moins de 150 000 troupes.\n- Défendre en priorité ceux qui ont la bannières \"[c=bleu]les troupes ne défendent pas[/c]\".\n- Défendre les membres inactifs qui sont éparpillés sur la carte.\n- Après la première attaque sur les tours, rappeler votre troupe pour la renvoyer de nouveau dans la tour pour renouveler les soldats morts au combat.\n- Ne pas soigner ses troupes pendant l'évent (réel ou légende?...)",
+            "en": "- Release the prisoner \"[c=vert]Spark[/c]\" (DEF boost) before sending your troops.\n- Check the box \"[c=vert]Troops in prison do not defend[/c]\".\n- Ratio for defending members:\n[c=vert]50%[/c] [b]shields[/b], [c=vert]20%[/c] [b]bombers[/b], [c=vert]30%[/c] [b]archers[/b]\n- Send the best heroes to defend the towers (Do not send Mia or blue heroes).\n- [c=rouge]Only one person[/c] per defense unless there are less than 150,000 troops.\n- Prioritize defending those who have the banner \"[c=bleu]troops do not defend[/c]\".\n- Defend inactive members scattered across the map.\n- After the first attack on the towers, recall your troops to send them back into the tower to renew soldiers killed in combat.\n- Do not heal your troops during the event (real or legend?...)",
+            "pt": "- Liberte o prisioneiro \"[c=vert]Centelha[/c]\" (boost DEF) antes de enviar suas tropas.\n- Marque a caixa \"[c=vert]Tropas na prisão não defendem[/c]\".\n- Proporção para defender membros:\n[c=vert]50%[/c] [b]escudos[/b], [c=vert]20%[/c] [b]bombardeiros[/b], [c=vert]30%[/c] [b]arqueiros[/b]\n- Envie os melhores heróis para defender as torres (Não envie Mia nem heróis azuis).\n- [c=rouge]Apenas uma pessoa[/c] por defesa, a menos que haja menos de 150.000 tropas.\n- Defenda em prioridade aqueles que têm o estandarte \"[c=bleu]as tropas não defendem[/c]\".\n- Defenda membros inativos espalhados pelo mapa.\n- Após o primeiro ataque às torres, recall suas tropas para reenviá-las para a torre para renovar os soldados mortos em combate.\n- Não cure suas tropas durante o evento (real ou lenda?...)",
+            "it": "- Libera il prigioniero \"[c=vert]Scintilla[/c]\" (boost DIF) prima di inviare le tue truppe.\n- Spunta la casella \"[c=vert]Le truppe in prigione non difendono[/c]\".\n- Rapporto per difendere i membri:\n[c=vert]50%[/c] [b]scudi[/b], [c=vert]20%[/c] [b]bombardieri[/b], [c=vert]30%[/c] [b]arcieri[/b]\n- Invia i migliori eroi per difendere le torri (Non inviare Mia né gli eroi blu).\n- [c=rouge]Una sola persona[/c] per difesa a meno che non ci siano meno di 150.000 truppe.\n- Difendi in priorità coloro che hanno lo stendardo \"[c=bleu]le truppe non difendono[/c]\".\n- Difendi i membri inattivi sparsi sulla mappa.\n- Dopo il primo attacco alle torri, richiama le tue truppe per rinviarle nella torre per rinnovare i soldati caduti in combattimento.\n- Non curare le tue truppe durante l'evento (reale o leggenda?...)",
+            "ar": "- حرر الأسير \"[c=vert]شرارة[/c]\" (تعزيز DEF) قبل إرسال قواتك.\n- حدد المربع \"[c=vert]القوات في السجن لا تدافع[/c]\".\n- النسبة للدفاع عن الأعضاء:\n[c=vert]50%[/c] [b]دروع[/b]، [c=vert]20%[/c] [b]قاذفات[/b]، [c=vert]30%[/c] [b]رماة[/b]\n- أرسل أفضل الأبطال للدفاع عن الأبراج (لا ترسل ميا ولا الأبطال الزرق).\n- [c=rouge]شخص واحد فقط[/c] لكل دفاع إلا إذا كان هناك أقل من 150.000 قوة.\n- دافع في الأولوية عن أولئك الذين لديهم الراية \"[c=bleu]القوات لا تدافع[/c]\".\n- دافع عن الأعضاء غير النشطين المتناثرين على الخريطة.\n- بعد الهجوم الأول على الأبراج، استدع قواتك لإرسالها مرة أخرى إلى البرج لتجديد الجنود الذين قتلوا في المعركة.\n- لا تشفِ قواتك أثناء الحدث (حقيقي أم أسطورة؟...)",
+            "ja": "- 囚人「[c=vert]スパーク[/c]」（DEF ブースト）を解放してから部隊を送出してください。\n- 「[c=vert]獄中の部隊は防御しない[/c]」のボックスをチェックしてください。\n- メンバーを防御するための比率：\n[c=vert]50%[/c] [b]シールド[/b]、[c=vert]20%[/c] [b]爆撃機[/b]、[c=vert]30%[/c] [b]射手[/b]\n- 最強のヒーローをタワー防御に派遣してください（ミアと青いヒーローは送らないこと）。\n- [c=rouge]防御ごとに1人のみ[/c]（15万以下の部隊がある場合を除く）。\n- 「[c=bleu]部隊は防御しない[/c]」のバナーを持つ者を優先的に防御してください。\n- マップに散在する非アクティブメンバーを防御してください。\n- タワーへの最初の攻撃の後、部隊をリコールしてタワーに戻し、戦闘で失われた兵士を補充してください。\n- イベント中は部隊を回復しないでください（実物か伝説か？...）"
+          },
+          "carousel": {
+            "enabled": true,
+            "images": [
+              {
+                "src": "images/caroussel/vague3.png"
+              },
+              {
+                "src": "images/caroussel/vague4.png"
+              },
+              {
+                "src": "images/caroussel/vague5.png"
+              }
+            ]
+          },
+          "strips": []
+        }
+      ],
+      "icon": "🌊",
+      "order": 4,
+      "id": "Vague de colere"
+    },
+    {
+      "id": "SVS",
+      "icon": "⭐",
+      "order": 5,
+      "cards": [
+        {
+          "carousel": {
+            "enabled": false,
+            "images": []
+          },
+          "strips": [],
+          "tierLabel": {
+            "ja": "準備段階",
+            "en": "PREPARATION PHASE",
+            "fr": "PHASE DE PRÉPARATION",
+            "pt": "FASE DE PREPARAÇÃO",
+            "it": "FASE DI PREPARAZIONE",
+            "ar": "مرحلة التحضير"
+          },
+          "resources": [
+            {
+              "label": {},
+              "items": [
+                "27.jpg",
+                "26.jpg",
+                "50.jpg",
+                "55.jpg",
+                "61.jpg",
+                "139.jpg",
+                "85.jpg",
+                "134.jpg"
+              ]
+            }
+          ],
+          "tier": "tier-2",
+          "name": {
+            "ja": "1日目 – 構築と調査",
+            "en": "DAY 1 – CONSTRUCTION & RESEARCH",
+            "fr": "JOUR 1 – CONSTRUCTION & RECHERCHE",
+            "pt": "DIA 1 – CONSTRUÇÃO E PESQUISA",
+            "it": "GIORNO 1 – REALIZZAZIONE E RICERCA",
+            "ar": "اليوم الأول – البناء والبحث"
+          },
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "stats": [
+            {
+              "tone": "good",
+              "value": {
+                "ar": "الأولوية.",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "ja": "優先順位"
+              },
+              "label": {
+                "ar": "حبيبات فورتيكلاد",
+                "en": "Forticlad cores",
+                "fr": "Noyaux Forticlad",
+                "pt": "Núcleos Forticlad",
+                "it": "Nuclei Forticlad",
+                "ja": "Forticlad コア"
+              }
+            },
+            {
+              "tone": "good",
+              "value": {
+                "ar": "ذو أولوية",
+                "pt": "Prioritário",
+                "it": "Prioritario",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "ja": "優先"
+              },
+              "label": {
+                "ja": "ハイパーアロイ",
+                "ar": "السبائك الفائقة",
+                "it": "Iperlega",
+                "pt": "Hiperliga",
+                "en": "Hyperalloy",
+                "fr": "Hyperalliage"
+              }
+            },
+            {
+              "value": {
+                "fr": "Si décret actif",
+                "en": "If active decree",
+                "it": "Se decreto attivo",
+                "pt": "Se o decreto estiver ativo",
+                "ar": "إذا كان مرسومًا نشطًا",
+                "ja": "アクティブな法令の場合"
+              },
+              "label": {
+                "ja": "建設アクセラレーター",
+                "pt": "Acelerador de construção",
+                "it": "Acceleratore di costruzione",
+                "fr": "Accélérateur de construction",
+                "en": "Construction accelerator",
+                "ar": "مسرع البناء"
+              },
+              "tone": "warn"
+            },
+            {
+              "value": {
+                "ja": "アクティブな法令の場合",
+                "en": "If active decree",
+                "fr": "Si décret actif",
+                "it": "Se decreto attivo",
+                "pt": "Se o decreto estiver ativo",
+                "ar": "إذا كان مرسومًا نشطًا"
+              },
+              "label": {
+                "fr": "Accélérateur de  recherche",
+                "en": "Search Accelerator",
+                "pt": "Acelerador de  pesquisa",
+                "it": "Acceleratore di  ricerca",
+                "ar": "مسرع البحث",
+                "ja": "検索アクセラレーター"
+              },
+              "tone": "warn"
+            },
+            {
+              "tone": "bad",
+              "label": {
+                "ja": "ドライブスロットル",
+                "ar": "دواسة الوقود",
+                "pt": "Acelerador de acionamento",
+                "it": "Acceleratore di azionamento",
+                "fr": "Accélérateur d'entraînement",
+                "en": "Drive Throttle"
+              },
+              "value": {
+                "ja": "4日目を待つ",
+                "pt": "Aguarde o dia 4",
+                "it": "Attendere Giorno 4",
+                "en": "Wait Day 4",
+                "fr": "Attendre Jour 4",
+                "ar": "انتظر اليوم الرابع"
+              }
+            },
+            {
+              "tone": "",
+              "label": {
+                "ja": "トメ",
+                "fr": "Tome",
+                "en": "TOME",
+                "it": "Tome",
+                "pt": "Tomo",
+                "ar": "المجلد"
+              },
+              "value": {
+                "pt": "Se forem necessários pontos",
+                "it": "Se sono necessari punti",
+                "fr": "Si points nécessaires",
+                "en": "If points are needed",
+                "ar": "إذا كانت النقاط مطلوبة",
+                "ja": "ポイントが必要な場合"
+              }
+            },
+            {
+              "value": {
+                "ja": "優先順位",
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "ar": "الأولوية."
+              },
+              "label": {
+                "ja": "衛星",
+                "fr": "Satellites",
+                "en": "Satellites",
+                "it": "Satellit i",
+                "pt": "Satélites",
+                "ar": "قمر اصتناعي عرض"
+              },
+              "tone": "good"
+            },
+            {
+              "label": {
+                "ja": "軌道/コズミックコア",
+                "pt": "Núcleo Orbital/Cósmico",
+                "it": "Nucleo orbitale/cosmico",
+                "fr": "Noyau orbital/cosmique",
+                "en": "Orbital/Cosmic Core",
+                "ar": "النواة المدارية/الكونية"
+              },
+              "value": {
+                "ar": "الأولوية.",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "ja": "優先順位"
+              },
+              "tone": "good"
+            }
+          ],
+          "desc": {
+            "pt": "Prioridade: Forticlad e pesquisa",
+            "it": "Priorità: Forticlad e ricerca",
+            "fr": "Priorité : Forticlad et recherche",
+            "en": "Priority: Forticlad and research",
+            "ar": "الأولوية: «فورتيكلاد» والبحث العلمي",
+            "ja": "優先事項：フォルティクラッドと研究"
+          }
+        },
+        {
+          "strips": [],
+          "carousel": {
+            "enabled": false,
+            "images": []
+          },
+          "name": {
+            "ja": "2日目–収穫",
+            "ar": "اليوم الثاني – الحصاد",
+            "en": "DAY 2 – HARVEST",
+            "fr": "JOUR 2 – RÉCOLTES",
+            "pt": "DIA 2 – COLHEITA",
+            "it": "GIORNO 2 – RACCOLTI"
+          },
+          "tier": "tier-2",
+          "stats": [
+            {
+              "tone": "good",
+              "value": {
+                "ar": "الأولوية.",
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "ja": "優先順位"
+              },
+              "label": {
+                "ar": "جمع الموارد",
+                "it": "Raccolta risorse",
+                "pt": "Recolha de Recursos",
+                "en": "Resource Gathering",
+                "fr": "Collecte de ressources",
+                "ja": "資源収集"
+              }
+            },
+            {
+              "label": {
+                "ja": "援軍タワー",
+                "ar": "برج التسليح",
+                "pt": "Torre de reforço",
+                "it": "Torre di rinforzo",
+                "en": "Reinforcement tower",
+                "fr": "Tour de renforcement"
+              },
+              "value": {
+                "ja": "優先順位",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "ar": "الأولوية."
+              },
+              "tone": "good"
+            },
+            {
+              "value": {
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "ar": "الأولوية.",
+                "ja": "優先順位"
+              },
+              "label": {
+                "ar": "استهلاك شظايا الأبطال (نادرة / ملحمية / أسطورية)",
+                "pt": "Consumir Fragmentos de Herói (Raro / Épico / Lendário)",
+                "it": "Consumare Frammenti di Eroe (Raro / Epico / Leggendario)",
+                "en": "Consume Hero Shards (Rare / Epic / Legendary)",
+                "fr": "Consommer des Éclats de héros (Rare / Épique / Légendaire)",
+                "ja": "ヒーローのかけらを消費する（レア/エピック/レジェンド）"
+              },
+              "tone": "good"
+            },
+            {
+              "tone": "good",
+              "value": {
+                "ja": "優先順位",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "ar": "الأولوية."
+              },
+              "label": {
+                "fr": "Noyaux Forticlad",
+                "en": "Forticlad cores",
+                "pt": "Núcleos Forticlad",
+                "it": "Nuclei Forticlad",
+                "ar": "نوى فورتيكلاد",
+                "ja": "フォルティクラッドコア"
+              }
+            },
+            {
+              "tone": "good",
+              "value": {
+                "ja": "優先順位",
+                "ar": "الأولوية.",
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "it": "Prioritario",
+                "pt": "Prioridade"
+              },
+              "label": {
+                "ja": "ハイパーアロイ",
+                "en": "Hyperalloy",
+                "fr": "Hyperalliage",
+                "it": "Iperallega",
+                "pt": "Hiperliga",
+                "ar": "Hyperalloy"
+              }
+            },
+            {
+              "tone": "warn",
+              "label": {
+                "fr": "Accélérateur de construction",
+                "en": "Construction accelerator",
+                "pt": "Acelerador de construção",
+                "it": "Acceleratore di costruzione",
+                "ar": "مسرع البناء",
+                "ja": "建設アクセラレーター"
+              },
+              "value": {
+                "ja": "アクティブな法令の場合",
+                "pt": "Se o decreto estiver ativo",
+                "it": "Se decreto attivo",
+                "fr": "Si décret actif",
+                "en": "If active decree",
+                "ar": "إذا كان مرسومًا نشطًا"
+              }
+            },
+            {
+              "value": {
+                "ja": "アクティブな法令の場合",
+                "it": "Se decreto attivo",
+                "pt": "Se o decreto estiver ativo",
+                "fr": "Si décret actif",
+                "en": "If active decree",
+                "ar": "إذا كان مرسومًا نشطًا"
+              },
+              "label": {
+                "ar": "مسرع البحث",
+                "pt": "Acelerador de pesquisa",
+                "it": "Acceleratore di ricerca",
+                "en": "Search Accelerator",
+                "fr": "Accélérateur de recherche",
+                "ja": "検索アクセラレーター"
+              },
+              "tone": "warn"
+            },
+            {
+              "label": {
+                "ar": "دواسة الوقود",
+                "pt": "Acelerador de acionamento",
+                "it": "Acceleratore di azionamento",
+                "fr": "Accélérateur d'entraînement",
+                "en": "Drive Throttle",
+                "ja": "ドライブスロットル"
+              },
+              "value": {
+                "fr": "Attendre Jour 4",
+                "en": "Wait Day 4",
+                "it": "Attendere Giorno 4",
+                "pt": "Aguarde o dia 4",
+                "ar": "انتظر اليوم الرابع",
+                "ja": "4日目を待つ"
+              },
+              "tone": "bad"
+            }
+          ],
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "desc": {
+            "ja": "優先度：資源獲得-増援要請タワー",
+            "fr": "Priorité : collecte de ressources - tour de renforcement ",
+            "en": "Priority: Resource Raising - Reinforcement Tower",
+            "it": "Priorità: raccolta risorse - torre di rinforzo",
+            "pt": "Prioridade: Captação de Recursos - Torre de Reforço",
+            "ar": "الأولوية: جمع الموارد - برج التعزيز"
+          },
+          "tierLabel": {
+            "ja": "準備フェーズ",
+            "pt": "FASE DE PREPARAÇÃO",
+            "it": "tempo di partenza",
+            "fr": "PHASE DE PRÉPARATION",
+            "en": "PREPARATION PHASE",
+            "ar": "مرحلة الإعداد"
+          },
+          "resources": [
+            {
+              "items": [
+                "27.jpg",
+                "26.jpg",
+                "50.jpg",
+                "55.jpg",
+                "61.jpg",
+                "84.jpg",
+                "87.jpg",
+                "114.jpg"
+              ],
+              "label": {}
+            }
+          ]
+        },
+        {
+          "carousel": {
+            "enabled": false,
+            "images": []
+          },
+          "strips": [],
+          "tierLabel": {
+            "ja": "準備フェーズ",
+            "pt": "FASE DE PREPARAÇÃO",
+            "it": "tempo di partenza",
+            "fr": "PHASE DE PRÉPARATION",
+            "en": "PREPARATION PHASE",
+            "ar": "مرحلة الإعداد"
+          },
+          "resources": [
+            {
+              "items": [
+                "139.jpg",
+                "114.jpg",
+                "84.jpg",
+                "87.jpg",
+                "7.jpg",
+                "76.jpg",
+                "77.jpg",
+                "8.jpg",
+                "9.jpg"
+              ],
+              "label": {}
+            }
+          ],
+          "tier": "tier-2",
+          "name": {
+            "ja": "3日目–モジュールとPVE",
+            "ar": "اليوم الثالث – الوحدات النمطية ومكافحة التطرف العنيف",
+            "en": "DAY 3 – MODULES & PVE",
+            "fr": "JOUR 3 – MODULES & PVE",
+            "it": "GIORNO 3 – MODULI & PVE",
+            "pt": "DIA 3 – MÓDULOS E PVE"
+          },
+          "desc": {
+            "ar": "الأولوية:  حشد الوحوش والهاربين",
+            "it": "Priorità:  Raduno di bestie e fuggitivi",
+            "pt": "Prioridade:  Reunir bestas e fugitivos",
+            "en": "Priority:  Rallying beasts and fugitives",
+            "fr": "Priorité :  Ralliement bêtes et fugitifs",
+            "ja": "優先度：野獣と逃亡者の結集"
+          },
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "stats": [
+            {
+              "tone": "good",
+              "label": {
+                "ar": "برج التسليح",
+                "fr": "Tour de renforcement",
+                "en": "Reinforcement tower",
+                "it": "Torre di rinforzo",
+                "pt": "Torre de reforço",
+                "ja": "援軍タワー"
+              },
+              "value": {
+                "ja": "優先順位",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "ar": "الأولوية."
+              }
+            },
+            {
+              "tone": "good",
+              "value": {
+                "ja": "優先順位",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "ar": "الأولوية."
+              },
+              "label": {
+                "ja": "野獣と逃亡者の結集",
+                "ar": "حشد الوحوش والهاربين",
+                "pt": "Reunindo feras e fugitivos",
+                "it": "Raduno di bestie e fuggitivi",
+                "fr": "Ralliement bêtes et fugitifs",
+                "en": "Rallying beasts and fugitives"
+              }
+            },
+            {
+              "tone": "good",
+              "value": {
+                "ar": "الأولوية.",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "ja": "優先順位"
+              },
+              "label": {
+                "ar": "فتح صناديق الوحدات",
+                "it": "APERTURA dei cassonetti del modulo",
+                "pt": "ABERTURA dos baús do módulo",
+                "fr": "OUVERTURE des coffres de module",
+                "en": "OPENING module chests",
+                "ja": "モジュールコンテナを開く"
+              }
+            },
+            {
+              "label": {
+                "it": "Modulo di potenza",
+                "pt": "Módulo de alimentação",
+                "fr": "Module de puissance",
+                "en": "Power module",
+                "ar": "وحدة الطاقة",
+                "ja": "電源モジュール"
+              },
+              "value": {
+                "ja": "優先順位",
+                "ar": "الأولوية.",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "en": "Priority",
+                "fr": "Prioritaire"
+              },
+              "tone": "good"
+            },
+            {
+              "label": {
+                "ja": "ヒーローのかけらを消費する（レア/エピック/レジェンド）",
+                "ar": "استهلاك شظايا الأبطال (نادرة / ملحمية / أسطورية)",
+                "pt": "Consumir Fragmentos de Herói (Raro / Épico / Lendário)",
+                "it": "Consumare Frammenti di Eroe (Raro / Epico / Leggendario)",
+                "en": "Consume Hero Shards (Rare / Epic / Legendary)",
+                "fr": "Consommer des Éclats de héros (Rare / Épique / Légendaire)"
+              },
+              "value": {
+                "ja": "優先順位",
+                "ar": "الأولوية.",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "pt": "Prioridade",
+                "it": "Prioritario"
+              },
+              "tone": "good"
+            },
+            {
+              "value": {
+                "en": "Points Needed",
+                "fr": "Si points nécessaires",
+                "pt": "Se pontos forem necessários",
+                "it": "Se punti necessari",
+                "ar": "إذا كانت هناك حاجة للنقاط",
+                "ja": "ポイントが必要な場合"
+              },
+              "label": {
+                "en": "TOME",
+                "fr": "Tome",
+                "pt": "Tomo",
+                "it": "Tome",
+                "ar": "المجلد",
+                "ja": "トメ"
+              },
+              "tone": ""
+            }
+          ]
+        },
+        {
+          "carousel": {
+            "images": [],
+            "enabled": false
+          },
+          "strips": [],
+          "resources": [
+            {
+              "label": {},
+              "items": [
+                "139.jpg",
+                "118.jpg",
+                "119.jpg",
+                "120.jpg",
+                "58.jpg",
+                "85.jpg",
+                "134.jpg",
+                "6.jpg",
+                "3.jpg",
+                "4.jpg",
+                "5.jpg"
+              ]
+            }
+          ],
+          "tierLabel": {
+            "ja": "準備フェーズ",
+            "ar": "مرحلة الإعداد",
+            "fr": "PHASE DE PRÉPARATION",
+            "en": "PREPARATION PHASE",
+            "it": "tempo di partenza",
+            "pt": "FASE DE PREPARAÇÃO"
+          },
+          "desc": {
+            "ja": "優先事項：軍隊の訓練\n\n[c=or]部隊を最適に訓練するために：[/c]\n- 訓練速度ブーストの囚人を散歩に出す\n- 防衛長官の役職に申請する\n- 順番を待つ [c=rouge]（注意：役職の有効時間は10分間のみです！）[/c]\n- 2時間の訓練ブーストを有効化する\n- ディレクター命令「鼓舞演説」（訓練ブースト）\n- 加速アイテムを使用して、できるだけ多くの部隊を訓練する",
+            "ar": "الأولوية: تدريب القوات العسكرية\n\n[c=or]للحصول على تدريب مثالي للقوات:[/c]\n- ضع السجين الذي يمنح زيادة سرعة التدريب في نزهة\n- تقدّم لمنصب رئيس الدفاع\n- انتظر دورك [c=rouge](انتباه: المنصب صالح لمدة 10 دقائق فقط!)[/c]\n- فعّل تعزيز التدريب لمدة ساعتين\n- أمر المدير: \"الخطاب التحفيزي\" (تعزيز التدريب)\n- درّب أكبر عدد ممكن من القوات باستخدام المسرّعات",
+            "it": "Priorità: Addestramento delle truppe militari\n\n[c=or]Per un addestramento ottimale delle truppe:[/c]\n- Mettere in passeggiata il prigioniero con il bonus velocità di addestramento\n- Candidarsi per la posizione di Capo della Difesa\n- Attendere il proprio turno [c=rouge](Attenzione: la posizione è valida solo per 10 minuti!)[/c]\n- Attivare il bonus addestramento di 2 ore\n- Ordine del Direttore: \"Discorso motivazionale\" (Bonus addestramento)\n- Addestrare il maggior numero possibile di truppe utilizzando gli acceleratori",
+            "pt": "Prioridade: Treinamento de tropas militares\n\n[c=or]Para um treinamento de tropas ideal:[/c]\n- Coloque o prisioneiro de bônus de velocidade de treinamento para passear\n- Candidate-se ao cargo de Chefe da Defesa\n- Aguarde sua vez [c=rouge](Atenção: o cargo é válido por apenas 10 minutos!)[/c]\n- Ative o bônus de treinamento de 2 horas\n- Ordem do Diretor: \"Discurso Motivador\" (Bônus de treinamento)\n- Treine o máximo de tropas possível utilizando aceleradores",
+            "fr": "Priorité : Entraînement troupes militaires\n\n[c=or]Pour un entrainement de troupes optimal :[/c]\n- Mettre le prisonnier de boost vitesse d'entrainement en promenade\n- Postuler au poste chef de la défense\n- Attendre son tour [c=rouge](Attention poste valide pendant 10min !) [/c]\n- Activer boost d'entrainement 2h\n- Ordre du directeur \"discours galvanisant\" (Boost d'entrainement)\n- Entrainer le plus de troupes possible en utilisant les accélérateurs",
+            "en": "Priority: Military troop training\n\n[c=or]For optimal troop training:[/c]\n- Put the training speed boost prisoner on a walk\n- Apply for the Defense Chief position\n- Wait for your turn [c=rouge](Warning: the position is only valid for 10 minutes!)[/c]\n- Activate the 2-hour training boost\n- Director's Order: \"Galvanizing Speech\" (Training boost)\n- Train as many troops as possible using speedups"
+          },
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "stats": [
+            {
+              "label": {
+                "fr": "Entrainement des troupes",
+                "en": "Troop training",
+                "it": "Addestramento truppe",
+                "pt": "Treinamento DE tropa",
+                "ar": "تدريب القوات",
+                "ja": "兵士の訓練"
+              },
+              "value": {
+                "ja": "優先順位",
+                "ar": "الأولوية.",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "fr": "Prioritaire",
+                "en": "Priority"
+              },
+              "tone": "good"
+            },
+            {
+              "label": {
+                "ja": "装備のアップグレード",
+                "fr": "Amélioration des équipements",
+                "en": "Equipment Upgrades",
+                "it": "Miglioramento delle attrezzature",
+                "pt": "Atualizações de Equipamentos",
+                "ar": "ترقيات المعدات"
+              },
+              "value": {
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "ar": "الأولوية.",
+                "ja": "優先順位"
+              },
+              "tone": "good"
+            },
+            {
+              "value": {
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "ar": "الأولوية.",
+                "ja": "優先順位"
+              },
+              "label": {
+                "ja": "限定装備アップグレード",
+                "pt": "Atualização Exclusiva de Equipamentos",
+                "it": "Miglioramento attrezzatura esclusiva",
+                "fr": "Amélioration équipement exclusif",
+                "en": "Exclusive Equipment Upgrade",
+                "ar": "ترقية حصرية للمعدات"
+              },
+              "tone": "good"
+            },
+            {
+              "value": {
+                "ar": "إذا لزم الأمر",
+                "pt": "Se necessário",
+                "it": "Se necessario",
+                "fr": "Si point nécessaire",
+                "en": "If necessary",
+                "ja": "必要に応じて"
+              },
+              "label": {
+                "ja": "トメ",
+                "en": "TOME",
+                "fr": "Tome",
+                "it": "Tome",
+                "pt": "Tomo",
+                "ar": "المجلد"
+              },
+              "tone": ""
+            },
+            {
+              "label": {
+                "ja": "サテライト",
+                "en": "Satellite",
+                "fr": "Satelite",
+                "it": "Satelite",
+                "pt": "Satélite",
+                "ar": "قمر صناعي"
+              },
+              "value": {
+                "ja": "優先順位",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "ar": "الأولوية."
+              },
+              "tone": "good"
+            },
+            {
+              "value": {
+                "ar": "الأولوية.",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "ja": "優先順位"
+              },
+              "label": {
+                "ja": "軌道/コズミックコア",
+                "it": "Nucleo orbitale/cosmico",
+                "pt": "Núcleo Orbital/Cósmico",
+                "fr": "Noyau orbital/cosmique",
+                "en": "Orbital/Cosmic Core",
+                "ar": "النواة المدارية/الكونية"
+              },
+              "tone": "good"
+            }
+          ],
+          "tier": "tier-2",
+          "name": {
+            "ja": "4日目：装備と軍隊",
+            "it": "GIORNO 4 – EQUIPAGGIAMENTO & ESERCITO",
+            "pt": "DIA 4 – EQUIPAMENTO E EXÉRCITO",
+            "fr": "JOUR 4 – ÉQUIPEMENT & ARMÉE",
+            "en": "DAY 4 – EQUIPMENT & ARMY",
+            "ar": "اليوم الرابع – المعدات والجيش"
+          }
+        },
+        {
+          "resources": [
+            {
+              "label": {},
+              "items": [
+                "26.jpg",
+                "27.jpg",
+                "118.jpg",
+                "119.jpg",
+                "120.jpg",
+                "7.jpg",
+                "76.jpg",
+                "77.jpg",
+                "8.jpg",
+                "9.jpg",
+                "58.jpg",
+                "50.jpg",
+                "55.jpg",
+                "61.jpg",
+                "138.jpg",
+                "6.jpg",
+                "3.jpg",
+                "4.jpg",
+                "5.jpg"
+              ]
+            }
+          ],
+          "tierLabel": {
+            "fr": "PHASE DE PRÉPARATION",
+            "en": "PREPARATION PHASE",
+            "pt": "FASE DE PREPARAÇÃO",
+            "it": "tempo di partenza",
+            "ar": "مرحلة الإعداد",
+            "ja": "準備フェーズ"
+          },
+          "desc": {
+            "ja": "目標：キャッチアップと最適化",
+            "ar": "الأهداف: اللحاق بالركب والتحسين",
+            "it": "Obiettivi: Recupero e ottimizzazione",
+            "pt": "Objetivos: Atualização e otimização",
+            "en": "Objectives: Catch-up and optimization",
+            "fr": "Objectifs : Rattrapage et optimisation"
+          },
+          "stats": [
+            {
+              "label": {
+                "ja": "フォルティクラッドコア",
+                "ar": "نوى فورتيكلاد",
+                "pt": "Núcleos Forticlad",
+                "it": "Nuclei Forticlad",
+                "en": "Forticlad cores",
+                "fr": "Noyaux Forticlad"
+              },
+              "value": {
+                "ar": "الأولوية.",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "ja": "優先順位"
+              },
+              "tone": "good"
+            },
+            {
+              "tone": "good",
+              "label": {
+                "ja": "ハイパーアロイ",
+                "ar": "Hyperalloy",
+                "pt": "Hiperliga",
+                "it": "Iperallega",
+                "fr": "Hyperalliage",
+                "en": "Hyperalloy"
+              },
+              "value": {
+                "ja": "優先順位",
+                "ar": "الأولوية.",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "fr": "Prioritaire",
+                "en": "Priority"
+              }
+            },
+            {
+              "label": {
+                "pt": "Acelerador de construção",
+                "it": "Acceleratore di costruzione",
+                "en": "Construction accelerator",
+                "fr": "Accélérateur de construction",
+                "ar": "مسرع البناء",
+                "ja": "建設アクセラレーター"
+              },
+              "value": {
+                "ja": "優先順位",
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "ar": "الأولوية."
+              },
+              "tone": "good"
+            },
+            {
+              "value": {
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "ar": "الأولوية.",
+                "ja": "優先順位"
+              },
+              "label": {
+                "ar": "مسرع البحث",
+                "pt": "Acelerador de pesquisa",
+                "it": "Acceleratore di ricerca",
+                "fr": "Accélérateur de recherche",
+                "en": "Search Accelerator",
+                "ja": "検索アクセラレーター"
+              },
+              "tone": "good"
+            },
+            {
+              "value": {
+                "en": "Priority",
+                "fr": "Prioritaire",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "ar": "الأولوية.",
+                "ja": "優先順位"
+              },
+              "label": {
+                "fr": "Accélérateur d'entrainement",
+                "en": "Training accelerator",
+                "pt": "Acelerador de treinamento",
+                "it": "Acceleratore di allenamento",
+                "ar": "مسرع التدريب",
+                "ja": "トレーニングアクセラレーター"
+              },
+              "tone": "good"
+            },
+            {
+              "label": {
+                "ar": "ترقيات المعدات",
+                "en": "Equipment Upgrades",
+                "fr": "Amélioration des équipements",
+                "it": "Miglioramento delle attrezzature",
+                "pt": "Atualizações de Equipamentos",
+                "ja": "装備のアップグレード"
+              },
+              "value": {
+                "ja": "優先順位",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "ar": "الأولوية."
+              },
+              "tone": "good"
+            },
+            {
+              "label": {
+                "ar": "ترقية حصرية للمعدات",
+                "pt": "Atualização Exclusiva de Equipamentos",
+                "it": "Miglioramento attrezzatura esclusiva",
+                "fr": "Amélioration équipement exclusif",
+                "en": "Exclusive Equipment Upgrade",
+                "ja": "限定装備アップグレード"
+              },
+              "value": {
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "ar": "الأولوية.",
+                "ja": "優先順位"
+              },
+              "tone": "good"
+            },
+            {
+              "tone": "good",
+              "value": {
+                "ja": "優先順位",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "ar": "الأولوية."
+              },
+              "label": {
+                "ja": "モジュールコンテナを開く",
+                "it": "APERTURA dei cassonetti del modulo",
+                "pt": "ABERTURA dos baús do módulo",
+                "fr": "OUVERTURE des coffres de module",
+                "en": "OPENING module chests",
+                "ar": "فتح صناديق الوحدات"
+              }
+            },
+            {
+              "value": {
+                "ar": "الأولوية.",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "it": "Prioritario",
+                "pt": "Prioridade",
+                "ja": "優先順位"
+              },
+              "label": {
+                "fr": "Module de puissance",
+                "en": "Power module",
+                "pt": "Módulo de alimentação",
+                "it": "Modulo di potenza",
+                "ar": "وحدة الطاقة",
+                "ja": "電源モジュール"
+              },
+              "tone": "good"
+            },
+            {
+              "value": {
+                "pt": "Prioridade",
+                "it": "Prioritario",
+                "fr": "Prioritaire",
+                "en": "Priority",
+                "ar": "الأولوية.",
+                "ja": "優先順位"
+              },
+              "label": {
+                "ja": "コレクションの改善",
+                "en": "Collection improvement",
+                "fr": "Amélioration collection",
+                "it": "Miglioramento collezione",
+                "pt": "Melhoria da coleção",
+                "ar": "تحسين التحصيل"
+              },
+              "tone": "good"
+            }
+          ],
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "name": {
+            "fr": "JOUR 5 – SPRINT FINAL",
+            "en": "DAY 5 – FINAL SPRINT",
+            "it": "GIORNO 5 – SPRINT FINALE",
+            "pt": "DIA 5 – SPRINT FINAL",
+            "ar": "اليوم الخامس – السباق النهائي",
+            "ja": "5日目–最終スプリント"
+          },
+          "tier": "tier-2",
+          "carousel": {
+            "images": [],
+            "enabled": false
+          },
+          "strips": []
+        }
+      ],
+      "blocks": [
+        {
+          "text": {},
+          "style": "callout",
+          "title": {}
+        }
+      ],
+      "enabled": true,
+      "showTable": false,
+      "type": "troops",
+      "i18n": {
+        "fr": {
+          "desc": "",
+          "title": "SVS",
+          "sub": "",
+          "label": "SVS"
+        }
+      }
+    },
+    {
+      "cards": [
+        {
+          "strips": [],
+          "carousel": {
+            "images": [],
+            "enabled": false
+          },
+          "stats": [],
+          "layout": [
+            "strips",
+            "resources",
+            "desc",
+            "stats",
+            "carousel"
+          ],
+          "desc": {
+            "fr": "Avant d'utiliser les accélérateurs :\n- Privilégier leur utilisation pendant la [c=or]phase de préparation SVS[/c].\n- S'assurer d'avoir le [c=vert]prisonnier[/c] correspondant en promenade.\n- Demander le privilège \"[c=vert]Chef de la justice[/c]\".",
+            "en": "Before using accelerators:\n- Prioritize their use during the [c=or]SVS preparation phase[/c].\n- Make sure you have the corresponding [c=vert]prisoner[/c] on walkabout.\n- Request the \"[c=vert]Chief of Justice[/c]\" privilege.",
+            "it": "Prima di utilizzare gli acceleratori:\n- Privilegiare il loro utilizzo durante la [c=or]fase di preparazione SVS[/c].\n- Assicurarsi di avere il [c=vert]prigioniero[/c] corrispondente in passeggiata.\n- Richiedere il privilegio \"[c=vert]Capo della giustizia[/c]\".",
+            "pt": "Antes de usar os aceleradores:\n- Priorize seu uso durante a [c=or]fase de preparação SVS[/c].\n- Certifique-se de ter o [c=vert]prisioneiro[/c] correspondente em passeio.\n- Solicite o privilégio \"[c=vert]Chefe da Justiça[/c]\".",
+            "ar": "قبل استخدام المسرعات:\n- امنح الأولوية لاستخدامها أثناء [c=or]مرحلة إعداد SVS[/c].\n- تأكد من وجود [c=vert]السجين[/c] المقابل في النزهة.\n- اطلب امتياز \"[c=vert]رئيس العدل[/c]\".",
+            "ja": "アクセレーターを使用する前に:\n- [c=or]SVS準備フェーズ[/c]の間の使用を優先します。\n- 対応する[c=vert]囚人[/c]が散歩中であることを確認してください。\n- \"[c=vert]司法長官[/c]\"の権限をリクエストしてください。"
+          },
+          "tier": "tier-gold",
+          "name": {
+            "fr": "Utilisation des accélération "
+          },
+          "resources": [],
+          "tierLabel": {
+            "fr": "Développement "
+          }
+        }
+      ],
+      "id": "Astuces",
+      "icon": "⭐",
+      "order": 1,
+      "enabled": true,
+      "showTable": false,
+      "i18n": {
+        "fr": {
+          "title": "ASTUCES",
+          "label": "Astuces",
+          "sub": "",
+          "desc": ""
+        },
+        "en": {
+          "label": "Tips",
+          "title": "TIPS"
+        },
+        "it": {
+          "label": "Suggerimenti",
+          "title": "SUGGERIMENTI"
+        },
+        "pt": {
+          "label": "Dicas",
+          "title": "DICAS"
+        },
+        "ar": {
+          "label": "نصائح",
+          "title": "نصائح"
+        },
+        "ja": {
+          "label": "ヒント",
+          "title": "ヒント"
+        }
+      },
+      "type": "troops"
+    }
+  ],
+  "heroNames": {
+    "ito": "ITO",
+    "marcus": "Marcus",
+    "tyronn": "Tyronn",
+    "zoltan": "Zoltan",
+    "vivian": "Vivian",
+    "pasino": "Pasino",
+    "edwin": "Edwin",
+    "flora": "Flora",
+    "lunarl": "Lunarl",
+    "alph": "Alph",
+    "durga": "Durga",
+    "veronica": "Veronica",
+    "tormund": "Tormund",
+    "samir": "Samir",
+    "harton": "Harton",
+    "aiksen": "Aiksen",
+    "lofili": "Lofili",
+    "mireya": "Mireya",
+    "flamme": "Flamme",
+    "whisper": "Whisper",
+    "gerd": "Gerd",
+    "cesar": "Cesar",
+    "inata": "Inata",
+    "drake": "Drake",
+    "lee": "Lee",
+    "devilian": "Devilian",
+    "vesaryon": "Vesaryon",
+    "gimes": "Gimes",
+    "sumo": "Sumo",
+    "phenix": "Phenix",
+    "platos": "Platos",
+    "ekko": "Ekko",
+    "terry": "Terry",
+    "mia": "Mia",
+    "xuanming": "Xuanming",
+    "sawyer": "Sawyer",
+    "koschevoi": "Koschevoi",
+    "ada": "Ada",
+    "lanchester": "Lanchester"
+  },
+  "heroFiles": {
+    "durga": "durga.jpg",
+    "veronica": "veronica.jpg",
+    "tormund": "tormund.jpg",
+    "harton": "harton.jpg",
+    "samir": "samir.jpg",
+    "marcus": "marcus.jpg",
+    "ito": "ito.jpg",
+    "tyronn": "tyronn.jpg",
+    "edwin": "edwin.jpg",
+    "pasino": "pasino.jpg",
+    "vivian": "vivian.jpg",
+    "zoltan": "zoltan.jpg",
+    "alph": "alph.jpg",
+    "flora": "flora.jpg",
+    "lunarl": "lunarl.jpg",
+    "ekko": "ekko.jpg",
+    "gimes": "gimes.jpg",
+    "platos": "platos.jpg",
+    "phenix": "phenix.jpg",
+    "sumo": "sumo.jpg",
+    "xuanming": "xuanming.jpg",
+    "mia": "mia.jpg",
+    "terry": "terry.jpg",
+    "sawyer": "sawyer.jpg",
+    "lanchester": "lanchester.jpg",
+    "ada": "ada.jpg",
+    "koschevoi": "koschevoi.jpg",
+    "lofili": "lofili.jpg",
+    "aiksen": "aiksen.jpg",
+    "inata": "inata.jpg",
+    "cesar": "cesar.jpg",
+    "gerd": "gerd.jpg",
+    "whisper": "whisper.jpg",
+    "flamme": "flamme.jpg",
+    "mireya": "mireya.jpg",
+    "drake": "drake.jpg",
+    "vesaryon": "vesaryon.jpg",
+    "devilian": "devilian.jpg",
+    "lee": "lee.jpg"
+  },
+  "heroGroups": {
+    "backline": [
+      "drake",
+      "mireya",
+      "sawyer",
+      "inata",
+      "ito",
+      "koschevoi",
+      "vivian",
+      "veronica",
+      "lee",
+      "ada",
+      "edwin",
+      "devilian"
+    ],
+    "frontline": [
+      "marcus",
+      "tyronn",
+      "phenix",
+      "koschevoi",
+      "tormund",
+      "xuanming",
+      "cesar",
+      "ito",
+      "lanchester",
+      "zoltan",
+      "whisper",
+      "vivian",
+      "gerd"
+    ],
+    "gatherers": [
+      "aiksen",
+      "durga",
+      "harton",
+      "pasino"
+    ]
+  }
+}

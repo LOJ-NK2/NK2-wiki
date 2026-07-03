@@ -991,13 +991,14 @@
   }
 
   // Ordre par défaut des blocs (doit refléter CARD_LAYOUT_DEFAULT côté index.html)
-  const CARD_LAYOUT_DEFAULT = ['strips', 'resources', 'desc', 'stats', 'carousel'];
+  const CARD_LAYOUT_DEFAULT = ['strips', 'resources', 'desc', 'stats', 'carousel', 'video'];
   const CARD_BLOCK_LABELS = {
     strips: 'Bandes de héros',
     resources: 'Bandes de ressources',
     desc: 'Description',
     stats: 'Statistiques',
-    carousel: 'Carrousel'
+    carousel: 'Carrousel',
+    video: 'Vidéo YouTube'
   };
 
   function ensureTroopsCards(tab) {
@@ -1006,6 +1007,10 @@
     tab.cards.forEach(c => {
       if (!c.carousel || typeof c.carousel !== 'object') c.carousel = { enabled: false, images: [] };
       if (!Array.isArray(c.carousel.images)) c.carousel.images = [];
+      if (!c.video || typeof c.video !== 'object') c.video = { enabled: false, url: {} };
+      // Migration : ancien format (une seule URL pour toutes les langues) -> objet par langue.
+      if (typeof c.video.url === 'string') c.video.url = c.video.url ? { fr: c.video.url } : {};
+      else if (!c.video.url || typeof c.video.url !== 'object') c.video.url = {};
       if (!Array.isArray(c.strips)) c.strips = [];
       if (!Array.isArray(c.resources)) c.resources = [];
       if (!Array.isArray(c.stats)) c.stats = [];
@@ -1133,6 +1138,13 @@
             <button class="small carousel-add">+ Ajouter une image</button>
           </div>
 
+          <div class="section-label" style="margin-top:14px;">Vidéo YouTube (bas de carte)</div>
+          <div class="checkbox-row">
+            <input type="checkbox" class="f-video-enabled" id="video-${cuid}" ${c.video && c.video.enabled ? 'checked' : ''}/>
+            <label for="video-${cuid}">Activer une vidéo YouTube</label>
+          </div>
+          ${c.video && c.video.enabled ? `<div class="help-text">Renseignez le lien YouTube pour chaque langue ci-dessous, dans l'onglet « Textes ». Si une langue n'a pas de lien, la version française est utilisée à sa place. Une vignette cliquable s'affiche sur le site ; la vidéo ne se charge qu'au clic.</div>` : ''}
+
           <div class="section-label" style="margin-top:14px;">Textes (par langue)</div>
           ${langTabsHtml(cuid)}
           ${LANGS.map((l, i) => `
@@ -1168,6 +1180,10 @@
                 <label>Valeur stat ${stidx + 1} (${l.code.toUpperCase()})</label>
                 <input type="text" class="f-stat-value" data-stidx="${stidx}" data-key="statv${stidx}" data-lang="${l.code}" value="${escapeHtml((st.value && st.value[l.code]) || '')}"/>
               `).join('')}
+              ${c.video && c.video.enabled ? `
+                <label>Lien vidéo YouTube (${l.code.toUpperCase()})</label>
+                <input type="text" class="f-video-url no-translate" data-lang="${l.code}" value="${escapeHtml((c.video.url && c.video.url[l.code]) || '')}" placeholder="https://www.youtube.com/watch?v=..."/>
+              ` : ''}
             </div>
           `).join('')}
         </div>
@@ -1301,6 +1317,17 @@
         c.carousel.images.push({ src: '' }); reexpand();
       });
 
+      // Vidéo YouTube — un lien par langue, comme les autres textes de la carte.
+      if (!c.video || typeof c.video !== 'object') c.video = { enabled: false, url: {} };
+      if (!c.video.url || typeof c.video.url !== 'object') c.video.url = {};
+      const videoEnabled = cc.querySelector('.f-video-enabled');
+      if (videoEnabled) videoEnabled.addEventListener('change', e => {
+        c.video.enabled = e.target.checked; reexpand();
+      });
+      cc.querySelectorAll('.f-video-url').forEach(inp => inp.addEventListener('input', e => {
+        c.video.url = c.video.url || {}; c.video.url[e.target.dataset.lang] = e.target.value;
+      }));
+
       // Textes i18n
       cc.querySelectorAll('.f-card-tierlabel').forEach(inp => inp.addEventListener('input', e => {
         c.tierLabel = c.tierLabel || {}; c.tierLabel[e.target.dataset.lang] = e.target.value;
@@ -1354,7 +1381,7 @@
 
     const addCardBtn = card.querySelector('.add-troop-card');
     if (addCardBtn) addCardBtn.addEventListener('click', () => {
-      tab.cards.push({ tier: 'tier-1', tierLabel: {}, name: {}, desc: {}, strips: [], resources: [], stats: [], carousel: { enabled: false, images: [] }, layout: CARD_LAYOUT_DEFAULT.slice() });
+      tab.cards.push({ tier: 'tier-1', tierLabel: {}, name: {}, desc: {}, strips: [], resources: [], stats: [], carousel: { enabled: false, images: [] }, video: { enabled: false, url: {} }, layout: CARD_LAYOUT_DEFAULT.slice() });
       reexpand();
     });
   }
@@ -2568,6 +2595,8 @@
     (root || document).querySelectorAll('.lang-fields[data-lang="fr"]').forEach(frPanel => {
       const uid = frPanel.dataset.uid || '';
       frPanel.querySelectorAll('input[type="text"], textarea').forEach(field => {
+        // Certains champs (URL vidéo…) ne sont pas du texte à traduire.
+        if (field.classList.contains('no-translate')) return;
         const next = field.nextElementSibling;
         if (next && next.classList && next.classList.contains('tr-btn')) return; // déjà présent
         const cls = [...field.classList].find(c => c.startsWith('f-'));
