@@ -222,6 +222,18 @@
     .hc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s; }
     .hc-dot.active { background: var(--accent); }
 
+    /* ── VIDÉO YOUTUBE DE CARTE ── */
+    .hero-video { margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; }
+    .hv-frame { position: relative; width: 100%; aspect-ratio: 16/9; background: var(--surface); border: 1px solid var(--border); overflow: hidden; cursor: pointer; }
+    .hv-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hv-play {
+      position: absolute; inset: 0; margin: auto; width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); border: 2px solid #fff; color: #fff; font-size: 1.3rem;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;
+    }
+    .hv-frame:hover .hv-play { background: var(--accent); border-color: var(--accent); color: #0a0c0f; }
+    .hv-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
     footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; }
 
     /* ── CUSTOM SECTION TYPES ── */
@@ -434,6 +446,17 @@
     s = s.replace(/\[i\]([\s\S]*?)\[\/i\]/gi, '<em>$1</em>');
     s = s.replace(/\[u\]([\s\S]*?)\[\/u\]/gi, '<u>$1</u>');
     return s;
+  }
+
+  // Extrait l'identifiant (11 caractères) d'une URL YouTube dans ses formats
+  // usuels (watch, youtu.be, embed, shorts) ou d'un identifiant déjà brut.
+  // Renvoie '' si rien n'est reconnu, pour ne rien afficher plutôt qu'un lecteur cassé.
+  function extractYouTubeId(raw) {
+    if (!raw) return '';
+    const s = String(raw).trim();
+    const m = s.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+    if (m) return m[1];
+    return /^[A-Za-z0-9_-]{11}$/.test(s) ? s : '';
   }
 
   let DATA = null;
@@ -695,7 +718,7 @@
 
   // Ordre par défaut des blocs d'une carte (les ressources sont insérées
   // juste après les bandes de héros ; sans contenu, elles n'affichent rien).
-  const CARD_LAYOUT_DEFAULT = ['strips', 'resources', 'desc', 'stats', 'carousel'];
+  const CARD_LAYOUT_DEFAULT = ['strips', 'resources', 'desc', 'stats', 'carousel', 'video'];
 
   function heroCardHtml(c) {
     const tier = c.tier || 'tier-1';
@@ -732,12 +755,17 @@
       ? c.carousel.images.filter(im => im && im.src) : [];
     const carouselHtml = carouselImgs.length ? heroCarouselHtml(carouselImgs) : '';
 
+    // Un lien par langue ; repli sur le français si la langue courante n'en a pas (cf. t()).
+    const videoId = (c.video && c.video.enabled) ? extractYouTubeId(t(c.video.url, currentLang)) : '';
+    const videoHtml = videoId ? heroVideoHtml(videoId) : '';
+
     const blocks = {
       strips: stripsHtml,
       resources: resourcesHtml,
       desc: desc ? `<div class="card-desc" style="margin-top:12px;">${formatRich(desc)}</div>` : '',
       stats: statsHtml,
-      carousel: carouselHtml
+      carousel: carouselHtml,
+      video: videoHtml
     };
     let order = Array.isArray(c.layout) && c.layout.length ? c.layout.slice() : CARD_LAYOUT_DEFAULT.slice();
     // sécurité : on ajoute les blocs manquants à la fin, on ignore les inconnus
@@ -764,6 +792,26 @@
       <div class="hc-dots">${images.map((_, idx) => `<span class="hc-dot ${idx === 0 ? 'active' : ''}" data-idx="${idx}"></span>`).join('')}</div>` : ''}
     </div>`;
   }
+
+  // Vignette cliquable (facade) : aucun script YouTube n'est chargé tant que
+  // l'utilisateur n'a pas cliqué sur le bouton lecture, pour préserver la
+  // performance de premier affichage de la carte.
+  function heroVideoHtml(videoId) {
+    return `<div class="hero-video">
+      <div class="hv-frame" data-video="${videoId}">
+        <img class="hv-thumb" src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg" alt="" loading="lazy" decoding="async">
+        <button class="hv-play" type="button" aria-label="Lire la vidéo">▶</button>
+      </div>
+    </div>`;
+  }
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.hv-play');
+    if (!btn) return;
+    const frame = btn.closest('.hv-frame');
+    const id = frame.dataset.video;
+    frame.innerHTML = `<iframe class="hv-iframe" src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  });
 
   function renderTroopsSection(tab) {
     // Ancien format (pas de cartes par onglet) → rendu hérité
