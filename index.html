@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NK2 Wiki — Land of Jail</title>
+  <meta name="description" content="Wiki de l'alliance NK2 — Land of Jail : guides des héros, stratégies (Cage, Vague de colère, SvS) et calendrier des événements." />
+  <meta property="og:title" content="NK2 Wiki — Land of Jail" />
+  <meta property="og:description" content="Guides des héros, stratégies et calendrier des événements de l'alliance NK2." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0a0c0f" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet" />
@@ -215,6 +221,18 @@
     .hc-dots { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
     .hc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); cursor: pointer; transition: background 0.2s; }
     .hc-dot.active { background: var(--accent); }
+
+    /* ── VIDÉO YOUTUBE DE CARTE ── */
+    .hero-video { margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; }
+    .hv-frame { position: relative; width: 100%; aspect-ratio: 16/9; background: var(--surface); border: 1px solid var(--border); overflow: hidden; cursor: pointer; }
+    .hv-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hv-play {
+      position: absolute; inset: 0; margin: auto; width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); border: 2px solid #fff; color: #fff; font-size: 1.3rem;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;
+    }
+    .hv-frame:hover .hv-play { background: var(--accent); border-color: var(--accent); color: #0a0c0f; }
+    .hv-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
     footer { border-top: 1px solid var(--border); padding: 20px 24px; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; }
 
@@ -430,11 +448,28 @@
     return s;
   }
 
+  // Extrait l'identifiant (11 caractères) d'une URL YouTube dans ses formats
+  // usuels (watch, youtu.be, embed, shorts) ou d'un identifiant déjà brut.
+  // Renvoie '' si rien n'est reconnu, pour ne rien afficher plutôt qu'un lecteur cassé.
+  function extractYouTubeId(raw) {
+    if (!raw) return '';
+    const s = String(raw).trim();
+    const m = s.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+    if (m) return m[1];
+    return /^[A-Za-z0-9_-]{11}$/.test(s) ? s : '';
+  }
+
   let DATA = null;
   let currentLang = 'fr';
   // Onglet actif courant, conservé entre les re-rendus (changement de langue,
   // réconciliation Firestore) et reflété dans l'URL pour des liens partageables.
   let currentTab = null;
+  // Ancre d'URL demandée à l'ouverture (#onglet), en attente tant que l'onglet
+  // visé n'est pas connu : il peut n'exister que dans Firestore et pas dans le
+  // seed local. Le repli s'affiche alors SANS écraser l'ancre, qui est honorée
+  // dès la réconciliation. Toute navigation de l'utilisateur annule l'attente.
+  let PENDING_HASH = '';
+  try { PENDING_HASH = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
   // Permet de supprimer le défilement vers le haut lors d'un re-rendu silencieux
   // (réconciliation Firestore en arrière-plan), pour ne pas déplacer l'utilisateur.
   let SUPPRESS_SCROLL = false;
@@ -491,6 +526,11 @@
     const loadingEl = document.getElementById('loading');
     let shown = false;
 
+    // Les deux sources partent en parallèle : le seed s'affiche immédiatement,
+    // et la réponse Firestore (autoritative) arrive d'autant plus tôt que sa
+    // requête n'attend pas la fin du rendu du seed.
+    const remotePromise = fetchContentREST();
+
     // 1) Rendu IMMÉDIAT depuis le seed local (même CDN que la page → très rapide).
     //    Le wiki s'affiche sans attendre Firestore ni aucun SDK.
     try {
@@ -509,9 +549,9 @@
     //    Si plus récent/différent du seed, on remplace en préservant l'onglet,
     //    la langue et la position de défilement de l'utilisateur (zéro saut visible).
     try {
-      const remote = await fetchContentREST();
+      const remote = await remotePromise;
       if (remote && (remote.tabs || []).length) {
-        const differs = !shown || JSON.stringify(remote) !== JSON.stringify(DATA);
+        const differs = !shown || stableStringify(remote) !== stableStringify(DATA);
         if (differs) {
           const savedY = window.scrollY;
           SUPPRESS_SCROLL = true;
@@ -539,10 +579,26 @@
     return await resp.json();
   }
 
+  // Sérialisation à clés triées : l'API REST Firestore et le seed local ne
+  // renvoient pas les clés dans le même ordre, un JSON.stringify brut verrait
+  // donc toujours une différence et forcerait un re-rendu inutile à chaque
+  // visite (avec réinitialisation des carrousels).
+  function stableStringify(v) {
+    if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+    if (v && typeof v === 'object') {
+      return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + stableStringify(v[k])).join(',') + '}';
+    }
+    return JSON.stringify(v === undefined ? null : v);
+  }
+
   function t(obj, lang, fallback) {
     if (obj === null || obj === undefined) return fallback || '';
     if (typeof obj === 'string') return obj;
-    return obj[lang] !== undefined ? obj[lang] : (obj['fr'] !== undefined ? obj['fr'] : (fallback || ''));
+    // Une traduction vide équivaut à une traduction absente : on retombe sur le
+    // français plutôt que d'afficher du vide (champ effacé dans l'admin).
+    if (obj[lang] !== undefined && obj[lang] !== '') return obj[lang];
+    if (obj['fr'] !== undefined && obj['fr'] !== '') return obj['fr'];
+    return fallback || '';
   }
 
   // Les noms ne sont plus affichés sous les vignettes de héros sur l'index.
@@ -573,21 +629,24 @@
       + `<button class="nav-btn" data-tab="${REPORT_TAB_ID}">📝 <span>${ri('navLabel')}</span></button>`;
 
     navInner.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => showSection(btn.dataset.tab));
+      btn.addEventListener('click', () => { PENDING_HASH = ''; showSection(btn.dataset.tab); });
     });
     // L'onglet actif est choisi de façon centralisée dans render() (cf. pickActiveTab).
   }
 
-  // Détermine l'onglet à afficher : on conserve l'onglet courant s'il existe encore
-  // (changement de langue, réconciliation Firestore), sinon on honore l'ancre d'URL
-  // (#onglet, lien partageable / rafraîchissement), sinon le premier onglet.
+  // Détermine l'onglet à afficher : l'ancre d'ouverture encore en attente prime
+  // dès qu'elle devient valide (l'onglet peut n'arriver qu'avec la réconciliation
+  // Firestore), sinon on conserve l'onglet courant s'il existe encore (changement
+  // de langue, réconciliation), sinon le premier onglet.
   function pickActiveTab() {
     const tabs = (DATA && DATA.tabs ? DATA.tabs : []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
     const valid = id => id === REPORT_TAB_ID || tabs.some(t => t.id === id);
+    if (PENDING_HASH && valid(PENDING_HASH)) {
+      const id = PENDING_HASH;
+      PENDING_HASH = '';
+      return id;
+    }
     if (currentTab && valid(currentTab)) return currentTab;
-    let fromHash = '';
-    try { fromHash = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
-    if (fromHash && valid(fromHash)) return fromHash;
     return tabs.length ? tabs[0].id : null;
   }
 
@@ -659,7 +718,7 @@
 
   // Ordre par défaut des blocs d'une carte (les ressources sont insérées
   // juste après les bandes de héros ; sans contenu, elles n'affichent rien).
-  const CARD_LAYOUT_DEFAULT = ['strips', 'resources', 'desc', 'stats', 'carousel'];
+  const CARD_LAYOUT_DEFAULT = ['strips', 'resources', 'desc', 'stats', 'carousel', 'video'];
 
   function heroCardHtml(c) {
     const tier = c.tier || 'tier-1';
@@ -696,12 +755,17 @@
       ? c.carousel.images.filter(im => im && im.src) : [];
     const carouselHtml = carouselImgs.length ? heroCarouselHtml(carouselImgs) : '';
 
+    // Un lien par langue ; repli sur le français si la langue courante n'en a pas (cf. t()).
+    const videoId = (c.video && c.video.enabled) ? extractYouTubeId(t(c.video.url, currentLang)) : '';
+    const videoHtml = videoId ? heroVideoHtml(videoId) : '';
+
     const blocks = {
       strips: stripsHtml,
       resources: resourcesHtml,
       desc: desc ? `<div class="card-desc" style="margin-top:12px;">${formatRich(desc)}</div>` : '',
       stats: statsHtml,
-      carousel: carouselHtml
+      carousel: carouselHtml,
+      video: videoHtml
     };
     let order = Array.isArray(c.layout) && c.layout.length ? c.layout.slice() : CARD_LAYOUT_DEFAULT.slice();
     // sécurité : on ajoute les blocs manquants à la fin, on ignore les inconnus
@@ -728,6 +792,26 @@
       <div class="hc-dots">${images.map((_, idx) => `<span class="hc-dot ${idx === 0 ? 'active' : ''}" data-idx="${idx}"></span>`).join('')}</div>` : ''}
     </div>`;
   }
+
+  // Vignette cliquable (facade) : aucun script YouTube n'est chargé tant que
+  // l'utilisateur n'a pas cliqué sur le bouton lecture, pour préserver la
+  // performance de premier affichage de la carte.
+  function heroVideoHtml(videoId) {
+    return `<div class="hero-video">
+      <div class="hv-frame" data-video="${videoId}">
+        <img class="hv-thumb" src="https://i.ytimg.com/vi/${videoId}/hqdefault.jpg" alt="" loading="lazy" decoding="async">
+        <button class="hv-play" type="button" aria-label="Lire la vidéo">▶</button>
+      </div>
+    </div>`;
+  }
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.hv-play');
+    if (!btn) return;
+    const frame = btn.closest('.hv-frame');
+    const id = frame.dataset.video;
+    frame.innerHTML = `<iframe class="hv-iframe" src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  });
 
   function renderTroopsSection(tab) {
     // Ancien format (pas de cartes par onglet) → rendu hérité
@@ -996,7 +1080,7 @@
 
     // quick-link clicks
     main.querySelectorAll('.quick-link[data-tab]').forEach(el => {
-      el.addEventListener('click', () => showSection(el.dataset.tab));
+      el.addEventListener('click', () => { PENDING_HASH = ''; showSection(el.dataset.tab); });
     });
 
     bindReportForm(main);
@@ -1147,10 +1231,14 @@
     if (btn) btn.classList.add('active');
     currentTab = id;
     // Reflète l'onglet dans l'URL sans polluer l'historique ni provoquer de saut natif
-    // (les ancres réelles sont "section-<id>", jamais "<id>").
+    // (les ancres réelles sont "section-<id>", jamais "<id>"). Une ancre d'ouverture
+    // encore en attente n'est jamais écrasée par un repli : elle peut être honorée
+    // à la réconciliation Firestore.
     try {
-      const target = id ? '#' + encodeURIComponent(id) : (location.pathname + location.search);
-      if (location.hash !== ('#' + encodeURIComponent(id))) history.replaceState(null, '', target);
+      if (!PENDING_HASH) {
+        const target = id ? '#' + encodeURIComponent(id) : (location.pathname + location.search);
+        if (location.hash !== ('#' + encodeURIComponent(id))) history.replaceState(null, '', target);
+      }
     } catch (e) {}
     if (!SUPPRESS_SCROLL) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1172,7 +1260,10 @@
         slides.forEach((s, idx) => s.classList.toggle('active', idx === cur));
         dots.forEach((d, idx) => d.classList.toggle('active', idx === cur));
       };
-      const restart = () => { if (timer) clearInterval(timer); timer = setInterval(() => show(cur + 1), 4500); carouselTimers.push(timer); };
+      // Le défilement automatique se met en pause quand la page est en
+      // arrière-plan ou quand le carrousel n'est pas visible (onglet inactif).
+      const tick = () => { if (document.hidden || !car.offsetParent) return; show(cur + 1); };
+      const restart = () => { if (timer) clearInterval(timer); timer = setInterval(tick, 4500); carouselTimers.push(timer); };
       const prev = car.querySelector('.hc-prev');
       const next = car.querySelector('.hc-next');
       if (prev) prev.addEventListener('click', () => { show(cur - 1); restart(); });
@@ -1231,7 +1322,14 @@
     let id = '';
     try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
     if (!id || id === currentTab) return;
-    if (document.getElementById('section-' + id)) showSection(id);
+    if (document.getElementById('section-' + id)) {
+      PENDING_HASH = '';
+      showSection(id);
+    } else {
+      // Onglet pas (encore) connu : l'ancre remplace l'attente en cours et sera
+      // honorée si la réconciliation Firestore apporte cet onglet.
+      PENDING_HASH = id;
+    }
   });
 
   // ── Suivi de fréquentation (anonyme, sans inscription ni connexion) ──
@@ -1283,6 +1381,9 @@
     }
     // 2) Repli sans configuration (service public gratuit, sans clé).
     //return await tryFetch('https://ipwho.is/?fields=country_code', j => j && j.country_code);
+    // Toujours renvoyer une chaîne : `undefined` ferait rejeter l'écriture
+    // Firestore entière (champ non supporté) et casserait le suivi de visite.
+    return '';
   }
 
   async function trackVisit() {
@@ -1325,7 +1426,7 @@
         device: info.device,
         browser: info.browser,
         os: info.os,
-        country: country,
+        country: country || '',
         scr: (window.screen ? window.screen.width + 'x' + window.screen.height : '').slice(0, 16)
       });
       sessionStorage.setItem('nk2_visit_logged', '1');
