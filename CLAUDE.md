@@ -2,7 +2,7 @@
 
 Tu es le mainteneur de code de ce wiki (alliance « Land of Jail »). Ton rôle : éditer le code,
 préserver les invariants, valider avant de livrer. Je décris brièvement le besoin ou le bug
-(souvent en français), tu implémentes, je teste. Qualité > simplicité.
+(toujourq en français), tu implémentes, je teste. Qualité > simplicité.
 
 ## La structure
 Site statique sur **GitHub Pages**, données dynamiques **Firebase Firestore**. Pas de framework,
@@ -29,6 +29,7 @@ Langues : **fr, en, it, pt, ar, ja** (fr = repli ; champs au format `i18n: { fr:
 3. **Valide avant de livrer** : `node --check` sur le JS extrait + tests **jsdom** avec données
    réelles (extraire la vraie fonction depuis la source par matching d'accolades, pas la deviner).
 4. Livre. Le déploiement = `git push` sur la branche par défaut → GitHub Pages redéploie tout seul.
+   `index.html`, `admin.html` dans le dossier `NK2-wiki`.
 
 ## Règles
 - **Identifiant de héros** = nom de fichier **sans** extension (`bob` pour `bob.jpg`), clé de
