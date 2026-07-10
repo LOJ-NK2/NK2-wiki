@@ -304,7 +304,7 @@
 
     <!-- UI TEXTS -->
     <div class="admin-panel" id="panel-ui">
-      <div class="help-text">Textes globaux de l'interface (pied de page, libellés de tableaux, descriptions génériques) par langue.</div>
+      <div class="help-text">Textes globaux de l'interface, par langue : entête du site, pied de page, en-têtes des tableaux (comparatif héros &amp; événements), sous-textes des liens rapides de l'accueil et formulaire « Signaler ». Les textes propres à un onglet (titres, descriptions, cartes…) se modifient dans « Onglets », et le contenu des événements dans « Événements ». Un champ laissé vide reprend la valeur par défaut indiquée en gris.</div>
       <div id="ui-editor"></div>
     </div>
 
@@ -2047,46 +2047,56 @@
   // ───────────────────────────────────────────
   // UI TEXTS PANEL
   // ───────────────────────────────────────────
+  // Textes globaux de l'interface, hors gestion des onglets/événements.
+  // Les entrées « section » ne sont que des séparateurs visuels.
+  // « ph » = placeholder indiquant la valeur par défaut du site (repli si laissé vide).
   const UI_FIELDS = [
+    { section: 'Entête du site' },
+    { key: 'header_title1', label: 'Titre — 1re partie', ph: 'NK2' },
+    { key: 'header_title2', label: 'Titre — 2e partie (colorée)', ph: 'WIKI' },
+    { key: 'header_tagline', label: 'Sous-titre / slogan', ph: '// LAND OF JAIL' },
+    { key: 'header_emblem', label: 'Emblème (emoji)', ph: '⚔️' },
+
+    { section: 'Pied de page' },
     { key: 'footer', label: 'Texte du pied de page' },
-    { key: 'tier1', label: 'Tier 1 (Récoltes)' },
-    { key: 'tier2', label: 'Tier 2 (Arène)' },
-    { key: 'tier3', label: 'Tier 3 (Solo)' },
-    { key: 'tier4', label: 'Tier 4 (Ralliements)' },
-    { key: 'troop1_name', label: 'Nom carte Récolteurs' },
-    { key: 'troop1_desc', label: 'Description carte Récolteurs', textarea: true },
-    { key: 'troop2_desc1', label: 'Description carte Arène 1', textarea: true },
-    { key: 'troop2_desc2', label: 'Description carte Arène 2', textarea: true },
-    { key: 'troop3_name', label: 'Nom carte Solo' },
-    { key: 'troop3_desc', label: 'Description carte Solo', textarea: true },
-    { key: 'troop4_name', label: 'Nom carte Ralliements' },
-    { key: 'troop4_desc', label: 'Description carte Ralliements', textarea: true },
-    { key: 'stat_role', label: 'Libellé "Rôle"' },
-    { key: 'stat_rec', label: 'Libellé "Recommandation"' },
-    { key: 'role_farm', label: 'Valeur rôle "Collecte"' },
-    { key: 'rec_no', label: 'Valeur "Pas de combat"' },
-    { key: 'troops_def', label: 'Libellé Déflecteurs' },
-    { key: 'troops_bomber', label: 'Libellé Bombardiers' },
-    { key: 'troops_tir', label: 'Libellé Tireurs' },
-    { key: 'troops_table_title', label: 'Titre tableau comparatif héros' },
-    { key: 'col_tier', label: 'Colonne "Héros"' },
-    { key: 'col_name', label: 'Colonne "Nom"' },
-    { key: 'col_rally', label: 'Colonne "Rally Cage"' },
-    { key: 'col_rejoin', label: 'Colonne "Rejoindre Cage"' },
-    { key: 'first_line', label: 'Libellé "Première ligne"' },
-    { key: 'robots', label: 'Libellé "Robots"' },
-    { key: 'second_line', label: 'Libellé "Seconde ligne"' },
-    { key: 'heroes_label', label: 'Libellé "Héros" (strip)' },
-    { key: 'events_table_title', label: 'Titre tableau événements' },
-    { key: 'col_day', label: 'Colonne "Jour"' },
-    { key: 'col_event', label: 'Colonne "Événement"' },
-    { key: 'col_type', label: 'Colonne "Type"' },
-    { key: 'col_req', label: 'Colonne "Requis"' },
-    { key: 'req_yes', label: 'Valeur "Oui"' },
-    { key: 'req_rec', label: 'Valeur "Recommandé"' },
-    { key: 'req_opt', label: 'Valeur "Optionnel"' },
-    { key: 'home_ql_troops', label: 'Sous-texte lien rapide Héros' },
-    { key: 'home_ql_events', label: 'Sous-texte lien rapide Événements' }
+
+    { section: 'Accueil — sous-textes des liens rapides' },
+    { key: 'home_ql_troops', label: 'Sous-texte lien rapide « Héros »' },
+    { key: 'home_ql_events', label: 'Sous-texte lien rapide « Événements »' },
+
+    { section: 'Tableau comparatif des héros' },
+    { key: 'troops_table_title', label: 'Titre du tableau' },
+    { key: 'col_tier', label: 'Colonne « Héros »' },
+    { key: 'col_name', label: 'Colonne « Nom »' },
+    { key: 'troop3_name', label: 'Colonne « Solo »' },
+    { key: 'troop4_name', label: 'Colonne « Rally »' },
+    { key: 'col_rally', label: 'Colonne « Rally Cage »' },
+    { key: 'col_rejoin', label: 'Colonne « Rejoindre Cage »' },
+
+    { section: 'Tableau des événements' },
+    { key: 'events_table_title', label: 'Titre du tableau' },
+    { key: 'col_day', label: 'Colonne « Jour »' },
+    { key: 'col_event', label: 'Colonne « Événement »' },
+    { key: 'col_type', label: 'Colonne « Type »' },
+
+    { section: 'Formulaire « Signaler »' },
+    { key: 'report_navLabel', label: 'Libellé onglet de navigation', ph: 'Signaler' },
+    { key: 'report_title', label: 'Titre', ph: 'Signaler une erreur' },
+    { key: 'report_sub', label: 'Sous-titre', ph: '// TRADUCTIONS & CORRECTIONS' },
+    { key: 'report_intro', label: 'Texte d\'introduction', textarea: true, ph: 'Vous avez repéré une faute de traduction…' },
+    { key: 'report_tabsLabel', label: 'Libellé « Onglet(s) concerné(s) »', ph: 'Onglet(s) concerné(s)' },
+    { key: 'report_langLabel', label: 'Libellé « Langue concernée »', ph: 'Langue concernée' },
+    { key: 'report_contextLabel', label: 'Libellé « Texte concerné »', ph: 'Texte concerné' },
+    { key: 'report_contextPh', label: 'Champ « Texte concerné » — indication', ph: 'Copiez ici le texte erroné ou décrivez où il se trouve' },
+    { key: 'report_proposalLabel', label: 'Libellé « Proposition de correction »', ph: 'Proposition de correction / traduction' },
+    { key: 'report_proposalPh', label: 'Champ « Proposition » — indication', ph: 'Votre version corrigée (facultatif)' },
+    { key: 'report_reporterLabel', label: 'Libellé « Votre pseudo »', ph: 'Votre pseudo en jeu (facultatif)' },
+    { key: 'report_submit', label: 'Bouton d\'envoi', ph: 'Envoyer le signalement' },
+    { key: 'report_sending', label: 'État pendant l\'envoi', ph: 'Envoi…' },
+    { key: 'report_success', label: 'Message de succès', ph: 'Merci ! Votre signalement a bien été envoyé.' },
+    { key: 'report_error', label: 'Message d\'erreur', ph: 'Échec de l\'envoi. Réessayez plus tard.' },
+    { key: 'report_needTab', label: 'Alerte « aucun onglet sélectionné »', ph: 'Sélectionnez au moins un onglet.' },
+    { key: 'report_needContext', label: 'Alerte « texte manquant »', ph: 'Indiquez le texte concerné.' }
   ];
 
   function renderUi() {
@@ -2096,13 +2106,17 @@
       ${langTabsHtml(uid)}
       ${LANGS.map((l, i) => `
         <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
-          ${UI_FIELDS.map(f => `
+          ${UI_FIELDS.map(f => {
+            if (f.section) return `<div class="section-label">${escapeHtml(f.section)}</div>`;
+            const v = escapeHtml((DATA.ui[l.code] && DATA.ui[l.code][f.key]) || '');
+            const ph = f.ph ? ` placeholder="${escapeHtml(f.ph)}"` : '';
+            return `
             <label>${f.label}</label>
             ${f.textarea
-              ? `<textarea class="f-ui" data-key="${f.key}" data-lang="${l.code}">${escapeHtml((DATA.ui[l.code] && DATA.ui[l.code][f.key]) || '')}</textarea>`
-              : `<input type="text" class="f-ui" data-key="${f.key}" data-lang="${l.code}" value="${escapeHtml((DATA.ui[l.code] && DATA.ui[l.code][f.key]) || '')}" />`
-            }
-          `).join('')}
+              ? `<textarea class="f-ui" data-key="${f.key}" data-lang="${l.code}"${ph}>${v}</textarea>`
+              : `<input type="text" class="f-ui" data-key="${f.key}" data-lang="${l.code}" value="${v}"${ph} />`
+            }`;
+          }).join('')}
         </div>
       `).join('')}
     `;
