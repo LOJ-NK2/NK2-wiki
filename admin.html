@@ -351,22 +351,6 @@
           <div class="section-label" style="margin-top:0;">Langue du navigateur</div>
           <div id="stats-langs"></div>
         </div>
-        <div class="stats-box">
-          <div class="section-label" style="margin-top:0;">Appareil</div>
-          <div id="stats-devices"></div>
-        </div>
-        <div class="stats-box">
-          <div class="section-label" style="margin-top:0;">Navigateur</div>
-          <div id="stats-browsers"></div>
-        </div>
-        <div class="stats-box">
-          <div class="section-label" style="margin-top:0;">Système</div>
-          <div id="stats-os"></div>
-        </div>
-        <div class="stats-box">
-          <div class="section-label" style="margin-top:0;">Provenance</div>
-          <div id="stats-refs"></div>
-        </div>
       </div>
 
       <div class="section-label">Historique récent</div>
@@ -2455,21 +2439,13 @@
     renderChart(buckets);
 
     // répartitions sur la période
-    const byLang = {}, byDev = {}, byBrow = {}, byOs = {}, byRef = {}, byCountry = {};
+    const byLang = {}, byCountry = {};
     within.forEach(v => {
       const lg = normLang(v.bl); byLang[lg] = (byLang[lg] || 0) + 1;
-      const dev = v.device || 'desktop'; byDev[dev] = (byDev[dev] || 0) + 1;
-      byBrow[v.browser || 'Autre'] = (byBrow[v.browser || 'Autre'] || 0) + 1;
-      byOs[v.os || 'Autre'] = (byOs[v.os || 'Autre'] || 0) + 1;
-      byRef[v.ref || '(direct)'] = (byRef[v.ref || '(direct)'] || 0) + 1;
       const cc = (v.country || '').toUpperCase(); byCountry[cc] = (byCountry[cc] || 0) + 1;
     });
     renderBreakdown('stats-countries', byCountry, { top: 10, label: c => flagEmoji(c) + ' ' + countryName(c) });
     renderBreakdown('stats-langs', byLang, { label: langLabel });
-    renderBreakdown('stats-devices', byDev, { label: k => DEV_LABEL[k] || k });
-    renderBreakdown('stats-browsers', byBrow, { top: 6 });
-    renderBreakdown('stats-os', byOs, { top: 6 });
-    renderBreakdown('stats-refs', byRef, { top: 8 });
 
     const meta = document.getElementById('stats-meta');
     if (meta) meta.textContent = within.length + ' visite(s) sur la période · ' + total + ' au total';
@@ -2481,7 +2457,7 @@
       histWrap.innerHTML = '<div class="stats-empty">Aucune visite enregistrée pour le moment.</div>';
     } else {
       histWrap.innerHTML = '<div class="stats-table-wrap"><table class="stats-table"><thead><tr>' +
-        '<th>Date</th><th>Pays</th><th>Langue</th><th>Appareil</th><th>Navigateur</th><th>Système</th><th>Provenance</th><th>Type</th>' +
+        '<th>Date</th><th>Pays</th><th>Langue</th><th>Type</th>' +
         '</tr></thead><tbody>' +
         recent.map(v => {
           const dt = visitTime(v);
@@ -2489,10 +2465,6 @@
           return '<tr><td>' + ds + '</td>' +
             '<td>' + escapeHtml((v.country ? flagEmoji(v.country.toUpperCase()) + ' ' : '') + countryName((v.country || '').toUpperCase())) + '</td>' +
             '<td>' + escapeHtml(langLabel(normLang(v.bl))) + '</td>' +
-            '<td>' + escapeHtml(DEV_LABEL[v.device] || v.device || '—') + '</td>' +
-            '<td>' + escapeHtml(v.browser || '—') + '</td>' +
-            '<td>' + escapeHtml(v.os || '—') + '</td>' +
-            '<td>' + escapeHtml(v.ref || '—') + '</td>' +
             '<td>' + (v.returning ? 'Récurrent' : 'Nouveau') + '</td></tr>';
         }).join('') +
         '</tbody></table></div>';
