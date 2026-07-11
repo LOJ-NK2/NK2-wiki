@@ -324,10 +324,10 @@
 <header>
   <div class="header-grid"></div>
   <div class="header-inner">
-    <div class="header-emblem">⚔️</div>
+    <div class="header-emblem" id="hdr-emblem">⚔️</div>
     <div class="header-text">
-      <h1>NK2 <span>WIKI</span></h1>
-      <p>// LAND OF JAIL</p>
+      <h1 id="hdr-title">NK2 <span>WIKI</span></h1>
+      <p id="hdr-tagline">// LAND OF JAIL</p>
     </div>
   </div>
 </header>
@@ -520,7 +520,15 @@
       error: "送信に失敗しました。後でもう一度お試しください。", needTab: "少なくとも1つのタブを選択してください。", needContext: "該当する文章を入力してください。" }
   };
   const REPORT_TAB_ID = '__report__';
-  function ri(key) { return (REPORT_I18N[currentLang] || REPORT_I18N.fr)[key] || REPORT_I18N.fr[key] || ''; }
+  // Textes du formulaire : surcharge admin (DATA.ui, clés « report_… ») si présente,
+  // sinon repli sur les traductions intégrées ci-dessus (le formulaire reste
+  // fonctionnel même sans aucune donnée Firestore).
+  function ri(key) {
+    const ui = (DATA.ui && (DATA.ui[currentLang] || DATA.ui.fr)) || {};
+    const custom = ui['report_' + key];
+    if (custom != null && custom !== '') return custom;
+    return (REPORT_I18N[currentLang] || REPORT_I18N.fr)[key] || REPORT_I18N.fr[key] || '';
+  }
 
   async function loadData() {
     const loadingEl = document.getElementById('loading');
@@ -1222,6 +1230,25 @@
     document.getElementById('footer').innerHTML = `<span>${ui.footer || ''}</span>`;
   }
 
+  // Valeurs par défaut de l'entête : repli si les champs « header_… » de DATA.ui
+  // sont absents (rétrocompatibilité : les anciennes données restent affichées).
+  const HEADER_DEFAULTS = { title1: 'NK2', title2: 'WIKI', tagline: '// LAND OF JAIL', emblem: '⚔️' };
+
+  function renderHeader() {
+    const ui = (DATA.ui && (DATA.ui[currentLang] || DATA.ui.fr)) || {};
+    const val = (k, def) => { const v = ui['header_' + k]; return (v != null && v !== '') ? v : def; };
+    const emb = document.getElementById('hdr-emblem');
+    const ttl = document.getElementById('hdr-title');
+    const tag = document.getElementById('hdr-tagline');
+    if (emb) emb.textContent = val('emblem', HEADER_DEFAULTS.emblem);
+    if (ttl) {
+      const t1 = val('title1', HEADER_DEFAULTS.title1);
+      const t2 = val('title2', HEADER_DEFAULTS.title2);
+      ttl.innerHTML = escapeAttr(t1) + (t2 ? ` <span>${escapeAttr(t2)}</span>` : '');
+    }
+    if (tag) tag.textContent = val('tagline', HEADER_DEFAULTS.tagline);
+  }
+
   function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1274,6 +1301,7 @@
   }
 
   function render() {
+    renderHeader();
     renderNav();
     renderMain();
     renderFooter();
