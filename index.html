@@ -326,8 +326,8 @@
   <div class="header-inner">
     <div class="header-emblem">⚔️</div>
     <div class="header-text">
-      <h1>NK2 <span>WIKI</span></h1>
-      <p>// LAND OF JAIL</p>
+      <h1 id="site-title">NK2 <span>WIKI</span></h1>
+      <p id="site-subtitle">// LAND OF JAIL</p>
     </div>
   </div>
 </header>
@@ -520,7 +520,18 @@
       error: "送信に失敗しました。後でもう一度お試しください。", needTab: "少なくとも1つのタブを選択してください。", needContext: "該当する文章を入力してください。" }
   };
   const REPORT_TAB_ID = '__report__';
-  function ri(key) { return (REPORT_I18N[currentLang] || REPORT_I18N.fr)[key] || REPORT_I18N.fr[key] || ''; }
+  // Textes du formulaire « Signaler » : d'abord la valeur éditée dans l'admin
+  // (DATA.ui, clés préfixées « report_ »), sinon repli sur les libellés intégrés
+  // ci-dessus. Garantit un rendu correct même sans ces clés dans Firestore.
+  function ri(key) {
+    const ui = (DATA.ui && (DATA.ui[currentLang] || DATA.ui.fr)) || {};
+    const v = ui['report_' + key];
+    if (v != null && v !== '') return v;
+    return (REPORT_I18N[currentLang] || REPORT_I18N.fr)[key] || REPORT_I18N.fr[key] || '';
+  }
+
+  // Valeurs par défaut de l'en-tête si l'admin n'a rien saisi (rétrocompat).
+  const HEADER_DEFAULTS = { title: 'NK2', accent: 'WIKI', subtitle: '// LAND OF JAIL', page: 'NK2 Wiki — Land of Jail' };
 
   async function loadData() {
     const loadingEl = document.getElementById('loading');
@@ -1222,6 +1233,21 @@
     document.getElementById('footer').innerHTML = `<span>${ui.footer || ''}</span>`;
   }
 
+  // En-tête du site (titre, partie colorée, sous-titre, titre d'onglet navigateur),
+  // éditable par langue dans l'admin (« Textes UI »), avec repli sur HEADER_DEFAULTS.
+  function renderHeader() {
+    const ui = (DATA.ui && (DATA.ui[currentLang] || DATA.ui.fr)) || {};
+    const title = ui.site_title || HEADER_DEFAULTS.title;
+    const accent = (ui.site_title_accent != null && ui.site_title_accent !== '') ? ui.site_title_accent : HEADER_DEFAULTS.accent;
+    const subtitle = (ui.site_subtitle != null && ui.site_subtitle !== '') ? ui.site_subtitle : HEADER_DEFAULTS.subtitle;
+    const page = ui.page_title || HEADER_DEFAULTS.page;
+    const h1 = document.getElementById('site-title');
+    if (h1) h1.innerHTML = escapeAttr(title) + (accent ? ` <span>${escapeAttr(accent)}</span>` : '');
+    const sub = document.getElementById('site-subtitle');
+    if (sub) sub.textContent = subtitle;
+    document.title = page;
+  }
+
   function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1274,6 +1300,7 @@
   }
 
   function render() {
+    renderHeader();
     renderNav();
     renderMain();
     renderFooter();
