@@ -324,10 +324,10 @@
 <header>
   <div class="header-grid"></div>
   <div class="header-inner">
-    <div class="header-emblem" id="hdr-emblem">⚔️</div>
+    <div class="header-emblem">⚔️</div>
     <div class="header-text">
-      <h1 id="hdr-title">NK2 <span>WIKI</span></h1>
-      <p id="hdr-tagline">// LAND OF JAIL</p>
+      <h1 id="site-title">NK2 <span>WIKI</span></h1>
+      <p id="site-subtitle">// LAND OF JAIL</p>
     </div>
   </div>
 </header>
@@ -520,15 +520,18 @@
       error: "送信に失敗しました。後でもう一度お試しください。", needTab: "少なくとも1つのタブを選択してください。", needContext: "該当する文章を入力してください。" }
   };
   const REPORT_TAB_ID = '__report__';
-  // Textes du formulaire : surcharge admin (DATA.ui, clés « report_… ») si présente,
-  // sinon repli sur les traductions intégrées ci-dessus (le formulaire reste
-  // fonctionnel même sans aucune donnée Firestore).
+  // Textes du formulaire « Signaler » : d'abord la valeur éditée dans l'admin
+  // (DATA.ui, clés préfixées « report_ »), sinon repli sur les libellés intégrés
+  // ci-dessus. Garantit un rendu correct même sans ces clés dans Firestore.
   function ri(key) {
     const ui = (DATA.ui && (DATA.ui[currentLang] || DATA.ui.fr)) || {};
-    const custom = ui['report_' + key];
-    if (custom != null && custom !== '') return custom;
+    const v = ui['report_' + key];
+    if (v != null && v !== '') return v;
     return (REPORT_I18N[currentLang] || REPORT_I18N.fr)[key] || REPORT_I18N.fr[key] || '';
   }
+
+  // Valeurs par défaut de l'en-tête si l'admin n'a rien saisi (rétrocompat).
+  const HEADER_DEFAULTS = { title: 'NK2', accent: 'WIKI', subtitle: '// LAND OF JAIL', page: 'NK2 Wiki — Land of Jail' };
 
   async function loadData() {
     const loadingEl = document.getElementById('loading');
@@ -1230,23 +1233,19 @@
     document.getElementById('footer').innerHTML = `<span>${ui.footer || ''}</span>`;
   }
 
-  // Valeurs par défaut de l'entête : repli si les champs « header_… » de DATA.ui
-  // sont absents (rétrocompatibilité : les anciennes données restent affichées).
-  const HEADER_DEFAULTS = { title1: 'NK2', title2: 'WIKI', tagline: '// LAND OF JAIL', emblem: '⚔️' };
-
+  // En-tête du site (titre, partie colorée, sous-titre, titre d'onglet navigateur),
+  // éditable par langue dans l'admin (« Textes UI »), avec repli sur HEADER_DEFAULTS.
   function renderHeader() {
     const ui = (DATA.ui && (DATA.ui[currentLang] || DATA.ui.fr)) || {};
-    const val = (k, def) => { const v = ui['header_' + k]; return (v != null && v !== '') ? v : def; };
-    const emb = document.getElementById('hdr-emblem');
-    const ttl = document.getElementById('hdr-title');
-    const tag = document.getElementById('hdr-tagline');
-    if (emb) emb.textContent = val('emblem', HEADER_DEFAULTS.emblem);
-    if (ttl) {
-      const t1 = val('title1', HEADER_DEFAULTS.title1);
-      const t2 = val('title2', HEADER_DEFAULTS.title2);
-      ttl.innerHTML = escapeAttr(t1) + (t2 ? ` <span>${escapeAttr(t2)}</span>` : '');
-    }
-    if (tag) tag.textContent = val('tagline', HEADER_DEFAULTS.tagline);
+    const title = ui.site_title || HEADER_DEFAULTS.title;
+    const accent = (ui.site_title_accent != null && ui.site_title_accent !== '') ? ui.site_title_accent : HEADER_DEFAULTS.accent;
+    const subtitle = (ui.site_subtitle != null && ui.site_subtitle !== '') ? ui.site_subtitle : HEADER_DEFAULTS.subtitle;
+    const page = ui.page_title || HEADER_DEFAULTS.page;
+    const h1 = document.getElementById('site-title');
+    if (h1) h1.innerHTML = escapeAttr(title) + (accent ? ` <span>${escapeAttr(accent)}</span>` : '');
+    const sub = document.getElementById('site-subtitle');
+    if (sub) sub.textContent = subtitle;
+    document.title = page;
   }
 
   function showSection(id) {

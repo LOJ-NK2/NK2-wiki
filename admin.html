@@ -304,7 +304,7 @@
 
     <!-- UI TEXTS -->
     <div class="admin-panel" id="panel-ui">
-      <div class="help-text">Textes globaux de l'interface, par langue : entête du site, pied de page, en-têtes des tableaux (comparatif héros &amp; événements), sous-textes des liens rapides de l'accueil et formulaire « Signaler ». Les textes propres à un onglet (titres, descriptions, cartes…) se modifient dans « Onglets », et le contenu des événements dans « Événements ». Un champ laissé vide reprend la valeur par défaut indiquée en gris.</div>
+      <div class="help-text">Textes globaux de l'interface (pied de page, libellés de tableaux, descriptions génériques) par langue.</div>
       <div id="ui-editor"></div>
     </div>
 
@@ -350,22 +350,6 @@
         <div class="stats-box">
           <div class="section-label" style="margin-top:0;">Langue du navigateur</div>
           <div id="stats-langs"></div>
-        </div>
-        <div class="stats-box">
-          <div class="section-label" style="margin-top:0;">Appareil</div>
-          <div id="stats-devices"></div>
-        </div>
-        <div class="stats-box">
-          <div class="section-label" style="margin-top:0;">Navigateur</div>
-          <div id="stats-browsers"></div>
-        </div>
-        <div class="stats-box">
-          <div class="section-label" style="margin-top:0;">Système</div>
-          <div id="stats-os"></div>
-        </div>
-        <div class="stats-box">
-          <div class="section-label" style="margin-top:0;">Provenance</div>
-          <div id="stats-refs"></div>
         </div>
       </div>
 
@@ -598,12 +582,78 @@
     loadReports();
   }
 
+  // Valeurs par défaut des textes UI ajoutés (en-tête du site + formulaire
+  // « Signaler »). Doivent rester identiques aux replis de index.html
+  // (HEADER_DEFAULTS et REPORT_I18N). Servent à pré-remplir l'éditeur pour des
+  // données Firestore antérieures qui n'ont pas encore ces clés.
+  const UI_HEADER_DEFAULTS = { site_title: 'NK2', site_title_accent: 'WIKI', site_subtitle: '// LAND OF JAIL', page_title: 'NK2 Wiki — Land of Jail' };
+  const UI_REPORT_DEFAULTS = {
+    fr: { navLabel: "Signaler", title: "Signaler une erreur", sub: "// TRADUCTIONS & CORRECTIONS",
+      intro: "Vous avez repéré une faute de traduction ou une information à corriger ? Indiquez le ou les onglets concernés, le texte fautif et, si vous le pouvez, une proposition. Un administrateur la validera.",
+      tabsLabel: "Onglet(s) concerné(s)", langLabel: "Langue concernée", contextLabel: "Texte concerné",
+      contextPh: "Copiez ici le texte erroné ou décrivez où il se trouve", proposalLabel: "Proposition de correction / traduction",
+      proposalPh: "Votre version corrigée (facultatif)", reporterLabel: "Votre pseudo en jeu (facultatif)",
+      submit: "Envoyer le signalement", sending: "Envoi…", success: "Merci ! Votre signalement a bien été envoyé.",
+      error: "Échec de l'envoi. Réessayez plus tard.", needTab: "Sélectionnez au moins un onglet.", needContext: "Indiquez le texte concerné." },
+    en: { navLabel: "Report", title: "Report an issue", sub: "// TRANSLATIONS & FIXES",
+      intro: "Spotted a translation mistake or something to fix? Tell us which tab(s) are affected, the wrong text and, if you can, a suggestion. An admin will review it.",
+      tabsLabel: "Tab(s) concerned", langLabel: "Language concerned", contextLabel: "Text concerned",
+      contextPh: "Paste the incorrect text here or describe where it is", proposalLabel: "Suggested fix / translation",
+      proposalPh: "Your corrected version (optional)", reporterLabel: "Your in-game name (optional)",
+      submit: "Send report", sending: "Sending…", success: "Thank you! Your report has been sent.",
+      error: "Sending failed. Please try again later.", needTab: "Select at least one tab.", needContext: "Please enter the text concerned." },
+    it: { navLabel: "Segnala", title: "Segnala un errore", sub: "// TRADUZIONI & CORREZIONI",
+      intro: "Hai notato un errore di traduzione o qualcosa da correggere? Indica la/e scheda/e, il testo errato e, se puoi, una proposta. Un amministratore la verificherà.",
+      tabsLabel: "Scheda/e interessata/e", langLabel: "Lingua interessata", contextLabel: "Testo interessato",
+      contextPh: "Incolla qui il testo errato o descrivi dove si trova", proposalLabel: "Proposta di correzione / traduzione",
+      proposalPh: "La tua versione corretta (facoltativo)", reporterLabel: "Il tuo nome di gioco (facoltativo)",
+      submit: "Invia segnalazione", sending: "Invio…", success: "Grazie! La tua segnalazione è stata inviata.",
+      error: "Invio non riuscito. Riprova più tardi.", needTab: "Seleziona almeno una scheda.", needContext: "Indica il testo interessato." },
+    pt: { navLabel: "Reportar", title: "Relatar um erro", sub: "// TRADUÇÕES & CORREÇÕES",
+      intro: "Encontrou um erro de tradução ou algo para corrigir? Informe a(s) aba(s), o texto incorreto e, se puder, uma sugestão. Um administrador vai revisar.",
+      tabsLabel: "Aba(s) relacionada(s)", langLabel: "Idioma relacionado", contextLabel: "Texto relacionado",
+      contextPh: "Cole aqui o texto incorreto ou descreva onde está", proposalLabel: "Sugestão de correção / tradução",
+      proposalPh: "Sua versão corrigida (opcional)", reporterLabel: "Seu nome no jogo (opcional)",
+      submit: "Enviar relatório", sending: "Enviando…", success: "Obrigado! Seu relatório foi enviado.",
+      error: "Falha no envio. Tente novamente mais tarde.", needTab: "Selecione pelo menos uma aba.", needContext: "Informe o texto relacionado." },
+    ar: { navLabel: "إبلاغ", title: "الإبلاغ عن خطأ", sub: "// الترجمات والتصحيحات",
+      intro: "هل لاحظت خطأ في الترجمة أو شيئًا يحتاج إلى تصحيح؟ حدد علامة (علامات) التبويب المعنية والنص الخاطئ، وإن أمكن اقتراحًا. سيقوم المشرف بمراجعته.",
+      tabsLabel: "علامة (علامات) التبويب المعنية", langLabel: "اللغة المعنية", contextLabel: "النص المعني",
+      contextPh: "الصق النص الخاطئ هنا أو صف موضعه", proposalLabel: "اقتراح التصحيح / الترجمة",
+      proposalPh: "نسختك المصححة (اختياري)", reporterLabel: "اسمك داخل اللعبة (اختياري)",
+      submit: "إرسال البلاغ", sending: "جارٍ الإرسال…", success: "شكرًا! تم إرسال بلاغك.",
+      error: "فشل الإرسال. حاول مرة أخرى لاحقًا.", needTab: "اختر علامة تبويب واحدة على الأقل.", needContext: "يرجى إدخال النص المعني." },
+    ja: { navLabel: "報告", title: "問題を報告", sub: "// 翻訳・修正",
+      intro: "翻訳の誤りや修正が必要な箇所を見つけましたか？ 該当するタブ、誤った文章、できれば修正案を教えてください。管理者が確認します。",
+      tabsLabel: "該当タブ", langLabel: "該当言語", contextLabel: "該当する文章",
+      contextPh: "誤った文章を貼り付けるか、場所を説明してください", proposalLabel: "修正・翻訳の提案",
+      proposalPh: "あなたの修正版（任意）", reporterLabel: "ゲーム内の名前（任意）",
+      submit: "報告を送信", sending: "送信中…", success: "ありがとうございます！報告を送信しました。",
+      error: "送信に失敗しました。後でもう一度お試しください。", needTab: "少なくとも1つのタブを選択してください。", needContext: "該当する文章を入力してください。" }
+  };
+
   function migrateData() {
     (DATA.events || []).forEach(ev => {
       if (typeof ev.date === 'string') {
         ev.date = { fr: ev.date };
       }
       if (!ev.date) ev.date = {};
+    });
+    // Back-fill des textes UI ajoutés : n'écrit que les clés absentes/vides, pour
+    // que l'éditeur affiche les valeurs actuelles du site et qu'un enregistrement
+    // les propage à Firestore. Ne touche jamais aux valeurs déjà saisies.
+    if (!DATA.ui || typeof DATA.ui !== 'object') DATA.ui = {};
+    ['fr', 'en', 'it', 'pt', 'ar', 'ja'].forEach(code => {
+      if (!DATA.ui[code]) DATA.ui[code] = {};
+      const bag = DATA.ui[code];
+      Object.keys(UI_HEADER_DEFAULTS).forEach(k => {
+        if (bag[k] == null || bag[k] === '') bag[k] = UI_HEADER_DEFAULTS[k];
+      });
+      const rep = UI_REPORT_DEFAULTS[code] || UI_REPORT_DEFAULTS.fr;
+      Object.keys(rep).forEach(k => {
+        const key = 'report_' + k;
+        if (bag[key] == null || bag[key] === '') bag[key] = rep[k];
+      });
     });
   }
 
@@ -2047,56 +2097,57 @@
   // ───────────────────────────────────────────
   // UI TEXTS PANEL
   // ───────────────────────────────────────────
-  // Textes globaux de l'interface, hors gestion des onglets/événements.
-  // Les entrées « section » ne sont que des séparateurs visuels.
-  // « ph » = placeholder indiquant la valeur par défaut du site (repli si laissé vide).
+  // Textes globaux de l'interface, hors contenu géré par onglet (cartes, blocs,
+  // liens, images) et hors calendrier des événements. Les entrées « section »
+  // ne sont que des séparateurs visuels. Toute nouvelle clé doit avoir un défaut
+  // dans UI_TEXT_DEFAULTS et être lue côté site (index.html).
   const UI_FIELDS = [
-    { section: 'Entête du site' },
-    { key: 'header_title1', label: 'Titre — 1re partie', ph: 'NK2' },
-    { key: 'header_title2', label: 'Titre — 2e partie (colorée)', ph: 'WIKI' },
-    { key: 'header_tagline', label: 'Sous-titre / slogan', ph: '// LAND OF JAIL' },
-    { key: 'header_emblem', label: 'Emblème (emoji)', ph: '⚔️' },
+    { section: 'En-tête du site' },
+    { key: 'site_title', label: 'Titre du site (partie normale)' },
+    { key: 'site_title_accent', label: 'Titre du site (partie colorée)' },
+    { key: 'site_subtitle', label: 'Sous-titre du site' },
+    { key: 'page_title', label: "Titre de l'onglet du navigateur" },
 
-    { section: 'Pied de page' },
+    { section: 'Général' },
     { key: 'footer', label: 'Texte du pied de page' },
-
-    { section: 'Accueil — sous-textes des liens rapides' },
-    { key: 'home_ql_troops', label: 'Sous-texte lien rapide « Héros »' },
-    { key: 'home_ql_events', label: 'Sous-texte lien rapide « Événements »' },
 
     { section: 'Tableau comparatif des héros' },
     { key: 'troops_table_title', label: 'Titre du tableau' },
-    { key: 'col_tier', label: 'Colonne « Héros »' },
-    { key: 'col_name', label: 'Colonne « Nom »' },
-    { key: 'troop3_name', label: 'Colonne « Solo »' },
-    { key: 'troop4_name', label: 'Colonne « Rally »' },
-    { key: 'col_rally', label: 'Colonne « Rally Cage »' },
-    { key: 'col_rejoin', label: 'Colonne « Rejoindre Cage »' },
+    { key: 'col_tier', label: 'Colonne "Héros"' },
+    { key: 'col_name', label: 'Colonne "Nom"' },
+    { key: 'troop3_name', label: 'Colonne "Solo"' },
+    { key: 'troop4_name', label: 'Colonne "Rally"' },
+    { key: 'col_rally', label: 'Colonne "Rally Cage"' },
+    { key: 'col_rejoin', label: 'Colonne "Rejoindre Cage"' },
 
     { section: 'Tableau des événements' },
     { key: 'events_table_title', label: 'Titre du tableau' },
-    { key: 'col_day', label: 'Colonne « Jour »' },
-    { key: 'col_event', label: 'Colonne « Événement »' },
-    { key: 'col_type', label: 'Colonne « Type »' },
+    { key: 'col_day', label: 'Colonne "Jour"' },
+    { key: 'col_event', label: 'Colonne "Événement"' },
+    { key: 'col_type', label: 'Colonne "Type"' },
+
+    { section: "Liens rapides (page d'accueil)" },
+    { key: 'home_ql_troops', label: 'Sous-texte lien rapide Héros' },
+    { key: 'home_ql_events', label: 'Sous-texte lien rapide Événements' },
 
     { section: 'Formulaire « Signaler »' },
-    { key: 'report_navLabel', label: 'Libellé onglet de navigation', ph: 'Signaler' },
-    { key: 'report_title', label: 'Titre', ph: 'Signaler une erreur' },
-    { key: 'report_sub', label: 'Sous-titre', ph: '// TRADUCTIONS & CORRECTIONS' },
-    { key: 'report_intro', label: 'Texte d\'introduction', textarea: true, ph: 'Vous avez repéré une faute de traduction…' },
-    { key: 'report_tabsLabel', label: 'Libellé « Onglet(s) concerné(s) »', ph: 'Onglet(s) concerné(s)' },
-    { key: 'report_langLabel', label: 'Libellé « Langue concernée »', ph: 'Langue concernée' },
-    { key: 'report_contextLabel', label: 'Libellé « Texte concerné »', ph: 'Texte concerné' },
-    { key: 'report_contextPh', label: 'Champ « Texte concerné » — indication', ph: 'Copiez ici le texte erroné ou décrivez où il se trouve' },
-    { key: 'report_proposalLabel', label: 'Libellé « Proposition de correction »', ph: 'Proposition de correction / traduction' },
-    { key: 'report_proposalPh', label: 'Champ « Proposition » — indication', ph: 'Votre version corrigée (facultatif)' },
-    { key: 'report_reporterLabel', label: 'Libellé « Votre pseudo »', ph: 'Votre pseudo en jeu (facultatif)' },
-    { key: 'report_submit', label: 'Bouton d\'envoi', ph: 'Envoyer le signalement' },
-    { key: 'report_sending', label: 'État pendant l\'envoi', ph: 'Envoi…' },
-    { key: 'report_success', label: 'Message de succès', ph: 'Merci ! Votre signalement a bien été envoyé.' },
-    { key: 'report_error', label: 'Message d\'erreur', ph: 'Échec de l\'envoi. Réessayez plus tard.' },
-    { key: 'report_needTab', label: 'Alerte « aucun onglet sélectionné »', ph: 'Sélectionnez au moins un onglet.' },
-    { key: 'report_needContext', label: 'Alerte « texte manquant »', ph: 'Indiquez le texte concerné.' }
+    { key: 'report_navLabel', label: 'Libellé onglet de navigation' },
+    { key: 'report_title', label: 'Titre' },
+    { key: 'report_sub', label: 'Sous-titre' },
+    { key: 'report_intro', label: "Texte d'introduction", textarea: true },
+    { key: 'report_tabsLabel', label: 'Libellé "Onglet(s) concerné(s)"' },
+    { key: 'report_langLabel', label: 'Libellé "Langue concernée"' },
+    { key: 'report_contextLabel', label: 'Libellé "Texte concerné"' },
+    { key: 'report_contextPh', label: 'Placeholder "Texte concerné"' },
+    { key: 'report_proposalLabel', label: 'Libellé "Proposition de correction"' },
+    { key: 'report_proposalPh', label: 'Placeholder "Proposition de correction"' },
+    { key: 'report_reporterLabel', label: 'Libellé "Pseudo en jeu"' },
+    { key: 'report_submit', label: "Bouton d'envoi" },
+    { key: 'report_sending', label: 'Message "Envoi en cours"' },
+    { key: 'report_success', label: 'Message de succès' },
+    { key: 'report_error', label: "Message d'erreur" },
+    { key: 'report_needTab', label: 'Message "Sélectionnez un onglet"' },
+    { key: 'report_needContext', label: 'Message "Indiquez le texte concerné"' }
   ];
 
   function renderUi() {
@@ -2106,17 +2157,15 @@
       ${langTabsHtml(uid)}
       ${LANGS.map((l, i) => `
         <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
-          ${UI_FIELDS.map(f => {
-            if (f.section) return `<div class="section-label">${escapeHtml(f.section)}</div>`;
-            const v = escapeHtml((DATA.ui[l.code] && DATA.ui[l.code][f.key]) || '');
-            const ph = f.ph ? ` placeholder="${escapeHtml(f.ph)}"` : '';
-            return `
+          ${UI_FIELDS.map(f => f.section
+            ? `<div class="section-label">${f.section}</div>`
+            : `
             <label>${f.label}</label>
             ${f.textarea
-              ? `<textarea class="f-ui" data-key="${f.key}" data-lang="${l.code}"${ph}>${v}</textarea>`
-              : `<input type="text" class="f-ui" data-key="${f.key}" data-lang="${l.code}" value="${v}"${ph} />`
-            }`;
-          }).join('')}
+              ? `<textarea class="f-ui" data-key="${f.key}" data-lang="${l.code}">${escapeHtml((DATA.ui[l.code] && DATA.ui[l.code][f.key]) || '')}</textarea>`
+              : `<input type="text" class="f-ui" data-key="${f.key}" data-lang="${l.code}" value="${escapeHtml((DATA.ui[l.code] && DATA.ui[l.code][f.key]) || '')}" />`
+            }
+          `).join('')}
         </div>
       `).join('')}
     `;
@@ -2332,7 +2381,6 @@
   function langLabel(code) {
     return { fr:'Français', en:'Anglais', it:'Italien', pt:'Portugais', ar:'Arabe', ja:'Japonais', autre:'Autre' }[code] || 'Autre';
   }
-  const DEV_LABEL = { mobile:'Mobile', tablet:'Tablette', desktop:'Ordinateur' };
 
   let _regionNames = null;
   function countryName(code) {
@@ -2469,21 +2517,13 @@
     renderChart(buckets);
 
     // répartitions sur la période
-    const byLang = {}, byDev = {}, byBrow = {}, byOs = {}, byRef = {}, byCountry = {};
+    const byLang = {}, byCountry = {};
     within.forEach(v => {
       const lg = normLang(v.bl); byLang[lg] = (byLang[lg] || 0) + 1;
-      const dev = v.device || 'desktop'; byDev[dev] = (byDev[dev] || 0) + 1;
-      byBrow[v.browser || 'Autre'] = (byBrow[v.browser || 'Autre'] || 0) + 1;
-      byOs[v.os || 'Autre'] = (byOs[v.os || 'Autre'] || 0) + 1;
-      byRef[v.ref || '(direct)'] = (byRef[v.ref || '(direct)'] || 0) + 1;
       const cc = (v.country || '').toUpperCase(); byCountry[cc] = (byCountry[cc] || 0) + 1;
     });
     renderBreakdown('stats-countries', byCountry, { top: 10, label: c => flagEmoji(c) + ' ' + countryName(c) });
     renderBreakdown('stats-langs', byLang, { label: langLabel });
-    renderBreakdown('stats-devices', byDev, { label: k => DEV_LABEL[k] || k });
-    renderBreakdown('stats-browsers', byBrow, { top: 6 });
-    renderBreakdown('stats-os', byOs, { top: 6 });
-    renderBreakdown('stats-refs', byRef, { top: 8 });
 
     const meta = document.getElementById('stats-meta');
     if (meta) meta.textContent = within.length + ' visite(s) sur la période · ' + total + ' au total';
@@ -2495,7 +2535,7 @@
       histWrap.innerHTML = '<div class="stats-empty">Aucune visite enregistrée pour le moment.</div>';
     } else {
       histWrap.innerHTML = '<div class="stats-table-wrap"><table class="stats-table"><thead><tr>' +
-        '<th>Date</th><th>Pays</th><th>Langue</th><th>Appareil</th><th>Navigateur</th><th>Système</th><th>Provenance</th><th>Type</th>' +
+        '<th>Date</th><th>Pays</th><th>Langue</th><th>Type</th>' +
         '</tr></thead><tbody>' +
         recent.map(v => {
           const dt = visitTime(v);
@@ -2503,10 +2543,6 @@
           return '<tr><td>' + ds + '</td>' +
             '<td>' + escapeHtml((v.country ? flagEmoji(v.country.toUpperCase()) + ' ' : '') + countryName((v.country || '').toUpperCase())) + '</td>' +
             '<td>' + escapeHtml(langLabel(normLang(v.bl))) + '</td>' +
-            '<td>' + escapeHtml(DEV_LABEL[v.device] || v.device || '—') + '</td>' +
-            '<td>' + escapeHtml(v.browser || '—') + '</td>' +
-            '<td>' + escapeHtml(v.os || '—') + '</td>' +
-            '<td>' + escapeHtml(v.ref || '—') + '</td>' +
             '<td>' + (v.returning ? 'Récurrent' : 'Nouveau') + '</td></tr>';
         }).join('') +
         '</tbody></table></div>';
