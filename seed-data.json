@@ -1552,8 +1552,8 @@
             "enabled": false
           },
           "name": {
-            "ja": "SOLO",
-            "ar": "SOLO",
+            "ja": "ソロ",
+            "ar": "منفردا",
             "en": "SOLO",
             "fr": "SOLO",
             "pt": "SOLO",
@@ -1563,7 +1563,7 @@
             "pl": "SOLO",
             "de": "SOLO",
             "es": "SOLO",
-            "zh": "SOLO"
+            "zh": "单人"
           },
           "resources": [],
           "desc": {
@@ -1638,18 +1638,18 @@
                 "fr": "50%"
               },
               "label": {
-                "ar": "Tirreur",
-                "it": "Tirreur",
-                "en": "Tirreur",
-                "pt": "Tirreur",
+                "ar": "مطلق النار",
+                "it": "Tiratore",
+                "en": "Tireur",
+                "pt": "Atirador",
                 "fr": "Tirreur",
-                "ja": "Tirreur",
-                "id": "Tirreur",
-                "tr": "Tirreur",
-                "pl": "Tirreur",
-                "de": "Tirreur",
-                "es": "Tirreur",
-                "zh": "Tirreur"
+                "ja": "シューター",
+                "id": "Penembak",
+                "tr": "Atıcı",
+                "pl": "Strzelec",
+                "de": "Schütze",
+                "es": "Tirador",
+                "zh": "射手"
               }
             }
           ],
