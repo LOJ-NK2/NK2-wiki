@@ -21,7 +21,7 @@ Services réels : Firebase projet `nk2-wiki` (collections `site/content`, `repor
 SDK chargé paresseusement, lectures perf en REST). Worker
 `https://nk2-translate.yannalogik.workers.dev`. API GitHub Contents pour les images
 (constantes en haut de `admin.html` : `GH_OWNER="loj-nk2"`, `GH_REPO="NK2-wiki"`, `GH_REF=""`).
-Langues : **fr, en, it, pt, ar, ja** (fr = repli ; champs au format `i18n: { fr:{…}, en:{…}, … }`).
+Langues : **fr, en, it, pt, ar, ja, id, tr, pl, de, es, zh** (fr = repli ; champs au format `i18n: { fr:{…}, en:{…}, … }`).
 
 ## Modifier le code
 1. **Audite d'abord** le code en place : ne duplique pas une logique, ne casse pas un motif existant.

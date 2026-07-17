@@ -341,6 +341,12 @@
     <button class="lang-btn" data-lang="pt" aria-label="Português" title="Português">🇧🇷</button>
     <button class="lang-btn" data-lang="ar" aria-label="العربية" title="العربية">🇸🇦</button>
     <button class="lang-btn" data-lang="ja" aria-label="日本語" title="日本語">🇯🇵</button>
+    <button class="lang-btn" data-lang="id" aria-label="Bahasa Indonesia" title="Bahasa Indonesia">🇮🇩</button>
+    <button class="lang-btn" data-lang="tr" aria-label="Türkçe" title="Türkçe">🇹🇷</button>
+    <button class="lang-btn" data-lang="pl" aria-label="Polski" title="Polski">🇵🇱</button>
+    <button class="lang-btn" data-lang="de" aria-label="Deutsch" title="Deutsch">🇩🇪</button>
+    <button class="lang-btn" data-lang="es" aria-label="Español" title="Español">🇪🇸</button>
+    <button class="lang-btn" data-lang="zh" aria-label="中文" title="中文">🇨🇳</button>
   </div>
 </div>
 
@@ -1110,7 +1116,9 @@
 
     const langOpts = [
       ['fr','🇫🇷 Français'],['en','🇬🇧 English'],['it','🇮🇹 Italiano'],
-      ['pt','🇧🇷 Português'],['ar','🇸🇦 العربية'],['ja','🇯🇵 日本語']
+      ['pt','🇧🇷 Português'],['ar','🇸🇦 العربية'],['ja','🇯🇵 日本語'],
+      ['id','🇮🇩 Bahasa Indonesia'],['tr','🇹🇷 Türkçe'],['pl','🇵🇱 Polski'],
+      ['de','🇩🇪 Deutsch'],['es','🇪🇸 Español'],['zh','🇨🇳 中文']
     ].map(([c,l]) => `<option value="${c}" ${c===currentLang?'selected':''}>${l}</option>`).join('');
 
     return `
@@ -1317,7 +1325,7 @@
 
   // Langue initiale : préférence mémorisée, sinon langue du navigateur si gérée, sinon FR.
   function initLang() {
-    const supported = ['fr', 'en', 'it', 'pt', 'ar', 'ja'];
+    const supported = ['fr', 'en', 'it', 'pt', 'ar', 'ja', 'id', 'tr', 'pl', 'de', 'es', 'zh'];
     let lang = '';
     try { lang = localStorage.getItem('nk2_lang') || ''; } catch (e) {}
     if (!supported.includes(lang)) {
