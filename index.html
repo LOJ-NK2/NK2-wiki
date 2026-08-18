@@ -108,6 +108,7 @@
       text-transform: uppercase; border-bottom: 3px solid transparent; transition: all 0.2s;
       white-space: nowrap; display: flex; align-items: center; gap: 8px;
     }
+    .tab-icon-img { object-fit: contain; vertical-align: middle; flex: 0 0 auto; }
     .nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.02); }
     .nav-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
 
@@ -434,6 +435,18 @@
 
   const IMAGES_BASE = "images/heros/";
   const RES_BASE = "images/ressources/";
+  const ICON_BASE = "images/icon/";
+
+  // Icône d'onglet polymorphe : un nom de fichier image (ex. "SVS.png") est rendu
+  // en <img> depuis images/icon/ ; toute autre valeur (emoji, texte) reste brute.
+  const ICON_IMG_RE = /\.(png|jpe?g|webp|gif|svg|avif)$/i;
+  function tabIconHtml(icon, size = 20) {
+    if (!icon) return '';
+    if (ICON_IMG_RE.test(icon)) {
+      return `<img class="tab-icon-img" src="${ICON_BASE}${escapeAttr(icon)}" alt="" width="${size}" height="${size}" decoding="async">`;
+    }
+    return icon;
+  }
 
   // Couleurs autorisées pour la mise en forme des descriptions (uniquement
   // celles déjà utilisées ailleurs sur le site, cf. variables CSS :root).
@@ -641,7 +654,7 @@
     navInner.innerHTML = tabs.map((tab) => {
       const langData = (tab.i18n && (tab.i18n[currentLang] || tab.i18n.fr)) || {};
       const label = langData.label || tab.id;
-      return `<button class="nav-btn" data-tab="${tab.id}">${tab.icon || ''} <span>${label}</span></button>`;
+      return `<button class="nav-btn" data-tab="${tab.id}">${tabIconHtml(tab.icon)} <span>${label}</span></button>`;
     }).join('')
       + `<button class="nav-btn" data-tab="${REPORT_TAB_ID}">📝 <span>${ri('navLabel')}</span></button>`;
 
@@ -677,7 +690,7 @@
       const subLabel = ot.type === 'troops' ? ui.home_ql_troops : (ot.type === 'events' ? ui.home_ql_events : (oi.label || ''));
       return `
         <div class="quick-link" data-tab="${ot.id}">
-          <span class="ql-icon">${ot.icon || ''}</span>
+          <span class="ql-icon">${tabIconHtml(ot.icon, 28)}</span>
           <div class="ql-text">
             <strong>${oi.label || ot.id}</strong>
             <span>${subLabel}</span>
@@ -1110,7 +1123,7 @@
       const label = li.label || tab.id;
       return `<label class="report-check">
         <input type="checkbox" value="${tab.id}" data-label="${(li && li.label) ? escapeAttr((tab.i18n && tab.i18n.fr && tab.i18n.fr.label) || tab.id) : escapeAttr(tab.id)}">
-        <span>${tab.icon || ''} ${escapeAttr(label)}</span>
+        <span>${tabIconHtml(tab.icon, 18)} ${escapeAttr(label)}</span>
       </label>`;
     }).join('');
 

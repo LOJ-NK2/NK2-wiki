@@ -272,6 +272,7 @@
     <div class="admin-panel active" id="panel-tabs">
       <div class="help-text">Gérez les onglets de navigation, leur ordre, leur icône, leur activation et leurs traductions.</div>
       <div id="tabs-list"></div>
+      <datalist id="tab-icon-files"></datalist>
       <button id="add-tab-btn" style="margin-top:12px;">+ Ajouter un onglet</button>
     </div>
 
@@ -435,8 +436,21 @@
   const GH_REPO  = "NK2-wiki";
   const GH_HERO_DIR = "images/heros";
   const GH_RES_DIR  = "images/ressources";
+  const GH_ICON_DIR = "images/icon";
   const GH_REF = ""; // branche : laisser vide pour la branche par défaut du dépôt
   const IMG_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
+  const ICON_BASE = "images/icon/";
+
+  // Icône d'onglet polymorphe : un nom de fichier image (ex. "SVS.png") est rendu
+  // en <img> depuis images/icon/ ; toute autre valeur (emoji, texte) reste brute.
+  const ICON_IMG_RE = /\.(png|jpe?g|webp|gif|svg|avif)$/i;
+  function tabIconHtml(icon, size = 20, fallback = '') {
+    if (!icon) return fallback;
+    if (ICON_IMG_RE.test(icon)) {
+      return `<img class="tab-icon-img" src="${escapeHtml(ICON_BASE + icon)}" alt="" width="${size}" height="${size}" decoding="async" style="object-fit:contain;vertical-align:middle;">`;
+    }
+    return escapeHtml(icon);
+  }
 
   function prettyName(file) {
     return file.replace(IMG_EXT, '').replace(/[_-]+/g, ' ').trim();
@@ -494,6 +508,18 @@
 
   const HERO_LOADER = makeImageLoader(GH_HERO_DIR, 'nk2_hero_images');
   const RES_LOADER  = makeImageLoader(GH_RES_DIR,  'nk2_res_images');
+  const ICON_LOADER = makeImageLoader(GH_ICON_DIR, 'nk2_icon_images');
+
+  // Remplit le <datalist> d'auto-complétion du champ « Icône » des onglets avec
+  // les fichiers du dossier images/icon/ (détectés via l'API GitHub).
+  async function refreshTabIconList() {
+    const dl = document.getElementById('tab-icon-files');
+    if (!dl) return;
+    try {
+      const files = await ICON_LOADER.load();
+      dl.innerHTML = (files || []).map(f => `<option value="${escapeHtml(f)}"></option>`).join('');
+    } catch (e) {}
+  }
 
   // Vignette cliquable générique pour les sélecteurs d'images des cartes.
   // `images` : [{ key, src, name }] ; `selected` : tableau muté en place.
@@ -837,7 +863,7 @@
         <div class="item-card" data-id="${tab.id}">
           <div class="item-card-header">
             <div class="item-card-title">
-              <span>${escapeHtml(tab.icon || '❔')}</span>
+              <span>${tabIconHtml(tab.icon, 20, '❔')}</span>
               <span>${escapeHtml(label)}</span>
               <span class="item-card-meta">(${escapeHtml(tab.id)} · ${tab.type})</span>
               ${!tab.enabled ? '<span class="item-card-meta" style="color:var(--danger)">DÉSACTIVÉ</span>' : ''}
@@ -854,8 +880,8 @@
           <div class="item-card-body">
             <div class="grid-3">
               <div>
-                <label>Icône (emoji)</label>
-                <input type="text" class="f-icon" value="${escapeHtml(tab.icon || '')}" />
+                <label>Icône (emoji ou fichier de images/icon/)</label>
+                <input type="text" class="f-icon" list="tab-icon-files" value="${escapeHtml(tab.icon || '')}" placeholder="⭐ ou SVS.png" />
               </div>
               <div>
                 <label>Type de section</label>
@@ -894,6 +920,7 @@
       `;
     }).join('');
 
+    refreshTabIconList();
     bindLangTabs(container);
 
     // bindings — uniquement les cartes d'onglet de 1er niveau (pas les cartes imbriquées)
