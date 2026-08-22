@@ -623,37 +623,37 @@
   // Libellés du tchat par langue (mêmes 6 langues détaillées que REPORT_I18N,
   // repli sur le français pour les autres — cohérent avec le motif existant).
   const CHAT_I18N = {
-    fr: { navLabel: "Tchat", title: "Tchat de l'alliance", sub: "// PARLEZ, C'EST TRADUIT AUTOMATIQUEMENT",
+    fr: { navLabel: "Tchat", title: "Chat", sub: "// PARLEZ, C'EST TRADUIT AUTOMATIQUEMENT",
       intro: "Écrivez dans votre langue : chaque message est automatiquement traduit dans la langue de chaque lecteur.",
       nameLabel: "Pseudo", namePh: "Votre pseudo", msgPh: "Votre message…", send: "Envoyer", sending: "Envoi…",
       empty: "Aucun message pour l'instant. Lancez la conversation !", loading: "Chargement du tchat…",
       needName: "Choisissez un pseudo.", needText: "Écrivez un message.", error: "Échec de l'envoi. Réessayez.",
       tooFast: "Doucement… patientez quelques secondes.", showOrig: "voir l'original", hideOrig: "masquer l'original" },
-    en: { navLabel: "Chat", title: "Alliance chat", sub: "// SPEAK — IT'S TRANSLATED AUTOMATICALLY",
+    en: { navLabel: "Chat", title: "Chat", sub: "// SPEAK — IT'S TRANSLATED AUTOMATICALLY",
       intro: "Write in your own language: every message is automatically translated into each reader's language.",
       nameLabel: "Nickname", namePh: "Your nickname", msgPh: "Your message…", send: "Send", sending: "Sending…",
       empty: "No messages yet. Start the conversation!", loading: "Loading chat…",
       needName: "Choose a nickname.", needText: "Write a message.", error: "Sending failed. Try again.",
       tooFast: "Easy there… wait a few seconds.", showOrig: "show original", hideOrig: "hide original" },
-    it: { navLabel: "Chat", title: "Chat dell'alleanza", sub: "// SCRIVI — VIENE TRADOTTO AUTOMATICAMENTE",
+    it: { navLabel: "Chat", title: "Chat", sub: "// SCRIVI — VIENE TRADOTTO AUTOMATICAMENTE",
       intro: "Scrivi nella tua lingua: ogni messaggio viene tradotto automaticamente nella lingua di chi legge.",
       nameLabel: "Soprannome", namePh: "Il tuo soprannome", msgPh: "Il tuo messaggio…", send: "Invia", sending: "Invio…",
       empty: "Ancora nessun messaggio. Inizia la conversazione!", loading: "Caricamento chat…",
       needName: "Scegli un soprannome.", needText: "Scrivi un messaggio.", error: "Invio non riuscito. Riprova.",
       tooFast: "Piano… aspetta qualche secondo.", showOrig: "mostra originale", hideOrig: "nascondi originale" },
-    pt: { navLabel: "Chat", title: "Chat da aliança", sub: "// ESCREVA — É TRADUZIDO AUTOMATICAMENTE",
+    pt: { navLabel: "Chat", title: "Chat", sub: "// ESCREVA — É TRADUZIDO AUTOMATICAMENTE",
       intro: "Escreva no seu idioma: cada mensagem é traduzida automaticamente para o idioma de cada leitor.",
       nameLabel: "Apelido", namePh: "Seu apelido", msgPh: "Sua mensagem…", send: "Enviar", sending: "Enviando…",
       empty: "Nenhuma mensagem ainda. Comece a conversa!", loading: "Carregando o chat…",
       needName: "Escolha um apelido.", needText: "Escreva uma mensagem.", error: "Falha no envio. Tente de novo.",
       tooFast: "Calma… espere alguns segundos.", showOrig: "ver original", hideOrig: "ocultar original" },
-    ar: { navLabel: "الدردشة", title: "دردشة التحالف", sub: "// اكتب — تُترجم تلقائيًا",
+    ar: { navLabel: "الدردشة", title: "الدردشة", sub: "// اكتب — تُترجم تلقائيًا",
       intro: "اكتب بلغتك: تتم ترجمة كل رسالة تلقائيًا إلى لغة كل قارئ.",
       nameLabel: "الاسم المستعار", namePh: "اسمك المستعار", msgPh: "رسالتك…", send: "إرسال", sending: "جارٍ الإرسال…",
       empty: "لا توجد رسائل بعد. ابدأ المحادثة!", loading: "جارٍ تحميل الدردشة…",
       needName: "اختر اسمًا مستعارًا.", needText: "اكتب رسالة.", error: "فشل الإرسال. حاول مرة أخرى.",
       tooFast: "على مهلك… انتظر بضع ثوانٍ.", showOrig: "عرض الأصل", hideOrig: "إخفاء الأصل" },
-    ja: { navLabel: "チャット", title: "同盟チャット", sub: "// 話そう — 自動で翻訳されます",
+    ja: { navLabel: "チャット", title: "チャット", sub: "// 話そう — 自動で翻訳されます",
       intro: "自分の言語で書いてください。各メッセージは読み手の言語に自動で翻訳されます。",
       nameLabel: "ニックネーム", namePh: "ニックネーム", msgPh: "メッセージ…", send: "送信", sending: "送信中…",
       empty: "まだメッセージはありません。会話を始めましょう！", loading: "チャットを読み込み中…",
@@ -822,11 +822,11 @@
         <p>${i.desc || ''}</p>
       </div>
       <div class="quick-links">${quickLinks}</div>
+      ${chatEnabled() ? renderChatSection() : ''}
       <div class="callout">
         <strong>${i.noticeTitle || ''}</strong>
         <span>${i.noticeText || ''}</span>
       </div>
-      ${chatEnabled() ? renderChatSection() : ''}
     `;
   }
 
