@@ -264,7 +264,6 @@
       <button class="admin-tab" data-panel="events">Événements</button>
       <button class="admin-tab" data-panel="ui">Textes UI</button>
       <button class="admin-tab" data-panel="reports">Signalements <span id="reports-badge" class="reports-badge hidden">0</span></button>
-      <button class="admin-tab" data-panel="chat">Tchat</button>
       <button class="admin-tab" data-panel="stats">Statistiques</button>
       <button class="admin-tab" data-panel="import">Import / Export</button>
     </div>
@@ -320,23 +319,6 @@
         </label>
       </div>
       <div id="reports-list"></div>
-    </div>
-
-    <!-- TCHAT -->
-    <div class="admin-panel" id="panel-chat">
-      <div class="help-text">Messages du tchat multilingue envoyés par les visiteurs. Chaque message est traduit automatiquement pour chaque lecteur ; ici vous voyez le texte original et pouvez supprimer un message inapproprié.</div>
-
-      <div class="section-label">Disponibilité</div>
-      <div class="help-text">Coupez le tchat en cas de problème : l'onglet disparaît immédiatement du site pour tous les visiteurs. Les messages existants sont conservés. Le changement est enregistré aussitôt (pensez à mettre à jour <strong>seed-data.json</strong> pour qu'il s'applique dès le premier affichage).</div>
-      <label class="checkbox-row" style="margin-bottom:20px;">
-        <input type="checkbox" id="chat-enabled-toggle"> <span>Tchat activé sur le site public</span>
-      </label>
-
-      <div class="section-label">Messages</div>
-      <div style="display:flex; gap:10px; align-items:center; margin-bottom:16px;">
-        <button id="chat-refresh">🔄 Rafraîchir</button>
-      </div>
-      <div id="chat-mod-list"></div>
     </div>
 
     <!-- STATISTIQUES -->
@@ -2408,97 +2390,6 @@
   document.getElementById('reports-hide-done').addEventListener('change', renderReports);
   // recharge à l'ouverture de l'onglet pour avoir les derniers signalements
   document.querySelector('.admin-tab[data-panel="reports"]').addEventListener('click', loadReports);
-
-  // ───────────────────────────────────────────
-  // MODÉRATION DU TCHAT (messages)
-  // ───────────────────────────────────────────
-  let CHAT_MSGS = [];
-
-  async function loadChatMessages() {
-    const listEl = document.getElementById('chat-mod-list');
-    if (listEl) listEl.innerHTML = '<div class="report-empty">Chargement…</div>';
-    try {
-      // Les 200 messages les plus récents (createdAt décroissant).
-      const snap = await getDocs(query(collection(db, 'messages'), orderBy('createdAt', 'desc'), limit(200)));
-      CHAT_MSGS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderChatMessages();
-    } catch (e) {
-      console.error('Chargement du tchat échoué :', e);
-      if (listEl) listEl.innerHTML = '<div class="report-empty">Erreur de chargement : ' + escapeHtml(e.message) + '</div>';
-    }
-  }
-
-  function renderChatMessages() {
-    const listEl = document.getElementById('chat-mod-list');
-    if (!listEl) return;
-
-    if (!CHAT_MSGS.length) {
-      listEl.innerHTML = '<div class="report-empty">Aucun message pour le moment.</div>';
-      return;
-    }
-
-    listEl.innerHTML = CHAT_MSGS.map(m => {
-      const i18n = m.i18n || {};
-      const langs = Object.keys(i18n).filter(L => i18n[L]);
-      const translations = langs.length
-        ? `<details class="report-block" style="margin-top:8px;">
-             <summary class="rb-label" style="cursor:pointer;">Traductions (${langs.length})</summary>
-             ${langs.map(L => `<div class="rb-text" style="margin-top:6px;"><strong>${L.toUpperCase()}</strong> — ${escapeHtml(i18n[L])}</div>`).join('')}
-           </details>`
-        : '';
-      return `
-        <div class="item-card report-item" data-id="${m.id}">
-          <div class="item-card-header">
-            <div class="item-card-title" style="flex-wrap:wrap; gap:8px;">
-              <span class="report-lang-pill">${(m.src || '?').toUpperCase()}</span>
-              <span class="item-card-meta">${formatReportDate(m)}</span>
-              <span class="item-card-meta">par ${escapeHtml(m.name || '?')}</span>
-            </div>
-            <div class="item-card-actions">
-              <button class="small chat-mod-delete danger">Suppr.</button>
-            </div>
-          </div>
-          <div class="report-block">
-            <span class="rb-label">Message original</span>
-            <div class="rb-text">${escapeHtml(m.text || '')}</div>
-          </div>
-          ${translations}
-        </div>`;
-    }).join('');
-
-    listEl.querySelectorAll('.report-item').forEach(card => {
-      const id = card.dataset.id;
-      card.querySelector('.chat-mod-delete').addEventListener('click', async () => {
-        if (!confirm('Supprimer définitivement ce message du tchat ?')) return;
-        try {
-          await deleteDoc(doc(db, 'messages', id));
-          CHAT_MSGS = CHAT_MSGS.filter(x => x.id !== id);
-          renderChatMessages();
-          showToast('Message supprimé');
-        } catch (e) {
-          showToast('Erreur : ' + e.message, true);
-        }
-      });
-    });
-  }
-
-  document.getElementById('chat-refresh').addEventListener('click', loadChatMessages);
-
-  // Interrupteur de disponibilité du tchat (DATA.chatEnabled, dans site/content).
-  // Absence du champ = activé (rétrocompatibilité). L'enregistrement est immédiat.
-  const chatToggle = document.getElementById('chat-enabled-toggle');
-  function syncChatToggle() { if (DATA) chatToggle.checked = DATA.chatEnabled !== false; }
-  chatToggle.addEventListener('change', async () => {
-    if (!DATA) { syncChatToggle(); return; }
-    DATA.chatEnabled = chatToggle.checked;
-    await saveData();
-  });
-
-  // recharge à l'ouverture de l'onglet pour avoir les derniers messages + état de l'interrupteur
-  document.querySelector('.admin-tab[data-panel="chat"]').addEventListener('click', () => {
-    syncChatToggle();
-    loadChatMessages();
-  });
 
   // ───────────────────────────────────────────
   // STATISTIQUES DE FRÉQUENTATION (visits)

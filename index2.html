@@ -309,63 +309,6 @@
     .report-status.err { color: var(--danger); }
     html[dir="rtl"] .report-field > label { text-align: right; }
 
-    /* ── Tchat multilingue ── */
-    .chat-wrap { max-width: 760px; }
-    .chat-log {
-      border: 1px solid var(--border); background: var(--surface); border-radius: 2px;
-      height: 52vh; min-height: 320px; max-height: 560px; overflow-y: auto;
-      padding: 16px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px;
-    }
-    .chat-empty, .chat-loading { color: var(--muted); font-size: 0.88rem; text-align: center; margin: auto; }
-    .chat-msg { display: flex; flex-direction: column; gap: 3px; animation: fadeIn 0.25s ease; }
-    .chat-msg-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-    .chat-msg-name { font-weight: 700; color: var(--accent2); font-size: 0.9rem; }
-    .chat-msg-time { font-family: 'Share Tech Mono', monospace; font-size: 0.66rem; color: var(--muted); }
-    .chat-msg-body {
-      background: var(--card); border: 1px solid var(--border); border-radius: 2px;
-      padding: 9px 13px; font-size: 0.93rem; line-height: 1.5; word-break: break-word;
-    }
-    .chat-msg.mine .chat-msg-name { color: var(--accent); }
-    .chat-msg-orig {
-      background: none; border: none; color: var(--muted); font-family: 'Share Tech Mono', monospace;
-      font-size: 0.62rem; letter-spacing: 1px; cursor: pointer; padding: 2px 0; text-transform: uppercase;
-      align-self: flex-start;
-    }
-    .chat-msg-orig:hover { color: var(--text); }
-    .chat-msg-original {
-      margin-top: 4px; padding: 7px 12px; border-left: 2px solid var(--border);
-      color: var(--muted); font-size: 0.85rem; font-style: italic; white-space: pre-line;
-    }
-    .chat-compose { display: flex; flex-direction: column; gap: 10px; }
-    .chat-name-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .chat-name-row label {
-      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 1.5px;
-      color: var(--accent); text-transform: uppercase;
-    }
-    .chat-name-row input {
-      flex: 0 1 220px; background: var(--surface); border: 1px solid var(--border); color: var(--text);
-      padding: 9px 12px; font-family: 'Barlow', sans-serif; font-size: 0.9rem; border-radius: 2px;
-    }
-    .chat-send-row { display: flex; gap: 10px; align-items: flex-end; }
-    .chat-send-row textarea {
-      flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text);
-      padding: 11px 13px; font-family: 'Barlow', sans-serif; font-size: 0.92rem; border-radius: 2px;
-      resize: vertical; min-height: 48px; max-height: 160px; line-height: 1.5;
-    }
-    .chat-name-row input:focus, .chat-send-row textarea:focus { outline: none; border-color: var(--accent); }
-    .chat-send {
-      font-family: 'Barlow', sans-serif; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-      background: var(--accent); color: #0a0c0f; border: 1px solid var(--accent); padding: 12px 22px;
-      font-size: 0.85rem; cursor: pointer; border-radius: 2px; transition: background 0.2s; white-space: nowrap;
-    }
-    .chat-send:hover { background: var(--accent2); }
-    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
-    .chat-status { font-size: 0.84rem; min-height: 1.1rem; }
-    .chat-status.err { color: var(--danger); }
-    .chat-note { font-size: 0.78rem; color: var(--muted); }
-    html[dir="rtl"] .chat-msg-original { border-left: none; border-right: 2px solid var(--border); }
-    @media (max-width: 600px) { .chat-send-row { flex-direction: column; align-items: stretch; } }
-
     @media (max-width: 600px) {
       .header-inner { padding: 28px 16px 24px; }
       .lang-inner, .nav-inner { padding: 0 12px; }
@@ -484,10 +427,7 @@
         ]);
         const app = appMod.initializeApp(firebaseConfig);
         const db = fs.getFirestore(app);
-        return {
-          db, collection: fs.collection, addDoc: fs.addDoc, serverTimestamp: fs.serverTimestamp,
-          query: fs.query, orderBy: fs.orderBy, limit: fs.limit, onSnapshot: fs.onSnapshot
-        };
+        return { db, collection: fs.collection, addDoc: fs.addDoc, serverTimestamp: fs.serverTimestamp };
       })();
     }
     return _fbReady;
@@ -610,64 +550,6 @@
     return (REPORT_I18N[currentLang] || REPORT_I18N.fr)[key] || REPORT_I18N.fr[key] || '';
   }
 
-  // ── Tchat multilingue ──
-  // Toutes les langues cibles de traduction (identiques aux langues du site).
-  // Le worker DeepL auto-détecte la langue source du message.
-  const CHAT_TAB_ID = '__chat__';
-  const CHAT_PROXY_URL = 'https://nk2-translate.yannalogik.workers.dev';
-  const CHAT_TR_TARGETS = ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh'];
-  const CHAT_NAME_MAX = 40;
-  const CHAT_TEXT_MAX = 500;
-  const CHAT_COOLDOWN_MS = 3000;   // anti-spam : délai minimal entre deux envois
-  const CHAT_MAX_SHOWN = 80;       // nombre de messages conservés/affichés
-
-  // Libellés du tchat par langue (mêmes 6 langues détaillées que REPORT_I18N,
-  // repli sur le français pour les autres — cohérent avec le motif existant).
-  const CHAT_I18N = {
-    fr: { navLabel: "Tchat", title: "Tchat de l'alliance", sub: "// PARLEZ, C'EST TRADUIT AUTOMATIQUEMENT",
-      intro: "Écrivez dans votre langue : chaque message est automatiquement traduit dans la langue de chaque lecteur.",
-      nameLabel: "Pseudo", namePh: "Votre pseudo", msgPh: "Votre message…", send: "Envoyer", sending: "Envoi…",
-      empty: "Aucun message pour l'instant. Lancez la conversation !", loading: "Chargement du tchat…",
-      needName: "Choisissez un pseudo.", needText: "Écrivez un message.", error: "Échec de l'envoi. Réessayez.",
-      tooFast: "Doucement… patientez quelques secondes.", showOrig: "voir l'original", hideOrig: "masquer l'original" },
-    en: { navLabel: "Chat", title: "Alliance chat", sub: "// SPEAK — IT'S TRANSLATED AUTOMATICALLY",
-      intro: "Write in your own language: every message is automatically translated into each reader's language.",
-      nameLabel: "Nickname", namePh: "Your nickname", msgPh: "Your message…", send: "Send", sending: "Sending…",
-      empty: "No messages yet. Start the conversation!", loading: "Loading chat…",
-      needName: "Choose a nickname.", needText: "Write a message.", error: "Sending failed. Try again.",
-      tooFast: "Easy there… wait a few seconds.", showOrig: "show original", hideOrig: "hide original" },
-    it: { navLabel: "Chat", title: "Chat dell'alleanza", sub: "// SCRIVI — VIENE TRADOTTO AUTOMATICAMENTE",
-      intro: "Scrivi nella tua lingua: ogni messaggio viene tradotto automaticamente nella lingua di chi legge.",
-      nameLabel: "Soprannome", namePh: "Il tuo soprannome", msgPh: "Il tuo messaggio…", send: "Invia", sending: "Invio…",
-      empty: "Ancora nessun messaggio. Inizia la conversazione!", loading: "Caricamento chat…",
-      needName: "Scegli un soprannome.", needText: "Scrivi un messaggio.", error: "Invio non riuscito. Riprova.",
-      tooFast: "Piano… aspetta qualche secondo.", showOrig: "mostra originale", hideOrig: "nascondi originale" },
-    pt: { navLabel: "Chat", title: "Chat da aliança", sub: "// ESCREVA — É TRADUZIDO AUTOMATICAMENTE",
-      intro: "Escreva no seu idioma: cada mensagem é traduzida automaticamente para o idioma de cada leitor.",
-      nameLabel: "Apelido", namePh: "Seu apelido", msgPh: "Sua mensagem…", send: "Enviar", sending: "Enviando…",
-      empty: "Nenhuma mensagem ainda. Comece a conversa!", loading: "Carregando o chat…",
-      needName: "Escolha um apelido.", needText: "Escreva uma mensagem.", error: "Falha no envio. Tente de novo.",
-      tooFast: "Calma… espere alguns segundos.", showOrig: "ver original", hideOrig: "ocultar original" },
-    ar: { navLabel: "الدردشة", title: "دردشة التحالف", sub: "// اكتب — تُترجم تلقائيًا",
-      intro: "اكتب بلغتك: تتم ترجمة كل رسالة تلقائيًا إلى لغة كل قارئ.",
-      nameLabel: "الاسم المستعار", namePh: "اسمك المستعار", msgPh: "رسالتك…", send: "إرسال", sending: "جارٍ الإرسال…",
-      empty: "لا توجد رسائل بعد. ابدأ المحادثة!", loading: "جارٍ تحميل الدردشة…",
-      needName: "اختر اسمًا مستعارًا.", needText: "اكتب رسالة.", error: "فشل الإرسال. حاول مرة أخرى.",
-      tooFast: "على مهلك… انتظر بضع ثوانٍ.", showOrig: "عرض الأصل", hideOrig: "إخفاء الأصل" },
-    ja: { navLabel: "チャット", title: "同盟チャット", sub: "// 話そう — 自動で翻訳されます",
-      intro: "自分の言語で書いてください。各メッセージは読み手の言語に自動で翻訳されます。",
-      nameLabel: "ニックネーム", namePh: "ニックネーム", msgPh: "メッセージ…", send: "送信", sending: "送信中…",
-      empty: "まだメッセージはありません。会話を始めましょう！", loading: "チャットを読み込み中…",
-      needName: "ニックネームを入力してください。", needText: "メッセージを入力してください。", error: "送信に失敗しました。もう一度お試しください。",
-      tooFast: "落ち着いて… 数秒待ってください。", showOrig: "原文を表示", hideOrig: "原文を隠す" }
-  };
-  function ci(key) {
-    return (CHAT_I18N[currentLang] || CHAT_I18N.fr)[key] || CHAT_I18N.fr[key] || '';
-  }
-  // Le tchat est activé par défaut ; l'admin peut le couper (DATA.chatEnabled=false).
-  // Absence du champ = activé (rétrocompatibilité avec les données existantes).
-  function chatEnabled() { return !!(DATA && DATA.chatEnabled !== false); }
-
   // Valeurs par défaut de l'en-tête si l'admin n'a rien saisi (rétrocompat).
   const HEADER_DEFAULTS = { title: 'NK2', accent: 'WIKI', subtitle: '// LAND OF JAIL', page: 'NK2 Wiki — Land of Jail' };
 
@@ -775,7 +657,6 @@
       const label = langData.label || tab.id;
       return `<button class="nav-btn" data-tab="${tab.id}">${tabIconHtml(tab.icon)} <span>${label}</span></button>`;
     }).join('')
-      + (chatEnabled() ? `<button class="nav-btn" data-tab="${CHAT_TAB_ID}">💬 <span>${ci('navLabel')}</span></button>` : '')
       + `<button class="nav-btn" data-tab="${REPORT_TAB_ID}">📝 <span>${ri('navLabel')}</span></button>`;
 
     navInner.querySelectorAll('.nav-btn').forEach(btn => {
@@ -790,7 +671,7 @@
   // de langue, réconciliation), sinon le premier onglet.
   function pickActiveTab() {
     const tabs = (DATA && DATA.tabs ? DATA.tabs : []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
-    const valid = id => id === REPORT_TAB_ID || (id === CHAT_TAB_ID && chatEnabled()) || tabs.some(t => t.id === id);
+    const valid = id => id === REPORT_TAB_ID || tabs.some(t => t.id === id);
     if (PENDING_HASH && valid(PENDING_HASH)) {
       const id = PENDING_HASH;
       PENDING_HASH = '';
@@ -1226,7 +1107,6 @@
         ${renderSectionContent(tab)}
       </div>
     `).join('')
-      + (chatEnabled() ? `<div id="section-${CHAT_TAB_ID}" class="section">${renderChatSection()}</div>` : '')
       + `<div id="section-${REPORT_TAB_ID}" class="section">${renderReportSection()}</div>`;
 
     // quick-link clicks
@@ -1235,7 +1115,6 @@
     });
 
     bindReportForm(main);
-    bindChat(main);
   }
 
   function renderReportSection() {
@@ -1371,263 +1250,6 @@
     });
   }
 
-  // ── Tchat multilingue : état et logique ──
-  // État vivant du tchat, indépendant des re-rendus (changement de langue).
-  // • msgs     : derniers messages (ordre chronologique croissant).
-  // • unsub    : fonction de désabonnement onSnapshot (abonnement unique).
-  // • lastSent : horodatage du dernier envoi local (anti-spam).
-  // • expanded : identifiants des messages dont l'original est déplié.
-  const CHAT = { msgs: [], unsub: null, lastSent: 0, expanded: new Set() };
-
-  // Texte d'un message dans la langue voulue. La langue de l'auteur affiche
-  // l'original exact ; sinon la traduction, avec repli sur l'original puis fr/en.
-  function msgText(msg, lang) {
-    if (!msg) return '';
-    if (msg.src && lang === msg.src && msg.text) return msg.text;
-    const i = msg.i18n || {};
-    if (i[lang]) return i[lang];
-    if (msg.text) return msg.text;
-    return i.fr || i.en || '';
-  }
-
-  // Échappe le texte utilisateur et convertit les retours à la ligne en <br>.
-  function chatEscape(s) {
-    return escapeAttr(s).replace(/\r?\n/g, '<br>');
-  }
-
-  // Horodatage court et localisé d'un message (heure:minute).
-  function fmtChatTime(msg) {
-    let ms = 0;
-    const c = msg && msg.createdAt;
-    if (c) {
-      if (typeof c.toMillis === 'function') ms = c.toMillis();
-      else if (typeof c.seconds === 'number') ms = c.seconds * 1000;
-      else if (typeof c === 'number') ms = c;
-    }
-    if (!ms) ms = Date.now();
-    try {
-      return new Date(ms).toLocaleTimeString(currentLang, { hour: '2-digit', minute: '2-digit' });
-    } catch (e) {
-      return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-  }
-
-  // Traduit un message vers toutes les langues via le worker (source auto-détectée).
-  // Renvoie une carte { langue: texte }. En cas d'échec, renvoie {} (repli sur
-  // l'original géré par msgText au rendu).
-  async function translateMessage(text) {
-    if (!CHAT_PROXY_URL) return {};
-    try {
-      const r = await fetch(CHAT_PROXY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, targets: CHAT_TR_TARGETS })
-      });
-      if (!r.ok) throw new Error('proxy ' + r.status);
-      const d = await r.json();
-      const out = {};
-      CHAT_TR_TARGETS.forEach(L => {
-        const v = (d.translations && d.translations[L]) || '';
-        if (v) out[L] = decodeChatEntities(v);
-      });
-      return out;
-    } catch (e) {
-      console.error('Traduction du message échouée :', e);
-      return {};
-    }
-  }
-
-  // Décode les éventuelles entités HTML renvoyées par le service de traduction.
-  function decodeChatEntities(str) {
-    const ta = document.createElement('textarea');
-    ta.innerHTML = String(str == null ? '' : str);
-    return ta.value;
-  }
-
-  // Coquille HTML de la section tchat (journal + zone de saisie).
-  function renderChatSection() {
-    let name = '';
-    try { name = localStorage.getItem('nk2_chat_name') || ''; } catch (e) {}
-    return `
-      <div class="section-title">${ci('title')}</div>
-      <div class="section-sub">${ci('sub')}</div>
-      <div class="callout"><span>${ci('intro')}</span></div>
-
-      <div class="chat-wrap">
-        <div class="chat-log" id="chat-log">
-          <div class="chat-loading">${ci('loading')}</div>
-        </div>
-
-        <div class="chat-compose">
-          <div class="chat-name-row">
-            <label for="chat-name">${ci('nameLabel')}</label>
-            <input type="text" id="chat-name" maxlength="${CHAT_NAME_MAX}" autocomplete="off"
-              placeholder="${escapeAttr(ci('namePh'))}" value="${escapeAttr(name)}">
-          </div>
-          <div class="chat-honey" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden;">
-            <label>Website</label>
-            <input type="text" id="chat-website" tabindex="-1" autocomplete="off">
-          </div>
-          <div class="chat-send-row">
-            <textarea id="chat-text" maxlength="${CHAT_TEXT_MAX}" placeholder="${escapeAttr(ci('msgPh'))}"></textarea>
-            <button type="button" class="chat-send" id="chat-send">${ci('send')}</button>
-          </div>
-          <div class="chat-status" id="chat-status"></div>
-        </div>
-      </div>
-    `;
-  }
-
-  // Construit le HTML d'un message dans la langue courante.
-  function chatMsgHtml(msg) {
-    const shown = msgText(msg, currentLang);
-    const original = msg.text || '';
-    // On propose l'original seulement si la traduction affichée en diffère.
-    const showToggle = original && original !== shown;
-    const expanded = CHAT.expanded.has(msg.id);
-    let mine = false;
-    try { mine = !!msg.name && msg.name === (localStorage.getItem('nk2_chat_name') || ''); } catch (e) {}
-    return `
-      <div class="chat-msg${mine ? ' mine' : ''}">
-        <div class="chat-msg-head">
-          <span class="chat-msg-name">${escapeAttr(msg.name || '?')}</span>
-          <span class="chat-msg-time">${fmtChatTime(msg)}</span>
-        </div>
-        <div class="chat-msg-body">${chatEscape(shown)}</div>
-        ${showToggle ? `<button type="button" class="chat-msg-orig" data-id="${escapeAttr(msg.id)}">${expanded ? ci('hideOrig') : ci('showOrig')}</button>` : ''}
-        ${showToggle && expanded ? `<div class="chat-msg-original">${chatEscape(original)}</div>` : ''}
-      </div>`;
-  }
-
-  // Rend les messages courants dans le journal, dans la langue active.
-  function renderChatMessages() {
-    const log = document.getElementById('chat-log');
-    if (!log) return;
-    if (!CHAT.msgs.length) {
-      log.innerHTML = `<div class="chat-empty">${ci('empty')}</div>`;
-      return;
-    }
-    // Mémorise si l'utilisateur était déjà collé en bas avant le re-rendu.
-    const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
-    log.innerHTML = CHAT.msgs.map(chatMsgHtml).join('');
-    log.querySelectorAll('.chat-msg-orig').forEach(b => {
-      b.addEventListener('click', () => {
-        const id = b.dataset.id;
-        if (CHAT.expanded.has(id)) CHAT.expanded.delete(id); else CHAT.expanded.add(id);
-        renderChatMessages();
-      });
-    });
-    if (atBottom) scrollChatToBottom();
-  }
-
-  function scrollChatToBottom() {
-    const log = document.getElementById('chat-log');
-    if (log) log.scrollTop = log.scrollHeight;
-  }
-
-  // Abonnement temps réel au tchat (unique). SDK Firebase chargé paresseusement.
-  async function ensureChatSubscription() {
-    if (CHAT.unsub) return;
-    CHAT.unsub = true; // verrou anti-double-abonnement pendant le chargement du SDK
-    try {
-      const fb = await ensureFirebase();
-      const q = fb.query(
-        fb.collection(fb.db, 'messages'),
-        fb.orderBy('createdAt', 'desc'),
-        fb.limit(CHAT_MAX_SHOWN)
-      );
-      CHAT.unsub = fb.onSnapshot(q, snap => {
-        const arr = [];
-        snap.forEach(doc => {
-          const d = doc.data() || {};
-          arr.push({
-            id: doc.id,
-            name: d.name || '',
-            text: d.text || '',
-            src: d.src || '',
-            i18n: d.i18n || {},
-            createdAt: d.createdAt || null
-          });
-        });
-        arr.reverse(); // du plus ancien au plus récent pour l'affichage
-        CHAT.msgs = arr;
-        renderChatMessages();
-      }, err => {
-        console.error('Abonnement au tchat échoué :', err);
-        const log = document.getElementById('chat-log');
-        if (log && !CHAT.msgs.length) log.innerHTML = `<div class="chat-empty">${ci('error')}</div>`;
-        CHAT.unsub = null; // permet une nouvelle tentative à la prochaine ouverture
-      });
-    } catch (e) {
-      console.error('Initialisation du tchat échouée :', e);
-      CHAT.unsub = null;
-    }
-  }
-
-  // Câble la zone de saisie du tchat (persistance du pseudo, envoi, Entrée).
-  function bindChat(root) {
-    const wrap = root.querySelector('.chat-compose');
-    if (!wrap) return;
-    const nameEl = wrap.querySelector('#chat-name');
-    const textEl = wrap.querySelector('#chat-text');
-    const honeyEl = wrap.querySelector('#chat-website');
-    const btn = wrap.querySelector('#chat-send');
-    const statusEl = wrap.querySelector('#chat-status');
-
-    nameEl.addEventListener('input', () => {
-      try { localStorage.setItem('nk2_chat_name', nameEl.value.trim().slice(0, CHAT_NAME_MAX)); } catch (e) {}
-    });
-
-    const send = async () => {
-      statusEl.className = 'chat-status';
-      statusEl.textContent = '';
-
-      // anti-spam : champ piège rempli → on n'envoie rien (faux succès silencieux)
-      if (honeyEl && honeyEl.value.trim()) { textEl.value = ''; return; }
-
-      const name = nameEl.value.trim().slice(0, CHAT_NAME_MAX);
-      const text = textEl.value.trim().slice(0, CHAT_TEXT_MAX);
-      if (!name) { statusEl.className = 'chat-status err'; statusEl.textContent = ci('needName'); nameEl.focus(); return; }
-      if (!text) { statusEl.className = 'chat-status err'; statusEl.textContent = ci('needText'); return; }
-      if (Date.now() - CHAT.lastSent < CHAT_COOLDOWN_MS) {
-        statusEl.className = 'chat-status err'; statusEl.textContent = ci('tooFast'); return;
-      }
-
-      btn.disabled = true;
-      const original = btn.textContent;
-      btn.textContent = ci('sending');
-      try {
-        try { localStorage.setItem('nk2_chat_name', name); } catch (e) {}
-        const i18n = await translateMessage(text);
-        const fb = await ensureFirebase();
-        await fb.addDoc(fb.collection(fb.db, 'messages'), {
-          name: name,
-          text: text,
-          src: currentLang,
-          i18n: i18n,
-          createdAt: fb.serverTimestamp()
-        });
-        CHAT.lastSent = Date.now();
-        textEl.value = '';
-        // L'abonnement temps réel affichera le message ; on force le défilement.
-        setTimeout(scrollChatToBottom, 50);
-      } catch (e) {
-        console.error('Envoi du message échoué :', e);
-        statusEl.className = 'chat-status err';
-        statusEl.textContent = ci('error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = original;
-      }
-    };
-
-    btn.addEventListener('click', send);
-    // Entrée = envoyer, Maj+Entrée = nouvelle ligne.
-    textEl.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-    });
-  }
-
   function renderFooter() {
     const ui = DATA.ui[currentLang] || DATA.ui.fr;
     document.getElementById('footer').innerHTML = `<span>${ui.footer || ''}</span>`;
@@ -1666,13 +1288,6 @@
         if (location.hash !== ('#' + encodeURIComponent(id))) history.replaceState(null, '', target);
       }
     } catch (e) {}
-    // À l'ouverture du tchat : abonnement temps réel (SDK paresseux), rendu des
-    // messages dans la langue courante et défilement du journal vers le bas.
-    if (id === CHAT_TAB_ID && chatEnabled()) {
-      ensureChatSubscription();
-      renderChatMessages();
-      scrollChatToBottom();
-    }
     if (!SUPPRESS_SCROLL) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
