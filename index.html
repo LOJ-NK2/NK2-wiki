@@ -613,7 +613,6 @@
   // ── Tchat multilingue ──
   // Toutes les langues cibles de traduction (identiques aux langues du site).
   // Le worker DeepL auto-détecte la langue source du message.
-  const CHAT_TAB_ID = '__chat__';
   const CHAT_PROXY_URL = 'https://nk2-translate.yannalogik.workers.dev';
   const CHAT_TR_TARGETS = ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh'];
   const CHAT_NAME_MAX = 40;
@@ -775,7 +774,6 @@
       const label = langData.label || tab.id;
       return `<button class="nav-btn" data-tab="${tab.id}">${tabIconHtml(tab.icon)} <span>${label}</span></button>`;
     }).join('')
-      + (chatEnabled() ? `<button class="nav-btn" data-tab="${CHAT_TAB_ID}">💬 <span>${ci('navLabel')}</span></button>` : '')
       + `<button class="nav-btn" data-tab="${REPORT_TAB_ID}">📝 <span>${ri('navLabel')}</span></button>`;
 
     navInner.querySelectorAll('.nav-btn').forEach(btn => {
@@ -790,7 +788,7 @@
   // de langue, réconciliation), sinon le premier onglet.
   function pickActiveTab() {
     const tabs = (DATA && DATA.tabs ? DATA.tabs : []).filter(tb => tb.enabled).sort((a,b) => a.order - b.order);
-    const valid = id => id === REPORT_TAB_ID || (id === CHAT_TAB_ID && chatEnabled()) || tabs.some(t => t.id === id);
+    const valid = id => id === REPORT_TAB_ID || tabs.some(t => t.id === id);
     if (PENDING_HASH && valid(PENDING_HASH)) {
       const id = PENDING_HASH;
       PENDING_HASH = '';
@@ -828,6 +826,7 @@
         <strong>${i.noticeTitle || ''}</strong>
         <span>${i.noticeText || ''}</span>
       </div>
+      ${chatEnabled() ? renderChatSection() : ''}
     `;
   }
 
@@ -1226,7 +1225,6 @@
         ${renderSectionContent(tab)}
       </div>
     `).join('')
-      + (chatEnabled() ? `<div id="section-${CHAT_TAB_ID}" class="section">${renderChatSection()}</div>` : '')
       + `<div id="section-${REPORT_TAB_ID}" class="section">${renderReportSection()}</div>`;
 
     // quick-link clicks
@@ -1666,9 +1664,11 @@
         if (location.hash !== ('#' + encodeURIComponent(id))) history.replaceState(null, '', target);
       }
     } catch (e) {}
-    // À l'ouverture du tchat : abonnement temps réel (SDK paresseux), rendu des
-    // messages dans la langue courante et défilement du journal vers le bas.
-    if (id === CHAT_TAB_ID && chatEnabled()) {
+    // Le tchat est intégré à l'onglet d'accueil : à son ouverture, abonnement
+    // temps réel (SDK paresseux), rendu des messages dans la langue courante et
+    // défilement du journal vers le bas.
+    const openedTab = (DATA.tabs || []).find(tb => tb.id === id);
+    if (openedTab && openedTab.type === 'home' && chatEnabled()) {
       ensureChatSubscription();
       renderChatMessages();
       scrollChatToBottom();
