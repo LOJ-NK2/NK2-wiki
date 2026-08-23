@@ -202,26 +202,11 @@
     .report-block.proposal .rb-text { border-left-color: var(--green); }
     .report-empty { color: var(--muted); font-style: italic; padding: 24px 0; }
 
-    /* ── AUTO-TRADUCTION ── */
-    .tr-btn {
-      margin: 2px 0 12px; padding: 3px 10px; font-size: 0.66rem; letter-spacing: 0.5px;
-      border-color: var(--border); color: var(--accent2); background: var(--surface); text-transform: none;
+    /* ── Badge de complétude des traductions ── */
+    .lang-badge {
+      font-family: 'Nunito', sans-serif; font-size: 0.62rem; letter-spacing: 0.5px;
+      padding: 2px 8px; border: 1px solid var(--border); border-radius: var(--radius-pill); white-space: nowrap;
     }
-    .tr-btn:hover { background: var(--accent); color: #0a0c0f; border-color: var(--accent); }
-    .tr-btn:disabled { opacity: 0.5; }
-    .tr-modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 2000;
-      display: flex; align-items: center; justify-content: center; padding: 20px;
-    }
-    .tr-modal {
-      background: var(--card); border: 1px solid var(--accent); border-radius: var(--radius-lg); max-width: 580px; width: 100%;
-      max-height: 86vh; overflow: auto; padding: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.55);
-    }
-    .tr-modal h3 { font-family: 'Fredoka', sans-serif; letter-spacing: 2px; color: var(--accent2); margin-bottom: 12px; font-size: 1.3rem; }
-    .tr-src { background: var(--surface); border: 1px solid var(--border); padding: 10px 12px; margin-bottom: 10px; font-size: 0.88rem; color: var(--text); }
-    .tr-src span { display: block; font-family: 'Nunito', sans-serif; font-size: 0.6rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; }
-    .tr-prop { min-height: 42px; margin-bottom: 4px; }
-    .tr-row-status { font-family: 'Nunito', sans-serif; font-size: 0.6rem; color: var(--danger); letter-spacing: 1px; margin-bottom: 8px; min-height: 0.7rem; }
     /* ── Statistiques ── */
     .stats-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:26px; }
     .stat-card { background:linear-gradient(180deg,var(--card2),var(--card)); border:1px solid var(--border); border-left:5px solid var(--accent); border-radius:var(--radius); padding:14px 16px; box-shadow:0 3px 10px rgba(0,0,0,0.2); }
@@ -245,6 +230,32 @@
     table.stats-table th { background:var(--surface); font-family:'Nunito',sans-serif; font-size:0.6rem; letter-spacing:1px; color:var(--accent); text-transform:uppercase; }
     table.stats-table td { color:var(--text); }
     .stats-empty { color:var(--muted); font-size:0.8rem; padding:20px; text-align:center; }
+
+    /* ── Enregistrement : bouton flottant (sticky au scroll) + état non-enregistré ── */
+    .save-hint { font-family:'Nunito',sans-serif; font-size:0.68rem; letter-spacing:1px; color:var(--muted); white-space:nowrap; }
+    .save-hint.dirty { color:var(--accent2); }
+    #save-btn { position:relative; }
+    #save-btn.dirty::after {
+      content:''; position:absolute; top:-4px; right:-4px; width:11px; height:11px;
+      border-radius:50%; background:var(--danger); border:2px solid var(--surface);
+    }
+    #save-fab {
+      position:fixed; right:22px; bottom:22px; z-index:900; display:none;
+      align-items:center; gap:8px; padding:13px 24px; font-size:0.95rem;
+      box-shadow:0 8px 24px rgba(0,0,0,0.5);
+    }
+    #save-fab.show { display:inline-flex; animation:fabIn 0.18s ease; }
+    @keyframes fabIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+    /* Cartes de « Cartes » repliables. Corps à classe dédiée (.troop-body) pour ne PAS
+       hériter de « .item-card.expanded .item-card-body » : cette règle descendante,
+       déclenchée par l'onglet parent déplié, forcerait sinon toutes les cartes ouvertes. */
+    .troop-card .card-toggle { min-width:66px; }
+    .troop-body { display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+    .troop-card.expanded > .troop-body { display:block; }
+    /* Panneau de langue affiché en ligne (stats : couleur + libellé + valeur sur une ligne) */
+    .lang-fields.lang-inline.active { display:inline-flex; align-items:center; gap:6px; }
+    .lang-fields.lang-inline label { margin:0; white-space:nowrap; }
+    .lang-fields.lang-inline input { width:auto; }
   </style>
 </head>
 <body>
@@ -267,7 +278,10 @@
   <header>
     <h1>NK2 <span>ADMIN</span></h1>
     <div class="topbar-actions">
+      <span id="dirty-hint" class="save-hint"></span>
       <a href="index.html" target="_blank"><button>Voir le site</button></a>
+      <button id="translate-modified-btn" title="Traduire vers toutes les langues tous les champs français modifiés depuis le dernier enregistrement">🌐 Traduire les modifs</button>
+      <button id="translate-missing-btn" title="Traduire uniquement les langues encore vides des champs dont le français est rempli (sans écraser les traductions existantes)">🈳 Compléter les manquants</button>
       <button id="save-btn" class="primary">💾 Enregistrer</button>
       <button id="logout-btn" class="danger">Déconnexion</button>
     </div>
@@ -421,6 +435,8 @@
     </div>
 
   </main>
+
+  <button id="save-fab" class="primary" title="Enregistrer les modifications">💾 Enregistrer</button>
 </div>
 
 <script type="module">
@@ -773,6 +789,7 @@
     try {
       await setDoc(doc(db, "site", "content"), DATA);
       SAVED_SNAPSHOT = JSON.stringify(DATA);
+      updateDirtyUI();
       showToast("Données enregistrées ✔ — pensez à mettre à jour seed-data.json (onglet Import / Export)", false, 6000);
     } catch (e) {
       showToast("Erreur d'enregistrement : " + e.message, true);
@@ -780,6 +797,32 @@
   }
 
   document.getElementById('save-btn').addEventListener('click', saveData);
+  document.getElementById('save-fab').addEventListener('click', saveData);
+
+  // Indicateur « modifications non enregistrées » : compare DATA à l'état chargé/enregistré.
+  // Pilote le bouton flottant (sticky), la pastille du bouton d'en-tête et le libellé d'aide.
+  function isDirty() {
+    return !!(DATA && auth.currentUser && JSON.stringify(DATA) !== SAVED_SNAPSHOT);
+  }
+  function updateDirtyUI() {
+    const dirty = isDirty();
+    const fab  = document.getElementById('save-fab');
+    const btn  = document.getElementById('save-btn');
+    const hint = document.getElementById('dirty-hint');
+    if (fab)  fab.classList.toggle('show', dirty);
+    if (btn)  btn.classList.toggle('dirty', dirty);
+    if (hint) { hint.textContent = dirty ? '● Modifications non enregistrées' : ''; hint.classList.toggle('dirty', dirty); }
+  }
+  // Recalcul de l'état « non enregistré » : déclenché à la saisie (débounce léger) plutôt
+  // qu'en continu. Les mutations programmatiques (ajout/suppression, traduction, import…)
+  // passent toutes par un re-rendu (renderAll/renderTabs) ou appellent updateDirtyUI.
+  let dirtyTimer = null;
+  function scheduleDirtyUI() {
+    if (dirtyTimer) return;
+    dirtyTimer = setTimeout(() => { dirtyTimer = null; updateDirtyUI(); }, 150);
+  }
+  document.addEventListener('input', scheduleDirtyUI);
+  document.addEventListener('change', scheduleDirtyUI);
 
   // Prévient la fermeture de la page avec des modifications non enregistrées
   // (comparaison à l'état chargé/enregistré : aucun marquage manuel à maintenir).
@@ -820,6 +863,7 @@
     safe('tableau', renderHeroTable);
     safe('événements', renderEvents);
     safe('textes UI', renderUi);
+    updateDirtyUI();
   }
 
   function langTabsHtml(uid, fields, getCurrentLang) {
@@ -899,61 +943,70 @@
       const uid = 'tab-' + tab.id;
       const fields = TAB_FIELD_SETS[tab.type] || TAB_FIELD_SETS.custom;
       const label = (tab.i18n && tab.i18n.fr && tab.i18n.fr.label) || tab.id;
+      // Seuls ces types sont proposés à la création. Un onglet existant d'un autre
+      // type (rétrocompat : gallery, links, richtext, custom, alliance, war…) garde
+      // son type via une option dédiée, sans être écrasé au rendu.
+      const STD_TAB_TYPES = ['home', 'troops', 'events'];
+      const extraTypeOption = STD_TAB_TYPES.includes(tab.type)
+        ? ''
+        : `<option value="${escapeHtml(tab.type)}" selected>${escapeHtml(tab.type)} (type existant)</option>`;
+      const isOpen = EXPANDED_TABS.has(tab.id);
+      const tabBadge = completenessBadge(countCompleteLangs(
+        fields.map(f => (lang) => (tab.i18n && tab.i18n[lang] && tab.i18n[lang][f.key]) || '')));
 
       return `
-        <div class="item-card" data-id="${tab.id}">
+        <div class="item-card${isOpen ? ' expanded' : ''}" data-id="${tab.id}">
           <div class="item-card-header">
-            <div class="item-card-title">
+            <div class="item-card-title" style="flex-wrap:wrap;">
               <span>${tabIconHtml(tab.icon, '❔')}</span>
               <span>${escapeHtml(label)}</span>
               <span class="item-card-meta">(${escapeHtml(tab.id)} · ${tab.type})</span>
-              ${!tab.enabled ? '<span class="item-card-meta" style="color:var(--danger)">DÉSACTIVÉ</span>' : ''}
+              ${tabBadge}
             </div>
             <div class="item-card-actions">
               <div class="order-controls">
                 <button class="small move-up" ${idx===0?'disabled':''}>▲</button>
                 <button class="small move-down" ${idx===tabs.length-1?'disabled':''}>▼</button>
               </div>
-              <button class="small toggle-expand">Éditer</button>
+              <button class="small toggle-expand">${isOpen ? 'Réduire' : 'Éditer'}</button>
+              <button class="small toggle-enabled" style="${tab.enabled ? 'border-color:var(--green); color:var(--green);' : 'border-color:var(--danger); color:var(--danger);'}">${tab.enabled ? '● Actif' : '○ Inactif'}</button>
               <button class="small delete-tab danger">Suppr.</button>
             </div>
           </div>
           <div class="item-card-body">
-            <div class="grid-3">
+            ${langTabsHtml(uid)}
+            <div class="grid-2" style="margin-top:12px;">
               <div>
-                <label>Icône (emoji ou fichier de images/icon/)</label>
+                <label>Icône</label>
                 <input type="text" class="f-icon" list="tab-icon-files" value="${escapeHtml(tab.icon || '')}" placeholder="⭐ ou SVS.png" />
               </div>
               <div>
                 <label>Type de section</label>
                 <select class="f-type">
                   <option value="home" ${tab.type==='home'?'selected':''}>Accueil</option>
-                  <option value="troops" ${tab.type==='troops'?'selected':''}>Héros</option>
+                  <option value="troops" ${tab.type==='troops'?'selected':''}>Cartes</option>
                   <option value="events" ${tab.type==='events'?'selected':''}>Événements</option>
-                  <option value="richtext" ${tab.type==='richtext'?'selected':''}>Texte riche (blocs/FAQ)</option>
-                  <option value="gallery" ${tab.type==='gallery'?'selected':''}>Galerie d'images</option>
-                  <option value="links" ${tab.type==='links'?'selected':''}>Liste de liens</option>
-                  <option value="custom" ${tab.type==='custom'?'selected':''}>Personnalisé (texte libre)</option>
+                  ${extraTypeOption}
                 </select>
-              </div>
-              <div class="checkbox-row" style="margin-top:24px;">
-                <input type="checkbox" class="f-enabled" id="enabled-${tab.id}" ${tab.enabled ? 'checked' : ''}/>
-                <label for="enabled-${tab.id}">Onglet activé (visible sur le site)</label>
               </div>
             </div>
 
-            ${langTabsHtml(uid)}
-            ${LANGS.map((l, i) => `
+            ${LANGS.map((l, i) => {
+              const fieldHtml = f => `
+                <label>${f.label} (${l.code.toUpperCase()})</label>
+                ${f.textarea
+                  ? `<textarea class="f-i18n" data-key="${f.key}" data-lang="${l.code}">${escapeHtml((tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || '')}</textarea>`
+                  : `<input type="text" class="f-i18n" data-key="${f.key}" data-lang="${l.code}" value="${escapeHtml((tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || '')}" />`
+                }`;
+              // « Libellé navigation » et « Titre principal » côte à côte, le reste dessous.
+              const head = fields.filter(f => f.key === 'label' || f.key === 'title');
+              const rest = fields.filter(f => f.key !== 'label' && f.key !== 'title');
+              return `
               <div class="lang-fields ${i===0?'active':''}" data-uid="${uid}" data-lang="${l.code}">
-                ${fields.map(f => `
-                  <label>${f.label} (${l.code.toUpperCase()})</label>
-                  ${f.textarea
-                    ? `<textarea class="f-i18n" data-key="${f.key}" data-lang="${l.code}">${escapeHtml((tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || '')}</textarea>`
-                    : `<input type="text" class="f-i18n" data-key="${f.key}" data-lang="${l.code}" value="${escapeHtml((tab.i18n && tab.i18n[l.code] && tab.i18n[l.code][f.key]) || '')}" />`
-                  }
-                `).join('')}
-              </div>
-            `).join('')}
+                <div class="grid-2">${head.map(f => `<div>${fieldHtml(f)}</div>`).join('')}</div>
+                ${rest.map(fieldHtml).join('')}
+              </div>`;
+            }).join('')}
 
             ${renderTabContentEditor(tab, uid)}
           </div>
@@ -971,7 +1024,22 @@
       const tab = DATA.tabs.find(t => t.id === id);
       if (!tab) return;
 
-      card.querySelector('.toggle-expand').addEventListener('click', () => card.classList.toggle('expanded'));
+      const exBtn = card.querySelector('.toggle-expand');
+      exBtn.addEventListener('click', () => {
+        // Accordéon : ouvrir un onglet referme les autres. État persistant (EXPANDED_TABS).
+        const willOpen = !card.classList.contains('expanded');
+        EXPANDED_TABS.clear();
+        container.querySelectorAll(':scope > .item-card').forEach(c => {
+          c.classList.remove('expanded');
+          const b = c.querySelector('.toggle-expand');
+          if (b) b.textContent = 'Éditer';
+        });
+        if (willOpen) {
+          EXPANDED_TABS.add(id);
+          card.classList.add('expanded');
+          exBtn.textContent = 'Réduire';
+        }
+      });
 
       card.querySelector('.delete-tab').addEventListener('click', () => {
         if (confirm(`Supprimer l'onglet "${id}" ?`)) {
@@ -988,9 +1056,20 @@
       });
 
       card.querySelector('.f-icon').addEventListener('input', e => tab.icon = e.target.value);
-      card.querySelector('.f-enabled').addEventListener('change', e => tab.enabled = e.target.checked);
+      // Bouton Actif/Inactif (remplace l'ancienne case à cocher). Bascule sans re-rendu ;
+      // l'état est porté par le bouton lui-même (plus de badge « DÉSACTIVÉ » redondant).
+      const enBtn = card.querySelector('.toggle-enabled');
+      if (enBtn) enBtn.addEventListener('click', () => {
+        tab.enabled = !tab.enabled;
+        enBtn.textContent = tab.enabled ? '● Actif' : '○ Inactif';
+        enBtn.style.borderColor = tab.enabled ? 'var(--green)' : 'var(--danger)';
+        enBtn.style.color = tab.enabled ? 'var(--green)' : 'var(--danger)';
+      });
       card.querySelector('.f-type').addEventListener('change', e => {
         tab.type = e.target.value;
+        // Passage au type « Cartes » : démarrer avec une liste vide plutôt que le
+        // contenu par défaut hérité de l'onglet héros (buildDefaultTroopsCards).
+        if (tab.type === 'troops' && !Array.isArray(tab.cards)) tab.cards = [];
         renderTabs();
       });
 
@@ -1007,6 +1086,7 @@
       bindTabContentEditor(card, tab);
      } catch (e) { console.error('Erreur de binding onglet', card.dataset.id, e); }
     });
+    updateDirtyUI();
   }
 
   function moveTab(id, dir) {
@@ -1054,6 +1134,51 @@
     { value: 'warn', label: 'Or' },
     { value: 'bad', label: 'Rouge' }
   ];
+
+  // État d'ouverture des cartes (section « Cartes »), persistant au travers des
+  // re-rendus (renderTabs régénère tout le DOM). Clé = `${tab.id}#${cidx}`.
+  const EXPANDED_CARDS = new Set();
+
+  // Accordéon : une seule carte ouverte à la fois par onglet. Ouvre `cidx` et
+  // referme les autres cartes du même onglet (les ids d'onglet ne contiennent pas de « # »).
+  function openCardExclusive(tabId, cidx) {
+    [...EXPANDED_CARDS].forEach(k => { if (k.startsWith(tabId + '#')) EXPANDED_CARDS.delete(k); });
+    EXPANDED_CARDS.add(tabId + '#' + cidx);
+  }
+
+  // Onglet ouvert en édition (persiste au travers des re-rendus). Accordéon : un seul id.
+  const EXPANDED_TABS = new Set();
+
+  // ── Complétude des traductions ──
+  // getters : liste de fonctions (code langue -> valeur). Le FR sert de référence :
+  // seuls les champs remplis en FR comptent ; une langue est « complète » si tous
+  // ces champs y sont remplis. Retourne { complete, total, empty }.
+  function countCompleteLangs(getters) {
+    const src = getters.filter(g => String(g('fr') || '').trim() !== '');
+    if (!src.length) return { complete: LANGS.length, total: LANGS.length, empty: true };
+    let complete = 0;
+    LANGS.forEach(l => { if (src.every(g => String(g(l.code) || '').trim() !== '')) complete++; });
+    return { complete, total: LANGS.length, empty: false };
+  }
+  function completenessBadge(stat) {
+    if (!stat || stat.empty) return '';
+    const { complete, total } = stat;
+    const color = complete === total ? 'var(--green)' : (complete * 2 >= total ? 'var(--accent2)' : 'var(--danger)');
+    const title = complete === total ? 'Toutes les langues sont traduites' : (total - complete) + ' langue(s) incomplète(s)';
+    return `<span class="lang-badge" style="border-color:${color}; color:${color};" title="${title}">🌐 ${complete}/${total}</span>`;
+  }
+  // Les champs i18n d'une carte (nom, description, étiquette, libellés de bandes et de stats).
+  function cardLangGetters(c) {
+    const g = [
+      l => (c.name && c.name[l]) || '',
+      l => (c.desc && c.desc[l]) || '',
+      l => (c.tierLabel && c.tierLabel[l]) || ''
+    ];
+    (c.strips || []).forEach(s => g.push(l => (s.label && s.label[l]) || ''));
+    (c.resources || []).forEach(s => g.push(l => (s.label && s.label[l]) || ''));
+    (c.stats || []).forEach(st => { g.push(l => (st.label && st.label[l]) || ''); g.push(l => (st.value && st.value[l]) || ''); });
+    return g;
+  }
 
   // Construit un objet i18n {fr:..,en:..} à partir d'une clé des textes UI globaux.
   function uiI18n(key) {
@@ -1150,7 +1275,7 @@
   function renderTroopsEditor(tab, uid) {
     ensureTroopsCards(tab);
     return `
-      <div class="section-label" style="margin-top:20px;">Section Héros — contenu de cet onglet</div>
+      <div class="section-label" style="margin-top:20px;">Section Cartes — contenu de cet onglet</div>
       <div class="checkbox-row">
         <input type="checkbox" class="f-show-table" id="showtable-${tab.id}" ${tab.showTable !== false ? 'checked' : ''}/>
         <label for="showtable-${tab.id}">Afficher le tableau comparatif (matrice globale) sous les cartes</label>
@@ -1166,27 +1291,76 @@
   function renderOneTroopCard(tab, uid, c, cidx) {
     const cuid = uid + '-card-' + cidx;
     const order = (Array.isArray(c.layout) && c.layout.length) ? c.layout : CARD_LAYOUT_DEFAULT;
+    const expanded = EXPANDED_CARDS.has(tab.id + '#' + cidx);
+    // Résumé affiché en tête de carte repliée, pour l'identifier d'un coup d'œil.
+    const nStrips = (c.strips || []).length, nRes = (c.resources || []).length, nStats = (c.stats || []).length;
+    const summaryBits = [];
+    if (nStrips) summaryBits.push(nStrips + ' bande' + (nStrips > 1 ? 's' : '') + ' héros');
+    if (nRes)    summaryBits.push(nRes + ' bande' + (nRes > 1 ? 's' : '') + ' ressources');
+    if (nStats)  summaryBits.push(nStats + ' stat' + (nStats > 1 ? 's' : ''));
+    if (c.carousel && c.carousel.enabled) summaryBits.push('carrousel');
+    if (c.video && c.video.enabled) summaryBits.push('vidéo');
+    const summary = summaryBits.join(' · ');
+    // Génère les 12 panneaux de langue (un par LANGS) partageant l'uid de la carte,
+    // de sorte qu'ils basculent ensemble via le sélecteur de langue en tête de carte,
+    // où qu'ils soient placés dans le corps (à côté de leur encadré).
+    const langField = (renderInner, extraClass = '') => LANGS.map((l, i) =>
+      `<div class="lang-fields${extraClass ? ' ' + extraClass : ''} ${i === 0 ? 'active' : ''}" data-uid="${cuid}" data-lang="${l.code}">${renderInner(l)}</div>`
+    ).join('');
     return `
-      <div class="item-card troop-card" data-cidx="${cidx}" style="padding:12px 16px;">
+      <div class="item-card troop-card${expanded ? ' expanded' : ''}" data-cidx="${cidx}" style="padding:12px 16px;">
         <div class="item-card-header" style="margin:0;">
-          <div class="item-card-title" style="font-size:0.95rem;">
+          <div class="item-card-title" style="font-size:0.95rem; flex-wrap:wrap;">
             <span class="item-card-meta">Carte ${cidx + 1}</span>
             <span>${escapeHtml((c.name && c.name.fr) || (c.tierLabel && c.tierLabel.fr) || '')}</span>
+            ${summary ? `<span class="item-card-meta" style="letter-spacing:0.5px; text-transform:none;">${escapeHtml(summary)}</span>` : ''}
+            ${completenessBadge(countCompleteLangs(cardLangGetters(c)))}
           </div>
           <div class="item-card-actions">
             <div class="order-controls">
               <button class="small card-up" ${cidx === 0 ? 'disabled' : ''}>▲</button>
               <button class="small card-down" ${cidx === tab.cards.length - 1 ? 'disabled' : ''}>▼</button>
             </div>
+            <button class="small card-toggle">${expanded ? 'Réduire' : 'Éditer'}</button>
             <button class="small card-clone" title="Dupliquer cette carte (avec tous ses textes et images)">Dupl.</button>
             <button class="small card-delete danger">Suppr.</button>
           </div>
         </div>
-        <div class="item-card-body" style="display:block; margin-top:10px; padding-top:10px;">
-          <label>Couleur de l'étiquette</label>
-          <select class="f-card-tier" style="width:auto;">
-            ${TIER_COLORS.map(tc => `<option value="${tc.value}" ${c.tier === tc.value ? 'selected' : ''}>${tc.label}</option>`).join('')}
-          </select>
+        <div class="troop-body">
+          <div class="help-text" style="margin-bottom:8px;">Choisissez la langue à éditer : tous les textes de la carte ci-dessous (nom, description, libellés de bandes et de stats…) suivent ce choix.</div>
+          ${langTabsHtml(cuid)}
+
+          <div style="margin-top:12px;">
+            <label>Couleur de l'étiquette</label>
+            <select class="f-card-tier" style="width:auto;">
+              ${TIER_COLORS.map(tc => `<option value="${tc.value}" ${c.tier === tc.value ? 'selected' : ''}>${tc.label}</option>`).join('')}
+            </select>
+          </div>
+          ${langField(l => `
+            <div class="grid-2">
+              <div>
+                <label>Étiquette de couleur (${l.code.toUpperCase()})</label>
+                <input type="text" class="f-card-tierlabel" data-lang="${l.code}" value="${escapeHtml((c.tierLabel && c.tierLabel[l.code]) || '')}"/>
+              </div>
+              <div>
+                <label>Nom de la carte (${l.code.toUpperCase()})</label>
+                <input type="text" class="f-card-name" data-lang="${l.code}" value="${escapeHtml((c.name && c.name[l.code]) || '')}"/>
+              </div>
+            </div>
+            <label>Description (${l.code.toUpperCase()})</label>
+            <div class="rt-toolbar">
+              <button type="button" class="rt-btn" data-fmt="b" title="Gras"><b>G</b></button>
+              <button type="button" class="rt-btn" data-fmt="i" title="Italique"><i>I</i></button>
+              <button type="button" class="rt-btn" data-fmt="u" title="Souligné"><u>S</u></button>
+              <span class="rt-sep"></span>
+              <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="or"     title="Or"     style="color:var(--accent2)">A</button>
+              <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="rouge"  title="Rouge"  style="color:var(--danger)">A</button>
+              <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="vert"   title="Vert"   style="color:var(--green)">A</button>
+              <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="bleu"   title="Bleu"   style="color:var(--blue)">A</button>
+              <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="violet" title="Violet" style="color:var(--violet)">A</button>
+            </div>
+            <textarea class="f-card-desc" data-lang="${l.code}">${escapeHtml((c.desc && c.desc[l.code]) || '')}</textarea>
+          `)}
 
           <div class="section-label" style="margin-top:14px;">Ordre d'affichage des blocs</div>
           <div class="help-text">Le nom et l'étiquette de couleur restent en haut de la carte. Réorganisez le reste (description, bandes, stats, carrousel) avec les flèches.</div>
@@ -1210,6 +1384,10 @@
                   <span class="item-card-meta">Bande ${sidx + 1} — héros affichés</span>
                   <button class="small strip-delete danger">Retirer</button>
                 </div>
+                ${langField(l => `
+                  <label>Libellé (${l.code.toUpperCase()})</label>
+                  <input type="text" class="f-strip-label" data-sidx="${sidx}" data-key="strip${sidx}" data-lang="${l.code}" value="${escapeHtml((s.label && s.label[l.code]) || '')}"/>
+                `)}
                 <div class="hero-pick" data-sidx="${sidx}" style="margin-top:6px;">
                   <span class="item-card-meta">Chargement des images…</span>
                 </div>
@@ -1226,6 +1404,10 @@
                   <span class="item-card-meta">Bande ${ridx + 1} — ressources affichées</span>
                   <button class="small res-delete danger">Retirer</button>
                 </div>
+                ${langField(l => `
+                  <label>Libellé (${l.code.toUpperCase()})</label>
+                  <input type="text" class="f-res-label" data-ridx="${ridx}" data-key="res${ridx}" data-lang="${l.code}" value="${escapeHtml((s.label && s.label[l.code]) || '')}"/>
+                `)}
                 <div class="res-pick" data-ridx="${ridx}" style="margin-top:6px;">
                   <span class="item-card-meta">Chargement des images…</span>
                 </div>
@@ -1236,13 +1418,21 @@
           <div class="section-label" style="margin-top:14px;">Statistiques</div>
           <div class="stats-list">
             ${(c.stats || []).map((st, stidx) => `
-              <div class="stat-edit-row" data-stidx="${stidx}" style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+              <div class="stat-edit-row" data-stidx="${stidx}" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; border:1px solid var(--border); padding:8px 10px; margin-bottom:8px;">
                 <span class="item-card-meta">Stat ${stidx + 1}</span>
-                <label style="margin:0;">couleur valeur</label>
+                <label style="margin:0;">couleur</label>
                 <select class="f-stat-tone" data-stidx="${stidx}" style="width:auto;">
                   ${STAT_TONES.map(tn => `<option value="${tn.value}" ${(st.tone || '') === tn.value ? 'selected' : ''}>${tn.label}</option>`).join('')}
                 </select>
-                <button class="small stat-delete danger">Retirer</button>
+                ${langField(l => `
+                  <label>Libellé (${l.code.toUpperCase()})</label>
+                  <input type="text" class="f-stat-label" data-stidx="${stidx}" data-key="statl${stidx}" data-lang="${l.code}" style="width:140px;" value="${escapeHtml((st.label && st.label[l.code]) || '')}"/>
+                `, 'lang-inline')}
+                ${langField(l => `
+                  <label>Valeur (${l.code.toUpperCase()})</label>
+                  <input type="text" class="f-stat-value" data-stidx="${stidx}" data-key="statv${stidx}" data-lang="${l.code}" style="width:110px;" value="${escapeHtml((st.value && st.value[l.code]) || '')}"/>
+                `, 'lang-inline')}
+                <button class="small stat-delete danger" style="margin-left:auto;">Retirer</button>
               </div>`).join('')}
           </div>
           <button class="small stat-add">+ Ajouter une stat</button>
@@ -1267,49 +1457,13 @@
             <input type="checkbox" class="f-video-enabled" id="video-${cuid}" ${c.video && c.video.enabled ? 'checked' : ''}/>
             <label for="video-${cuid}">Activer une vidéo YouTube</label>
           </div>
-          ${c.video && c.video.enabled ? `<div class="help-text">Renseignez le lien YouTube pour chaque langue ci-dessous, dans l'onglet « Textes ». Si une langue n'a pas de lien, la version française est utilisée à sa place. Une vignette cliquable s'affiche sur le site ; la vidéo ne se charge qu'au clic.</div>` : ''}
-
-          <div class="section-label" style="margin-top:14px;">Textes (par langue)</div>
-          ${langTabsHtml(cuid)}
-          ${LANGS.map((l, i) => `
-            <div class="lang-fields ${i === 0 ? 'active' : ''}" data-uid="${cuid}" data-lang="${l.code}">
-              <label>Étiquette de couleur (${l.code.toUpperCase()})</label>
-              <input type="text" class="f-card-tierlabel" data-lang="${l.code}" value="${escapeHtml((c.tierLabel && c.tierLabel[l.code]) || '')}"/>
-              <label>Nom de la carte (${l.code.toUpperCase()})</label>
-              <input type="text" class="f-card-name" data-lang="${l.code}" value="${escapeHtml((c.name && c.name[l.code]) || '')}"/>
-              <label>Description (${l.code.toUpperCase()})</label>
-              <div class="rt-toolbar">
-                <button type="button" class="rt-btn" data-fmt="b" title="Gras"><b>G</b></button>
-                <button type="button" class="rt-btn" data-fmt="i" title="Italique"><i>I</i></button>
-                <button type="button" class="rt-btn" data-fmt="u" title="Souligné"><u>S</u></button>
-                <span class="rt-sep"></span>
-                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="or"     title="Or"     style="color:var(--accent2)">A</button>
-                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="rouge"  title="Rouge"  style="color:var(--danger)">A</button>
-                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="vert"   title="Vert"   style="color:var(--green)">A</button>
-                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="bleu"   title="Bleu"   style="color:var(--blue)">A</button>
-                <button type="button" class="rt-btn rt-color" data-fmt="c" data-color="violet" title="Violet" style="color:var(--violet)">A</button>
-              </div>
-              <textarea class="f-card-desc" data-lang="${l.code}">${escapeHtml((c.desc && c.desc[l.code]) || '')}</textarea>
-              ${(c.strips || []).map((s, sidx) => `
-                <label>Libellé bande héros ${sidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-strip-label" data-sidx="${sidx}" data-key="strip${sidx}" data-lang="${l.code}" value="${escapeHtml((s.label && s.label[l.code]) || '')}"/>
-              `).join('')}
-              ${(c.resources || []).map((s, ridx) => `
-                <label>Libellé bande ressources ${ridx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-res-label" data-ridx="${ridx}" data-key="res${ridx}" data-lang="${l.code}" value="${escapeHtml((s.label && s.label[l.code]) || '')}"/>
-              `).join('')}
-              ${(c.stats || []).map((st, stidx) => `
-                <label>Libellé stat ${stidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-stat-label" data-stidx="${stidx}" data-key="statl${stidx}" data-lang="${l.code}" value="${escapeHtml((st.label && st.label[l.code]) || '')}"/>
-                <label>Valeur stat ${stidx + 1} (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-stat-value" data-stidx="${stidx}" data-key="statv${stidx}" data-lang="${l.code}" value="${escapeHtml((st.value && st.value[l.code]) || '')}"/>
-              `).join('')}
-              ${c.video && c.video.enabled ? `
-                <label>Lien vidéo YouTube (${l.code.toUpperCase()})</label>
-                <input type="text" class="f-video-url no-translate" data-lang="${l.code}" value="${escapeHtml((c.video.url && c.video.url[l.code]) || '')}" placeholder="https://www.youtube.com/watch?v=..."/>
-              ` : ''}
-            </div>
-          `).join('')}
+          ${c.video && c.video.enabled ? `
+            <div class="help-text">Un lien par langue (celui de la langue sélectionnée en haut de la carte s'affiche ci-dessous). Si une langue n'a pas de lien, la version française est utilisée. La vidéo ne se charge qu'au clic sur la vignette.</div>
+            ${langField(l => `
+              <label>Lien vidéo YouTube (${l.code.toUpperCase()})</label>
+              <input type="text" class="f-video-url" data-lang="${l.code}" value="${escapeHtml((c.video.url && c.video.url[l.code]) || '')}" placeholder="https://www.youtube.com/watch?v=..."/>
+            `)}
+          ` : ''}
         </div>
       </div>
     `;
@@ -1319,9 +1473,10 @@
     ensureTroopsCards(tab);
     bindLangTabs(card);
     const reexpand = () => {
+      // Garde cet onglet ouvert après re-rendu (accordéon : un seul ouvert).
+      EXPANDED_TABS.clear();
+      EXPANDED_TABS.add(tab.id);
       renderTabs();
-      const nc = document.querySelector('.item-card[data-id="' + tab.id + '"]');
-      if (nc) nc.classList.add('expanded');
     };
 
     const showCb = card.querySelector('.f-show-table');
@@ -1331,11 +1486,33 @@
       const cidx = parseInt(cc.dataset.cidx, 10);
       const c = tab.cards[cidx];
 
+      // Repli/dépli de la carte (état conservé au travers des re-rendus).
+      // Accordéon : ouvrir une carte referme les autres cartes de l'onglet.
+      const tkey = tab.id + '#' + cidx;
+      const toggleBtn = cc.querySelector('.card-toggle');
+      if (toggleBtn) toggleBtn.addEventListener('click', () => {
+        const willOpen = !cc.classList.contains('expanded');
+        if (willOpen) {
+          openCardExclusive(tab.id, cidx);
+          card.querySelectorAll('.troop-card').forEach(other => {
+            const isSelf = other === cc;
+            other.classList.toggle('expanded', isSelf);
+            const ob = other.querySelector('.card-toggle');
+            if (ob) ob.textContent = isSelf ? 'Réduire' : 'Éditer';
+          });
+        } else {
+          cc.classList.remove('expanded');
+          EXPANDED_CARDS.delete(tkey);
+          toggleBtn.textContent = 'Éditer';
+        }
+      });
+
       cc.querySelector('.f-card-tier').addEventListener('change', e => { c.tier = e.target.value; });
       cc.querySelector('.card-clone').addEventListener('click', () => {
         // copie profonde : la carte dupliquée doit être indépendante de l'originale
         // (textes i18n, bandes, stats, carrousel imbriqués)
         tab.cards.splice(cidx + 1, 0, JSON.parse(JSON.stringify(c)));
+        openCardExclusive(tab.id, cidx + 1);
         reexpand();
       });
       cc.querySelector('.card-delete').addEventListener('click', () => {
@@ -1506,6 +1683,7 @@
     const addCardBtn = card.querySelector('.add-troop-card');
     if (addCardBtn) addCardBtn.addEventListener('click', () => {
       tab.cards.push({ tier: 'tier-1', tierLabel: {}, name: {}, desc: {}, strips: [], resources: [], stats: [], carousel: { enabled: false, images: [] }, video: { enabled: false, url: {} }, layout: CARD_LAYOUT_DEFAULT.slice() });
+      openCardExclusive(tab.id, tab.cards.length - 1);
       reexpand();
     });
   }
@@ -1809,8 +1987,10 @@
     if (!id) { alert("Identifiant invalide : utilisez des lettres, chiffres, tirets."); return; }
     if (DATA.tabs.find(t => t.id === id)) { alert("Cet identifiant existe déjà."); return; }
     const maxOrder = DATA.tabs.reduce((m, t) => Math.max(m, t.order), -1);
+    // Type « Cartes » par défaut, avec une liste de cartes VIDE : un nouvel onglet ne
+    // doit pas hériter du contenu par défaut (buildDefaultTroopsCards) de l'onglet héros.
     DATA.tabs.push({
-      id, icon: '⭐', order: maxOrder + 1, enabled: true, type: 'custom',
+      id, icon: '⭐', order: maxOrder + 1, enabled: true, type: 'troops', cards: [],
       i18n: { fr: { label: id, title: id.toUpperCase(), sub: '', desc: '' } }
     });
     renderTabs();
@@ -2818,122 +2998,146 @@
     return decodeEntities((data.responseData && data.responseData.translatedText) || '');
   }
 
-  // Ajoute un bouton "Traduire" sous chaque champ français traduisible.
-  function injectTranslateButtons(root) {
-    (root || document).querySelectorAll('.lang-fields[data-lang="fr"]').forEach(frPanel => {
-      const uid = frPanel.dataset.uid || '';
-      frPanel.querySelectorAll('input[type="text"], textarea').forEach(field => {
-        // Certains champs (URL vidéo…) ne sont pas du texte à traduire.
-        if (field.classList.contains('no-translate')) return;
-        const next = field.nextElementSibling;
-        if (next && next.classList && next.classList.contains('tr-btn')) return; // déjà présent
-        const cls = [...field.classList].find(c => c.startsWith('f-'));
-        if (!cls) return;
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'tr-btn';
-        btn.textContent = '🌐 Traduire';
-        btn.title = 'Traduire ce champ français vers les autres langues';
-        btn.dataset.uid = uid;
-        btn.dataset.cls = cls;
-        btn.dataset.key = field.dataset.key || '';
-        field.insertAdjacentElement('afterend', btn);
-      });
-    });
-  }
+  // NB : la traduction se fait désormais uniquement via le bouton global
+  // « Traduire les modifs » (voir translateModifiedFields ci-dessous). Les anciens
+  // boutons « Traduire » par champ (injection dans le DOM + modale d'approbation)
+  // ont été retirés à la demande, car redondants avec le bouton global.
 
-  // Retrouve, pour un champ FR donné, les champs équivalents des autres langues.
-  function findTargetFields(uid, cls, key) {
-    const map = {};
-    TR_TARGETS.forEach(L => {
-      const panel = document.querySelector('.lang-fields[data-uid="' + uid + '"][data-lang="' + L + '"]');
-      if (!panel) return;
-      const candidates = [...panel.querySelectorAll('.' + cls)];
-      const el = candidates.find(e => (e.dataset.key || '') === (key || ''));
-      if (el) map[L] = el;
-    });
-    return map;
-  }
+  // ───────────────────────────────────────────
+  // TRADUCTION GLOBALE — tous les champs FR modifiés depuis le dernier enregistrement
+  // ───────────────────────────────────────────
+  // Parcourt DATA (comparé au dernier état enregistré) et collecte chaque champ dont
+  // la valeur française a changé, sous forme d'un descripteur { fr, apply(props) }.
+  // Deux formes i18n coexistent : « plate » (name/desc/label = {fr,en,…}) et
+  // « imbriquée » (tab.i18n / ui = {fr:{clé:…}, en:{clé:…}}). Les URL vidéo (sous
+  // « video ») ne sont pas du texte à traduire et sont ignorées.
+  function collectModifiedI18n(cur, snap) {
+    const fields = [];
+    const langSet = new Set(LANGS.map(l => l.code));
+    const isLang = k => langSet.has(k);
+    const isObj = o => o && typeof o === 'object' && !Array.isArray(o);
+    const isFlat = o => isObj(o) && typeof o.fr === 'string' && Object.keys(o).every(isLang);
+    const isNested = o => isObj(o) && isObj(o.fr) && Object.keys(o).every(isLang);
 
-  // Délégation : clic sur un bouton "Traduire"
-  document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.tr-btn');
-    if (!btn) return;
-
-    const srcField = btn.previousElementSibling;
-    const text = (srcField && srcField.value || '').trim();
-    if (!text) { alert("Remplissez d'abord le champ français."); return; }
-
-    const targets = findTargetFields(btn.dataset.uid, btn.dataset.cls, btn.dataset.key);
-    if (!Object.keys(targets).length) { alert("Aucun champ cible trouvé."); return; }
-
-    const original = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = '⏳ Traduction...';
-
-    const { props, errs } = await translateAll(text);
-    // ne garder que les langues ayant un champ cible présent
-    const proposals = {}, errors = {};
-    TR_TARGETS.forEach(L => {
-      if (!targets[L]) return;
-      proposals[L] = props[L] || '';
-      if (errs[L]) errors[L] = errs[L];
-    });
-
-    btn.disabled = false;
-    btn.textContent = original;
-    openTranslateModal(text, proposals, errors, targets);
-  });
-
-  // Fenêtre d'approbation : l'utilisateur vérifie/corrige puis applique.
-  function openTranslateModal(source, proposals, errors, targets) {
-    const overlay = document.createElement('div');
-    overlay.className = 'tr-modal-overlay';
-    const rows = TR_TARGETS.filter(L => targets[L]).map(L => `
-      <label>${L.toUpperCase()}</label>
-      <textarea class="tr-prop" data-lang="${L}">${escapeHtml(proposals[L] || '')}</textarea>
-      <div class="tr-row-status">${errors[L] ? ('⚠ ' + escapeHtml(errors[L]) + ' — saisie manuelle possible') : ''}</div>
-    `).join('');
-    overlay.innerHTML = `
-      <div class="tr-modal">
-        <h3>🌐 Traduction automatique</h3>
-        <div class="tr-src"><span>FRANÇAIS (SOURCE)</span>${escapeHtml(source)}</div>
-        <div class="help-text">Vérifiez et corrigez chaque traduction si nécessaire, puis cliquez sur « Appliquer ». Rien n'est modifié tant que vous n'avez pas approuvé.</div>
-        ${rows}
-        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:16px;">
-          <button class="tr-cancel">Annuler</button>
-          <button class="primary tr-apply">✔ Appliquer</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-
-    const close = () => overlay.remove();
-    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
-    overlay.querySelector('.tr-cancel').addEventListener('click', close);
-    overlay.querySelector('.tr-apply').addEventListener('click', () => {
-      overlay.querySelectorAll('.tr-prop').forEach(ta => {
-        const L = ta.dataset.lang;
-        const field = targets[L];
-        if (field) {
-          field.value = ta.value;
-          // déclenche les écouteurs 'input' existants → met à jour DATA
-          field.dispatchEvent(new Event('input', { bubbles: true }));
+    function walk(node, snapNode) {
+      if (!node || typeof node !== 'object') return;
+      if (isFlat(node)) {
+        const fr = String(node.fr || '').trim();
+        const sfr = (snapNode && typeof snapNode.fr === 'string') ? snapNode.fr : '';
+        if (fr && node.fr !== sfr) {
+          fields.push({ fr: node.fr, apply: props => {
+            TR_TARGETS.forEach(L => { if (props[L]) node[L] = props[L]; });
+          }});
         }
-      });
-      close();
-      showToast("Traductions appliquées (pensez à Enregistrer)");
-    });
+        return; // valeurs = chaînes, rien à explorer plus bas
+      }
+      if (isNested(node)) {
+        const frObj = node.fr;
+        const sfrObj = (snapNode && isObj(snapNode.fr)) ? snapNode.fr : {};
+        Object.keys(frObj).forEach(key => {
+          const fr = String(frObj[key] || '').trim();
+          const sfr = (sfrObj[key] == null) ? '' : String(sfrObj[key]);
+          if (fr && frObj[key] !== sfr) {
+            fields.push({ fr: frObj[key], apply: props => {
+              TR_TARGETS.forEach(L => { if (props[L]) { if (!node[L]) node[L] = {}; node[L][key] = props[L]; } });
+            }});
+          }
+        });
+        return;
+      }
+      if (Array.isArray(node)) {
+        node.forEach((v, i) => walk(v, snapNode && snapNode[i]));
+      } else {
+        Object.keys(node).forEach(k => {
+          if (k === 'video') return; // liens vidéo : non traduisibles (no-translate)
+          walk(node[k], snapNode ? snapNode[k] : undefined);
+        });
+      }
+    }
+    walk(cur, snap);
+    return fields;
   }
 
-  // Injecte les boutons à chaque (re)rendu de l'interface.
-  let trScheduled = false;
-  const trObserver = new MutationObserver(() => {
-    if (trScheduled) return;
-    trScheduled = true;
-    requestAnimationFrame(() => { trScheduled = false; injectTranslateButtons(document); });
-  });
-  trObserver.observe(document.body, { childList: true, subtree: true });
-  injectTranslateButtons(document);
+  // Collecte les champs FR remplis dont au moins une langue cible est encore vide.
+  // apply n'écrit QUE les langues manquantes (ne remplace pas les traductions existantes).
+  function collectIncompleteI18n(cur) {
+    const fields = [];
+    const langSet = new Set(LANGS.map(l => l.code));
+    const isLang = k => langSet.has(k);
+    const isObj = o => o && typeof o === 'object' && !Array.isArray(o);
+    const isFlat = o => isObj(o) && typeof o.fr === 'string' && Object.keys(o).every(isLang);
+    const isNested = o => isObj(o) && isObj(o.fr) && Object.keys(o).every(isLang);
+    function walk(node) {
+      if (!node || typeof node !== 'object') return;
+      if (isFlat(node)) {
+        if (String(node.fr || '').trim()) {
+          const missing = TR_TARGETS.filter(L => !String(node[L] || '').trim());
+          if (missing.length) fields.push({ fr: node.fr, apply: props => {
+            missing.forEach(L => { if (props[L]) node[L] = props[L]; });
+          }});
+        }
+        return;
+      }
+      if (isNested(node)) {
+        Object.keys(node.fr).forEach(key => {
+          if (String(node.fr[key] || '').trim()) {
+            const missing = TR_TARGETS.filter(L => !String((node[L] && node[L][key]) || '').trim());
+            if (missing.length) fields.push({ fr: node.fr[key], apply: props => {
+              missing.forEach(L => { if (props[L]) { if (!node[L]) node[L] = {}; node[L][key] = props[L]; } });
+            }});
+          }
+        });
+        return;
+      }
+      if (Array.isArray(node)) node.forEach(walk);
+      else Object.keys(node).forEach(k => { if (k !== 'video') walk(node[k]); });
+    }
+    walk(cur);
+    return fields;
+  }
+
+  // Boucle de traduction commune aux deux boutons (modifs / complétion).
+  async function runTranslation(fields, btnId, emptyMsg) {
+    if (!fields.length) { showToast(emptyMsg); return; }
+    const btn = document.getElementById(btnId);
+    const original = btn ? btn.textContent : '';
+    if (btn) btn.disabled = true;
+    let done = 0, failed = 0;
+    for (let i = 0; i < fields.length; i++) {
+      if (btn) btn.textContent = `⏳ Traduction ${i + 1}/${fields.length}…`;
+      try {
+        const { props } = await translateAll(fields[i].fr);
+        const got = TR_TARGETS.some(L => props[L]);
+        fields[i].apply(props);
+        if (got) done++; else failed++;
+      } catch (e) { failed++; }
+    }
+    if (btn) { btn.disabled = false; btn.textContent = original; }
+    renderAll();
+    updateDirtyUI();
+    showToast(`${done} champ(s) traduit(s) vers les autres langues${failed ? ` — ${failed} en échec` : ''} (pensez à Enregistrer)`, failed > 0, 6000);
+  }
+
+  async function translateModifiedFields() {
+    if (!DATA) return;
+    let snap = {};
+    try { snap = SAVED_SNAPSHOT ? JSON.parse(SAVED_SNAPSHOT) : {}; } catch (e) { snap = {}; }
+    await runTranslation(collectModifiedI18n(DATA, snap), 'translate-modified-btn',
+      "Aucun champ français modifié à traduire depuis le dernier enregistrement");
+  }
+
+  async function translateMissingFields() {
+    if (!DATA) return;
+    await runTranslation(collectIncompleteI18n(DATA), 'translate-missing-btn',
+      "Toutes les traductions sont déjà complètes");
+  }
+
+  {
+    const tmBtn = document.getElementById('translate-modified-btn');
+    if (tmBtn) tmBtn.addEventListener('click', translateModifiedFields);
+    const tgBtn = document.getElementById('translate-missing-btn');
+    if (tgBtn) tgBtn.addEventListener('click', translateMissingFields);
+  }
 </script>
 </body>
 </html>
