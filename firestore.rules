@@ -1,0 +1,133 @@
+rules_version = '2';
+
+// Règles de sécurité Firestore du wiki NK2 (« Land of Jail »).
+//
+// Modèle : le site public écrit SANS authentification dans `messages`, `reports`
+// et `visits` (tchat, signalements, analytics). Toute la protection anti-abus du
+// client (cooldown, honeypot, slice) est contournable en écrivant directement via
+// le SDK — la clé API Firebase est publique par nature. Ces règles sont donc la
+// SEULE défense serveur : elles bornent chaque champ exactement comme le client.
+//
+// « Admin » = tout utilisateur authentifié. Il n'existe aucune inscription
+// publique dans le code (pas de createUserWithEmailAndPassword) : seul le compte
+// admin créé manuellement dans la console Firebase peut donc s'authentifier.
+// IMPORTANT : garder l'inscription désactivée dans Firebase Auth. Pour verrouiller
+// davantage, remplacer isAdmin() par une comparaison d'UID (voir plus bas).
+//
+// Déploiement : `firebase deploy --only firestore:rules`, ou copier ce contenu
+// dans la console Firebase (Firestore → Règles). Non déployé par GitHub Pages.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Seul compte autorisé à administrer le contenu et à modérer.
+    function isAdmin() {
+      return request.auth != null;
+      // Variante stricte par UID (décommenter et renseigner l'UID admin) :
+      // return request.auth != null
+      //   && request.auth.uid == 'REMPLACER_PAR_UID_ADMIN';
+    }
+
+    // Un champ est une chaîne dont la longueur est dans [min, max].
+    function isStr(v, min, max) {
+      return v is string && v.size() >= min && v.size() <= max;
+    }
+
+    // À la création avec serverTimestamp(), la valeur vaut request.time.
+    function createdNow(data) {
+      return data.createdAt == request.time;
+    }
+
+    // ── site/content : document unique, cœur du wiki ──
+    // Lecture publique (premier rendu + réconciliation). Écriture admin seule.
+    // Aucune validation de forme : le schéma évolue et doit rester rétrocompatible.
+    match /site/content {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    // Rien d'autre n'est autorisé sous la collection `site`.
+    match /site/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── messages : tchat multilingue public ──
+    // Lecture publique (abonnement temps réel). Création publique validée.
+    // Modification interdite à tous ; suppression réservée à la modération admin.
+    match /messages/{msgId} {
+      allow read: if true;
+
+      allow create: if
+        request.resource.data.keys().hasOnly(
+          ['name', 'text', 'src', 'i18n', 'createdAt']) &&
+        isStr(request.resource.data.name, 1, 40) &&
+        isStr(request.resource.data.text, 1, 500) &&
+        isStr(request.resource.data.src, 1, 8) &&
+        request.resource.data.i18n is map &&
+        request.resource.data.i18n.keys().size() <= 12 &&
+        request.resource.data.i18n.keys().hasOnly(
+          ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh']) &&
+        createdNow(request.resource.data);
+
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ── reports : formulaire « 📝 Signaler » ──
+    // Création publique validée. Lecture / changement de statut / suppression admin.
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+
+      allow create: if
+        request.resource.data.keys().hasOnly(
+          ['tabs','tabLabels','lang','context','proposal','reporter','status','createdAt']) &&
+        request.resource.data.tabs is list &&
+        request.resource.data.tabs.size() > 0 &&
+        request.resource.data.tabs.size() <= 20 &&
+        request.resource.data.tabLabels is list &&
+        request.resource.data.tabLabels.size() <= 20 &&
+        isStr(request.resource.data.lang, 0, 8) &&
+        isStr(request.resource.data.context, 1, 4000) &&
+        isStr(request.resource.data.proposal, 0, 4000) &&
+        isStr(request.resource.data.reporter, 0, 60) &&
+        request.resource.data.status == 'new' &&
+        createdNow(request.resource.data);
+
+      // La modération ne modifie que le statut ; le reste du document est figé.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+
+      allow delete: if isAdmin();
+    }
+
+    // ── visits : analytics anonymes ──
+    // Création publique validée. Lecture (stats) admin seule ; jamais modifiable.
+    match /visits/{visitId} {
+      allow read: if isAdmin();
+
+      allow create: if
+        request.resource.data.keys().hasOnly(
+          ['ts','createdAt','vid','returning','bl','ref',
+           'device','browser','os','country','scr']) &&
+        request.resource.data.ts is int &&
+        request.resource.data.returning is bool &&
+        isStr(request.resource.data.vid, 0, 40) &&
+        isStr(request.resource.data.bl, 0, 12) &&
+        isStr(request.resource.data.ref, 0, 80) &&
+        isStr(request.resource.data.device, 0, 40) &&
+        isStr(request.resource.data.browser, 0, 40) &&
+        isStr(request.resource.data.os, 0, 40) &&
+        isStr(request.resource.data.country, 0, 60) &&
+        isStr(request.resource.data.scr, 0, 16) &&
+        createdNow(request.resource.data);
+
+      allow update, delete: if false;
+    }
+
+    // ── Refus par défaut ──
+    // Toute collection non listée ci-dessus est inaccessible (lecture et écriture).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
