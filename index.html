@@ -128,7 +128,15 @@
       overflow-x: auto; cursor: grab; scroll-behavior: smooth;
       /* Masque la barre de défilement horizontal (PC) tout en gardant le défilement */
       scrollbar-width: none; -ms-overflow-style: none;
+      /* Fondu progressif du côté où il reste des onglets à défiler (classes posées en JS).
+         Sans classe : masque opaque = aucun fondu. Le fondu adoucit l'onglet coupé et
+         signale qu'il reste du contenu de ce côté. */
+      --fade-l: #000 0; --fade-r: #000 100%;
+      -webkit-mask-image: linear-gradient(90deg, var(--fade-l), var(--fade-r));
+              mask-image: linear-gradient(90deg, var(--fade-l), var(--fade-r));
     }
+    .nav-inner.fade-start { --fade-l: transparent 0, #000 32px; }
+    .nav-inner.fade-end   { --fade-r: #000 calc(100% - 32px), transparent 100%; }
     .nav-inner::-webkit-scrollbar { display: none; height: 0; }
     .nav-inner.dragging { cursor: grabbing; scroll-behavior: auto; user-select: none; }
     .nav-inner.dragging .nav-btn { pointer-events: none; }
@@ -140,7 +148,7 @@
       white-space: nowrap; display: flex; align-items: center; gap: 8px; position: relative; top: 1px;
       flex: 0 0 auto; box-sizing: border-box;
     }
-    .tab-icon-img { width: 1.8em; height: 1.8em; object-fit: contain; vertical-align: -0.2em; flex: 0 0 auto; }
+    .tab-icon-img { width: 1.8em; height: 1.8em; object-fit: contain; vertical-align: -0.2em; flex: 0 0 auto; -webkit-user-drag: none; user-select: none; }
     .nav-btn:hover { color: var(--text); background: var(--card2); }
     .nav-btn.active {
       color: #1b1e24; background: linear-gradient(180deg, #f4f5f8, #e4e7ec);
@@ -558,7 +566,9 @@
     if (!icon) return '';
     if (ICON_IMG_RE.test(icon)) {
       // Dimensionnée en 1.2em via CSS (.tab-icon-img) → même taille que l'emoji du contexte.
-      return `<img class="tab-icon-img" src="${ICON_BASE}${escapeAttr(icon)}" alt="" width="24" height="24" decoding="async">`;
+      // draggable="false" : sans cela, saisir l'icône démarre le drag&drop natif de
+      // l'image et vole le glissement de la barre (le défilement ne se déclenche plus).
+      return `<img class="tab-icon-img" src="${ICON_BASE}${escapeAttr(icon)}" alt="" width="24" height="24" decoding="async" draggable="false">`;
     }
     return icon;
   }
@@ -857,7 +867,19 @@
     navInner.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => { PENDING_HASH = ''; showSection(btn.dataset.tab); });
     });
+    updateNavFade();
     // L'onglet actif est choisi de façon centralisée dans render() (cf. pickActiveTab).
+  }
+
+  // Pose les classes de fondu selon la position de défilement : fondu à gauche s'il
+  // reste des onglets avant, à droite s'il en reste après (voir CSS .fade-start/.fade-end).
+  function updateNavFade() {
+    const el = document.getElementById('nav-inner');
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const x = el.scrollLeft;
+    el.classList.toggle('fade-start', x > 1);
+    el.classList.toggle('fade-end', x < max - 1);
   }
 
   // Détermine l'onglet à afficher : l'ancre d'ouverture encore en attente prime
@@ -2061,6 +2083,10 @@
       el.scrollLeft += e.deltaY;
       e.preventDefault();
     }, { passive: false });
+    // Réévalue le fondu des extrémités au défilement et au redimensionnement.
+    el.addEventListener('scroll', updateNavFade, { passive: true });
+    window.addEventListener('resize', updateNavFade);
+    updateNavFade();
   }
 
   initLang();
