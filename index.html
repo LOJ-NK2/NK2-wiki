@@ -467,6 +467,7 @@
     <button class="lang-btn" data-lang="de" aria-label="Deutsch" title="Deutsch">🇩🇪</button>
     <button class="lang-btn" data-lang="es" aria-label="Español" title="Español">🇪🇸</button>
     <button class="lang-btn" data-lang="zh" aria-label="中文" title="中文">🇨🇳</button>
+    <button class="lang-btn" data-lang="vi" aria-label="Tiếng Việt" title="Tiếng Việt">🇻🇳</button>
   </div>
 </div>
 
@@ -678,13 +679,13 @@
   // Toutes les langues cibles de traduction (identiques aux langues du site).
   // Le worker DeepL auto-détecte la langue source du message.
   const CHAT_PROXY_URL = 'https://nk2-translate.yannalogik.workers.dev';
-  const CHAT_TR_TARGETS = ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh'];
+  const CHAT_TR_TARGETS = ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh','vi'];
   const CHAT_NAME_MAX = 40;
   const CHAT_TEXT_MAX = 500;
   const CHAT_COOLDOWN_MS = 3000;   // anti-spam : délai minimal entre deux envois
   const CHAT_MAX_SHOWN = 80;       // nombre de messages conservés/affichés
 
-  // Libellés du tchat pour les 12 langues du site (repli sur le français si une
+  // Libellés du tchat pour les 13 langues du site (repli sur le français si une
   // clé manque, cohérent avec le motif existant).
   const CHAT_I18N = {
     fr: { navLabel: "Tchat", title: "Tchat", 
@@ -742,11 +743,16 @@
       empty: "Aún no hay mensajes. ¡Empieza la conversación!", loading: "Cargando el chat…",
       needName: "Elige un apodo.", needText: "Escribe un mensaje.", error: "Error al enviar. Inténtalo de nuevo.",
       tooFast: "Tranquilo… espera unos segundos.", showOrig: "ver original", hideOrig: "ocultar original" },
-    zh: { navLabel: "聊天", title: "聊天", 
+    zh: { navLabel: "聊天", title: "聊天",
       nameLabel: "昵称", namePh: "你的昵称", msgPh: "你的消息…", send: "发送", sending: "发送中…",
       empty: "还没有消息。开始对话吧！", loading: "正在加载聊天…",
       needName: "请选择一个昵称。", needText: "请输入消息。", error: "发送失败。请重试。",
-      tooFast: "慢一点…请等几秒钟。", showOrig: "查看原文", hideOrig: "隐藏原文" }
+      tooFast: "慢一点…请等几秒钟。", showOrig: "查看原文", hideOrig: "隐藏原文" },
+    vi: { navLabel: "Trò chuyện", title: "Trò chuyện",
+      nameLabel: "Biệt danh", namePh: "Biệt danh của bạn", msgPh: "Tin nhắn của bạn…", send: "Gửi", sending: "Đang gửi…",
+      empty: "Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!", loading: "Đang tải trò chuyện…",
+      needName: "Hãy chọn một biệt danh.", needText: "Hãy viết một tin nhắn.", error: "Gửi không thành công. Vui lòng thử lại.",
+      tooFast: "Từ từ… hãy đợi vài giây.", showOrig: "xem bản gốc", hideOrig: "ẩn bản gốc" }
   };
   function ci(key) {
     return (CHAT_I18N[currentLang] || CHAT_I18N.fr)[key] || CHAT_I18N.fr[key] || '';
@@ -1351,7 +1357,8 @@
       ['fr','🇫🇷 Français'],['en','🇬🇧 English'],['it','🇮🇹 Italiano'],
       ['pt','🇧🇷 Português'],['ar','🇸🇦 العربية'],['ja','🇯🇵 日本語'],
       ['id','🇮🇩 Bahasa Indonesia'],['tr','🇹🇷 Türkçe'],['pl','🇵🇱 Polski'],
-      ['de','🇩🇪 Deutsch'],['es','🇪🇸 Español'],['zh','🇨🇳 中文']
+      ['de','🇩🇪 Deutsch'],['es','🇪🇸 Español'],['zh','🇨🇳 中文'],
+      ['vi','🇻🇳 Tiếng Việt']
     ].map(([c,l]) => `<option value="${c}" ${c===currentLang?'selected':''}>${l}</option>`).join('');
 
     return `
@@ -1822,7 +1829,7 @@
 
   // Langue initiale : préférence mémorisée, sinon langue du navigateur si gérée, sinon FR.
   function initLang() {
-    const supported = ['fr', 'en', 'it', 'pt', 'ar', 'ja', 'id', 'tr', 'pl', 'de', 'es', 'zh'];
+    const supported = ['fr', 'en', 'it', 'pt', 'ar', 'ja', 'id', 'tr', 'pl', 'de', 'es', 'zh', 'vi'];
     let lang = '';
     try { lang = localStorage.getItem('nk2_lang') || ''; } catch (e) {}
     if (!supported.includes(lang)) {

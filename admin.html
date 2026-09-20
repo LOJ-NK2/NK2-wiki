@@ -474,7 +474,8 @@
     { code: 'pl', label: '🇵🇱 PL' },
     { code: 'de', label: '🇩🇪 DE' },
     { code: 'es', label: '🇪🇸 ES' },
-    { code: 'zh', label: '🇨🇳 ZH' }
+    { code: 'zh', label: '🇨🇳 ZH' },
+    { code: 'vi', label: '🇻🇳 VI' }
   ];
 
   let DATA = null;
@@ -732,7 +733,7 @@
     // que l'éditeur affiche les valeurs actuelles du site et qu'un enregistrement
     // les propage à Firestore. Ne touche jamais aux valeurs déjà saisies.
     if (!DATA.ui || typeof DATA.ui !== 'object') DATA.ui = {};
-    ['fr', 'en', 'it', 'pt', 'ar', 'ja', 'id', 'tr', 'pl', 'de', 'es', 'zh'].forEach(code => {
+    ['fr', 'en', 'it', 'pt', 'ar', 'ja', 'id', 'tr', 'pl', 'de', 'es', 'zh', 'vi'].forEach(code => {
       if (!DATA.ui[code]) DATA.ui[code] = {};
       const bag = DATA.ui[code];
       Object.keys(UI_HEADER_DEFAULTS).forEach(k => {
@@ -776,7 +777,7 @@
       heroFiles: {},
       resourceNames: {},
       events: [],
-      ui: { fr: {}, en: {}, it: {}, pt: {}, ar: {}, ja: {}, id: {}, tr: {}, pl: {}, de: {}, es: {}, zh: {} }
+      ui: { fr: {}, en: {}, it: {}, pt: {}, ar: {}, ja: {}, id: {}, tr: {}, pl: {}, de: {}, es: {}, zh: {}, vi: {} }
     };
   }
 
@@ -2721,10 +2722,10 @@
 
   function normLang(bl) {
     const c = String(bl || '').slice(0, 2).toLowerCase();
-    return ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh'].includes(c) ? c : 'autre';
+    return ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh','vi'].includes(c) ? c : 'autre';
   }
   function langLabel(code) {
-    return { fr:'Français', en:'Anglais', it:'Italien', pt:'Portugais', ar:'Arabe', ja:'Japonais', id:'Indonésien', tr:'Turc', pl:'Polonais', de:'Allemand', es:'Espagnol', zh:'Chinois', autre:'Autre' }[code] || 'Autre';
+    return { fr:'Français', en:'Anglais', it:'Italien', pt:'Portugais', ar:'Arabe', ja:'Japonais', id:'Indonésien', tr:'Turc', pl:'Polonais', de:'Allemand', es:'Espagnol', zh:'Chinois', vi:'Vietnamien', autre:'Autre' }[code] || 'Autre';
   }
 
   let _regionNames = null;
@@ -2920,7 +2921,7 @@
   // ───────────────────────────────────────────
   // AUTO-TRADUCTION (FR → autres langues)
   // ───────────────────────────────────────────
-  const TR_TARGETS = ['en', 'it', 'pt', 'ar', 'ja', 'id', 'tr', 'pl', 'de', 'es', 'zh'];
+  const TR_TARGETS = ['en', 'it', 'pt', 'ar', 'ja', 'id', 'tr', 'pl', 'de', 'es', 'zh', 'vi'];
 
   // ===== QUALITÉ DE TRADUCTION =====
   // Vide  = MyMemory (gratuit, qualité moyenne, aucune installation).
@@ -2929,7 +2930,7 @@
   const TRANSLATE_PROXY_URL = 'https://nk2-translate.yannalogik.workers.dev'; //'https://nk2-translate.yannalogik.workers.dev';
 
   // Codes attendus par l'API MyMemory (repli)
-  const MM_LANG = { en: 'en-GB', it: 'it-IT', pt: 'pt-BR', ar: 'ar-SA', ja: 'ja-JP', id: 'id-ID', tr: 'tr-TR', pl: 'pl-PL', de: 'de-DE', es: 'es-ES', zh: 'zh-CN' };
+  const MM_LANG = { en: 'en-GB', it: 'it-IT', pt: 'pt-BR', ar: 'ar-SA', ja: 'ja-JP', id: 'id-ID', tr: 'tr-TR', pl: 'pl-PL', de: 'de-DE', es: 'es-ES', zh: 'zh-CN', vi: 'vi-VN' };
 
   function escapeHtml(s) {
     return String(s == null ? '' : s)

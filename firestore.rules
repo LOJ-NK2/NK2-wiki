@@ -64,9 +64,9 @@ service cloud.firestore {
         isStr(request.resource.data.text, 1, 500) &&
         isStr(request.resource.data.src, 1, 8) &&
         request.resource.data.i18n is map &&
-        request.resource.data.i18n.keys().size() <= 12 &&
+        request.resource.data.i18n.keys().size() <= 13 &&
         request.resource.data.i18n.keys().hasOnly(
-          ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh']) &&
+          ['fr','en','it','pt','ar','ja','id','tr','pl','de','es','zh','vi']) &&
         createdNow(request.resource.data);
 
       allow update: if false;
